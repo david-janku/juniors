@@ -101,18 +101,6 @@ total <- cosine[,0]
 total$avg <- rowMeans(cosine) #tady průměruju všechny cosiny od každé publikace zvlášť - průměr možná není to co bych s tím měl dělat, ale potřeboval jsem z toho dostat jedno číslo za každou publikaci abych mohl udělat t-test
 total$id <- c(1:465) #tady jsem vzdal párování datasetů a prostě jsem každé publikaci se setu 465 publikací dal ID od 1-465a, bych to konečně mohl aspon nějak spárovat s tím setem 561 publikací
 
-save(total, file = paste(root.direct,c("total.Rdata"), sep=""))
-
-text <- as.data.table(text)
-total <- as.data.table(total)
-
-total2 <- merge.data.table(text, total, by.y = "id", by.x = "ID_core_pubs", all = TRUE) #tady páruju ty datasety
-
-
-
-
-
-
 
 #random poznamky a věci co jsem zkoušel a nefungovali
 
@@ -135,6 +123,15 @@ names(total)
 ?names
 
 # konec random poznamek
+
+
+save(total, file = paste(root.direct,c("total.Rdata"), sep=""))
+
+text <- as.data.table(text)
+total <- as.data.table(total)
+
+total2 <- merge.data.table(text, total, by.y = "id", by.x = "ID_core_pubs", all = TRUE) #tady páruju ty datasety
+
 
 # tady binarizuju celkově 8 řešitelů do 2 skupin (arbitrárně) 
 total2$ID_recipient <- replace(total2$ID_recipient, total2$ID_recipient>4,6) 
