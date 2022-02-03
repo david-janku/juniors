@@ -6,6 +6,7 @@
 
 # install.packages("data.table")
 library(data.table)
+require(data.table)
 root.direct = here::here()
 text = fread(here::here(root.direct, 'data_core_pubs_trim.csv'))
 all.text = text$pubs_title
@@ -13,10 +14,10 @@ corpus = tolower(all.text)
 
 # install.packages("quanteda")
 library(quanteda)
-tokens = tokens(corpus, what = "word", 
+tokens <-  tokens(corpus, what = "word", 
                 remove_numbers = F, remove_punct = T,
                 remove_symbols = F, remove_hyphens = F)
-tokens = tokens_wordstem(tokens, language="english")
+tokens <-  tokens_wordstem(tokens, language="english")
 stopwords("english")
 sw = unique(c(stopwords("english"),"also","e.g", "can","includ","said","first","wherein","other","made","make", "later",  "copyright", "fig", "figur", "tabl", "description", "describ"))
 tokens = tokens_select(tokens, sw,  selection = "remove")
@@ -47,9 +48,9 @@ library("ldatuning")
 load(here::here(root.direct, "dfm_min10_full_text.Rdata"))
 set.seed(123)
 
-dfm = dfm[which(rowSums(dfm) > 0),] #tady v tomto momentě mi zmizí asi 100 datapointů a nevím proč - vytvoří to ale komplikaci níže 
+dfm <- dfm[which(rowSums(dfm) > 0),] #tady v tomto momentě mi zmizí asi 100 datapointů a nevím proč - vytvoří to ale komplikaci níže 
 dim(dfm)
-dtm = convert(dfm,to="topicmodels")
+dtm <- convert(dfm,to="topicmodels")
 dim(dtm)
 
 result <- FindTopicsNumber(
@@ -76,24 +77,34 @@ dim(dtm)
 lda.model = LDA(dtm,k = 15, control = list(seed = 123),alpha = 0.1, beta = 0.01 , verbose=1) 
 save(lda.model, file = here::here(root.direct, "lda_full_text_15_topics_min10.RDS"))
 
+rowSums(lda.matrix)
+
 lda.matrix = posterior(lda.model,dfm)$topics
 dim(lda.matrix) 
 
 save(lda.matrix, file = here::here(root.direct, "topic_dist_full_text_15_topics_min10.Rdata"))
-library('data.table') 
-library('ggplot2')
+library(data.table) 
+library(ggplot2)
 
 #tady už se odchyluju od toho původního kódu a snažím se spočítat cosine distatnce s použitím loadingů každé publikace ke každému z 15 témat 
 
 # install.packages("lsa")
 library(lsa)
-data <- as.matrix(lda.matrix)
-data <- as.data.frame(t(data))
+# data <- as.matrix(lda.matrix)
+data <- as.data.frame(t(lda.matrix))
 data <- as.matrix(data)
 
-cosine <- cosine(data)
+cosine_matrix <- lsa::cosine(data)
 
-save(cosine, file = here::here(root.direct, "cosine.Rdata"))
+ 
+data_test[,-1] %>% dim()
+
+data_test <- cosine_matrix %>% 
+    as.data.frame() %>% 
+    rownames_to_column("name") %>% 
+    as_tibble() %>%
+    inner_join(enframe(all.text, value = "title") %>% mutate(name = as.character(name)))
+
 
 #tady jsem narazil na ten výše zmiňovaný problém - mám matici cosinů 465 publikací, ale můj celkový vzorek se kterým se to snažím matchovat má 561 publikací. V matici cosinů má každá publikace "name" které odpovídá ID_core_pubs v tom setu 561 publikací, ale nenašel jsem způsob jak spárovat tyhle dva datasety.
 
