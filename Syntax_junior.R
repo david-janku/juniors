@@ -1,17 +1,17 @@
-install.packages("cli", repos = "https://cran.rstudio.com/")
-install.packages("dplyr")
+# install.packages("cli", repos = "https://cran.rstudio.com/")
+# install.packages("dplyr")
 
 
 #postup na základě tohoto kódu https://bixuansunphd.com/N-R_tutorial.html#overview
 
-install.packages("data.table")
+# install.packages("data.table")
 library(data.table)
-root.direct = c("C:/R/Juniori/")
-text = fread(paste(root.direct, 'data_core_pubs_trim.csv', sep=""))
+root.direct = here::here()
+text = fread(here::here(root.direct, 'data_core_pubs_trim.csv'))
 all.text = text$pubs_title
 corpus = tolower(all.text)
 
-install.packages("quanteda")
+# install.packages("quanteda")
 library(quanteda)
 tokens = tokens(corpus, what = "word", 
                 remove_numbers = F, remove_punct = T,
@@ -35,16 +35,16 @@ C = terms[grep("[0-9][0-9][A-Za-z]",terms,perl = T)]
 D = terms[grep("[A-Za-z][0-9][0-9]",terms,perl = T)] 
 dfm = dfm[,terms]
 dim(dfm) 
-save(dfm, file = paste(root.direct,c("dfm_min10_full_text.Rdata"), sep=""))
-install.packages("topicmodels")
-install.packages("ggplot2")
-install.packages("scales")
-install.packages("ldatuning")
+save(dfm, file = here::here(root.direct,"dfm_min10_full_text.Rdata"))
+# install.packages("topicmodels")
+# install.packages("ggplot2")
+# install.packages("scales")
+# install.packages("ldatuning")
 library("topicmodels")
 library("ggplot2")
 library("scales")
 library("ldatuning")
-load(paste(root.direct,c("dfm_min10_full_text.Rdata"), sep=""))
+load(here::here(root.direct, "dfm_min10_full_text.Rdata"))
 set.seed(123)
 
 dfm = dfm[which(rowSums(dfm) > 0),] #tady v tomto momentě mi zmizí asi 100 datapointů a nevím proč - vytvoří to ale komplikaci níže 
@@ -65,7 +65,7 @@ result <- FindTopicsNumber(
 
 FindTopicsNumber_plot(result)
 
-install.packages("tidytext")
+# install.packages("tidytext")
 library("topicmodels")
 library("tidytext")
 library("tm")
@@ -74,18 +74,18 @@ dfm = dfm[which(rowSums(dfm) > 0),]
 dtm = convert(dfm,to="topicmodels")
 dim(dtm)
 lda.model = LDA(dtm,k = 15, control = list(seed = 123),alpha = 0.1, beta = 0.01 , verbose=1) 
-save(lda.model, file = paste(root.direct,c("lda_full_text_15_topics_min10.RDS"), sep=""))
+save(lda.model, file = here::here(root.direct, "lda_full_text_15_topics_min10.RDS"))
 
 lda.matrix = posterior(lda.model,dfm)$topics
 dim(lda.matrix) 
 
-save(lda.matrix, file = paste(root.direct,c("topic_dist_full_text_15_topics_min10.Rdata"), sep=""))
+save(lda.matrix, file = here::here(root.direct, "topic_dist_full_text_15_topics_min10.Rdata"))
 library('data.table') 
 library('ggplot2')
 
 #tady už se odchyluju od toho původního kódu a snažím se spočítat cosine distatnce s použitím loadingů každé publikace ke každému z 15 témat 
 
-install.packages("lsa")
+# install.packages("lsa")
 library(lsa)
 data <- as.matrix(lda.matrix)
 data <- as.data.frame(t(data))
@@ -93,7 +93,7 @@ data <- as.matrix(data)
 
 cosine <- cosine(data)
 
-save(cosine, file = paste(root.direct,c("cosine.Rdata"), sep=""))
+save(cosine, file = here::here(root.direct, "cosine.Rdata"))
 
 #tady jsem narazil na ten výše zmiňovaný problém - mám matici cosinů 465 publikací, ale můj celkový vzorek se kterým se to snažím matchovat má 561 publikací. V matici cosinů má každá publikace "name" které odpovídá ID_core_pubs v tom setu 561 publikací, ale nenašel jsem způsob jak spárovat tyhle dva datasety.
 
@@ -125,7 +125,7 @@ names(total)
 # konec random poznamek
 
 
-save(total, file = paste(root.direct,c("total.Rdata"), sep=""))
+save(total, file = here::here(root.direct, "total.Rdata"))
 
 text <- as.data.table(text)
 total <- as.data.table(total)
