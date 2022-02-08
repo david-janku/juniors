@@ -34,19 +34,27 @@ read_csv2(here::here("data_core_pubs_trim.csv"))
 
 # Text pre-processing
 
-```{targets}
+```{targets pre_processing}
 list(
-    tar_target(corpus,
-               extract_corpus(texts)),
-    tar_target(tokens,
-               process_tokens(corpus, texts))
+tar_target(corpus,
+           extract_corpus(texts)),
+
+tar_target(tokens,
+           process_tokens(corpus, texts)),
+
+tar_target(dfm_object,
+           create_dfm(tokens))
 )
+
 ```
 
 # Check results
 
 ```{r}
-tar_read(tokens)
+head(tar_read(tokens))
+
+dim(tar_read(dfm_object))
+
 ```
 
 etc... rinse and repeat
