@@ -3,3 +3,7 @@
 .RData
 .Ruserdata
 .Rdata
+_targets/
+_targets_r/
+*.html
+
