@@ -7,3 +7,4 @@ _targets/
 _targets_r/
 *.html
 
+.DS_Store
