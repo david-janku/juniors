@@ -8,7 +8,7 @@
 library(data.table)
 require(data.table)
 root.direct = here::here()
-text = fread(here::here(root.direct, 'data_core_pubs_trim.csv'))
+text = fread(here::here("data", "raw", "data_core_pubs_trim.csv"))
 all.text = text$pubs_title
 corpus = tolower(all.text)
 

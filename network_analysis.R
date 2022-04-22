@@ -14,7 +14,7 @@ library(DiagrammeR)
 
 #creating coauthorship network - this didnt work - below trying adapting code from: https://stackoverflow.com/questions/33540449/creating-an-edge-list-from-co-authorship-data
 
-oneauth <- read.csv2("C:\\R\\Juniors\\Binter_pubs.csv")
+oneauth <- read.csv2(here::here("data", "raw", "Binter_pubs.csv"))
 
 split_authors <- strsplit(as.character(oneauth$list), ':')
 head(split_authors)
@@ -118,7 +118,7 @@ clustering <-
         isolates = c("NaN", "zero")
 )
 
-#vypočtení finálního skoru indepependence
+#vypočtení finálního skoru independence
 RII = ((1-supeig)+clustering)/2
 
 #vypočtení tematickeho překryvu
@@ -187,14 +187,14 @@ dfm = dfm[which(rowSums(dfm) > 0),]
 dtm = convert(dfm,to="topicmodels")
 dim(dtm)
 lda.model = LDA(dtm,k = 15, control = list(seed = 123),alpha = 0.1, beta = 0.01 , verbose=1) 
-save(lda.model, file = here::here(root.direct, "lda_full_text_15_topics_min10.RDS"))
+save(lda.model, file = here::here(root.direct, "bitner_lda_full_text_15_topics_min10.RDS"))
 
 rowSums(lda.matrix)
 
 lda.matrix = posterior(lda.model,dfm)$topics
 dim(lda.matrix) 
 
-save(lda.matrix, file = here::here(root.direct, "topic_dist_full_text_15_topics_min10.Rdata"))
+save(lda.matrix, file = here::here(root.direct, "bitner_topic_dist_full_text_15_topics_min10.Rdata"))
 library(data.table) 
 library(ggplot2)
 
