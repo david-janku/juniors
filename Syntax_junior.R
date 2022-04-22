@@ -159,4 +159,4 @@ t.test(total2$avg~total2$ID_recipient, paired=FALSE)
 # něco v tom testu vyjde, ale ve skutečnosti to smysl nedává, protože 1) skupiny které porovnávám jsou vybráné arbitrárně a není za tím žádná teorie; 2) nepodařilo se mi zpárovat těchz 465 publikací se skutečnými 561 publikacemi, takže se to spárovalo nesprávně a tedy to není vypovídající 
 
 #test version control
-neco 
+1245
