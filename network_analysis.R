@@ -204,3 +204,15 @@ data <- as.data.frame(t(lda.matrix))
 data <- as.matrix(data)
 
 cosine_matrix <- lsa::cosine(data)
+
+
+# radim kod
+# edgelist_df <- dat %>% group_by(name) %>% 
+#   right_join(dat, by = "name") %>% 
+#   filter(value.x != value.y) %>% 
+#   mutate(from = pmin(value.x, value.y),
+#          to = pmax(value.x, value.y)) %>% 
+#   select(pub_id = name, from, to) %>% 
+#   distinct() %>% 
+#   ungroup()
+# AuthorGraph2 <- graph_from_edgelist(as.matrix(edgelist_df %>% select(-pub_id)), directed = FALSE)
