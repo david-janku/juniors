@@ -21,6 +21,25 @@ head(split_authors)
 
 dat <- rbind(split_authors)
 
+
+# radim kod - vyhazuje mi to error se kterým nevím co dělat
+ edgelist_df <- dat %>% group_by(name) %>% 
+   right_join(dat, by = "name") %>% 
+   filter(value.x != value.y) %>% 
+   mutate(from = pmin(value.x, value.y),
+          to = pmax(value.x, value.y)) %>% 
+   select(pub_id = name, from, to) %>% 
+   distinct() %>% 
+   ungroup()
+
+ # AuthorGraph2 <- graph_from_edgelist(as.matrix(edgelist_df %>% select(-pub_id)), directed = FALSE)
+
+tolower(edgelist_df) #funkce k uprave jmen
+remove_punct = T,
+remove_symbols = F, remove_hyphens = F
+
+
+
 #this is the kind of structure I need to run this code:
 # dat <- rbind(c("Miyazaki T.", "Akisawa A.", "Saha B.B.", "El-Sharkawy I.I.", "Chakraborty A."),
   #           c("Saha B.B.", "Chakraborty A.", "Koyama S.", "Aristov Y.I.", NA),
@@ -29,25 +48,24 @@ dat <- rbind(split_authors)
 # loop through all rows of dat (all papers, I presume)
 #transformed.dat <- lapply(1:nrow(dat), function(row.num) {
     
-    #row.el <- dat[row.num, ] # the row element that will be used in this loop
+#    row.el <- dat[row.num, ] # the row element that will be used in this loop
     
-    # number of authors per paper
-    #n.authors <- length(row.el[!is.na(row.el)])
+#    n.authors <- length(row.el[!is.na(row.el)])
     
     # creates a matrix with all possible combinations (play around with n.authors, to see what it does)
-    #pairings <- combn(n.authors, 2)
+#    pairings <- combn(n.authors, 2)
     
     # loop through all pairs and return a vector with one row and two columns
-    #res <- apply(pairings, 2, function(vec) {
-   #     return(t(row.el[vec]))
-   # })
+#    res <- apply(pairings, 2, function(vec) {
+#        return(t(row.el[vec]))
+#    })
     
     # create a data.frame with names aut1 and aut2
-   # res <- data.frame(aut1 = res[1, ],
-    #                  aut2 = res[2, ])
+#   res <- data.frame(aut1 = res[1, ],
+#                      aut2 = res[2, ])
                       
     
-   # return(res)
+#    return(res)
 #})
 
 #final.dat <- data.table::rbindlist(transformed.dat)
@@ -67,7 +85,13 @@ names(AuthorEdges) <- NULL
 
 AuthorEdges <- trimws(AuthorEdges)
 
+
+print(AuthorEdges)
+
 AuthorGraph <- graph(AuthorEdges, directed = FALSE)
+
+
+
 
 #plotting the graph
 par("mar")       #this was to prevent one error: https://stackoverflow.com/questions/23050928/error-in-plot-new-figure-margins-too-large-scatter-plot
@@ -279,19 +303,3 @@ topic_independence_categories = sum(ifelse(topics==1, 1, 0))/(sum(ifelse(topics=
 #podle https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0202712#sec002 se topic independence categories násobí 2x  
 RII_2 = ((1-supeig)+clustering+topic_independence_categories*2)/3
 
-
-
-# radim kod
-# edgelist_df <- dat %>% group_by(name) %>% 
-#   right_join(dat, by = "name") %>% 
-#   filter(value.x != value.y) %>% 
-#   mutate(from = pmin(value.x, value.y),
-#          to = pmax(value.x, value.y)) %>% 
-#   select(pub_id = name, from, to) %>% 
-#   distinct() %>% 
-#   ungroup()
-# AuthorGraph2 <- graph_from_edgelist(as.matrix(edgelist_df %>% select(-pub_id)), directed = FALSE)
-
-tolower(edgelist_df) #funkce k uprave jmen
-remove_punct = T,
-remove_symbols = F, remove_hyphens = F
