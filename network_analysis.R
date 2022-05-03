@@ -30,20 +30,14 @@ dat <- enframe(split_authors) %>% unnest(cols = "value") #co to dela> vem list a
    select(pub_id = name, from, to) %>% 
    distinct() %>% 
    ungroup() %>% 
+     
      mutate(from = tolower(stringi::stri_trans_general(from, "latin-ascii")),
-            to = tolower(stringi::stri_trans_general(from, "latin-ascii"))) %>% 
-        mutate(from = str_replace(from, "(.*), (.?){1}.*", "\\1\\2"),
-               to = str_replace(to, "(.*), (.?){1}.*", "\\1\\2"))
+            to = tolower(stringi::stri_trans_general(to, "latin-ascii"))) %>% 
+        mutate(from = str_trim(str_replace(from, "(.*), (.?){1}.*", "\\1\\2")),
+               to = str_trim(str_replace(to, "(.*), (.?){1}.*", "\\1\\2")))
             
 
 authorgraph <- graph_from_edgelist(as.matrix(edgelist_df %>% select(-pub_id)), directed = FALSE)
-
-
-# treti cast indikatoru: pocet publikaci daneho vyzkumnika bez vedouciho jako spoluautora deleno poctem vsech jeho publikaci
- 
-n <- filter(oneauth, !str_detect(oneauth$list, "Klapilová, Kateřina"))
-
-rpubs = nrow(n)/nrow(oneauth)
 
 #alternative to creating coauthorship network - this worked but I didnt use it - adapted from: https://stackoverflow.com/questions/57487704/how-to-split-a-string-of-author-names-by-comma-into-a-data-frame-and-generate-an
 
@@ -59,8 +53,9 @@ rpubs = nrow(n)/nrow(oneauth)
 #plotting the graph
 par("mar")       #this was to prevent one error: https://stackoverflow.com/questions/23050928/error-in-plot-new-figure-margins-too-large-scatter-plot
 par(mar=c(1,1,1,1))
-
+set.seed(123)
 plot(authorgraph)
+
 
 
 #taking one subpart of the network and plotting it
@@ -109,6 +104,14 @@ clustering <-
 
 #vypočtení skoru independence z coauthorské síte
 network_independence = ((1-supeig)+clustering)/2
+
+
+# treti cast indikatoru: pocet publikaci daneho vyzkumnika bez vedouciho jako spoluautora deleno poctem vsech jeho publikaci
+
+n <- filter(oneauth, !str_detect(oneauth$list, "Klapilová, Kateřina"))
+
+rpubs = nrow(n)/nrow(oneauth)
+
 
 #vypočtení tematickeho překryvu
 
