@@ -1,11 +1,9 @@
 
-install.packages("igraph")
-install.packages("DiagrammeR")
-
 library(tidyverse)
 library(dplyr)
 library(igraph)
 library(targets)
+library(DiagrammeR)
 
 
 
@@ -34,10 +32,18 @@ dat <- enframe(split_authors) %>% unnest(cols = "value") #co to dela> vem list a
      mutate(from = tolower(stringi::stri_trans_general(from, "latin-ascii")),
             to = tolower(stringi::stri_trans_general(to, "latin-ascii"))) %>% 
         mutate(from = str_trim(str_replace(from, "(.*), (.?){1}.*", "\\1\\2")),
-               to = str_trim(str_replace(to, "(.*), (.?){1}.*", "\\1\\2")))
-            
+               to = str_trim(str_replace(to, "(.*), (.?){1}.*", "\\1\\2"))) %>% 
+    
+     relocate(pub_id, .after = last_col()) %>% 
+    group_by(from, to) %>% 
+    count(name = "weight") %>% 
+ ungroup()
+ 
 
-authorgraph <- graph_from_edgelist(as.matrix(edgelist_df %>% select(-pub_id)), directed = FALSE)
+ 
+authorgraph <- graph_from_data_frame(edgelist_df, directed = FALSE) 
+
+
 
 #alternative to creating coauthorship network - this worked but I didnt use it - adapted from: https://stackoverflow.com/questions/57487704/how-to-split-a-string-of-author-names-by-comma-into-a-data-frame-and-generate-an
 
@@ -56,8 +62,6 @@ par(mar=c(1,1,1,1))
 set.seed(123)
 plot(authorgraph)
 
-
-
 #taking one subpart of the network and plotting it
 Excerpt <- induced_subgraph(authorgraph,c("Binter, Jakub", "Prossinger, Hermann"))
 par("mar")
@@ -75,56 +79,79 @@ ecentr <- eigen_centrality(
     authorgraph,
     directed = FALSE,
     scale = TRUE,
-    weights = NULL,
+    weights = E(authorgraph)$weight,
     options = arpack_defaults
 )
 
-centr <- ecentr %>% 
-    as.data.frame() %>% 
-    rownames_to_column("name")
+centr <- enframe(ecentr$vector, name = "author", value = "eigen_ctr")
+
+# centr%>%arrange(desc(eigen_ctr)) 
 
 sup <- centr %>% 
-    filter(centr$name=="KlapilovĂˇ, KateĹ™ina")
+    filter(author=="klapilovak")
 
-supeig <- sup$vector
+supeig <- sup$eigen_ctr
 
 #calculating clustering coefficient of the former supervisor in the ego-network of the researcher: https://igraph.org/r/doc/transitivity.html
 
 list.vertex.attributes(authorgraph)   #from https://stackoverflow.com/questions/20209303/how-to-get-vertex-ids-back-from-graph
-which(V(authorgraph)$name == "KlapilovĂˇ, KateĹ™ina")
+which(V(authorgraph)$name == "klapilovak")
 
 clustering <-
     transitivity(
         authorgraph,
         type = c("local"),
-        vids = 29,
-        weights = NULL,
+        vids = which(V(authorgraph)$name == "klapilovak"),
+        weights = E(authorgraph)$weight,
         isolates = c("NaN", "zero")
 )
 
-#vypočtení skoru independence z coauthorské síte
-network_independence = ((1-supeig)+clustering)/2
+clustering <-
+    transitivity(
+        authorgraph,
+        type = c("local"),
+        vids = NULL,
+        weights = E(authorgraph)$weight,
+        isolates = c("NaN", "zero")
+    )
 
+centr_full <- centr %>% bind_cols("transitivity" = clustering)
+
+network_independence <- function(supeig, clustering){((1-supeig)+clustering)/2}
+
+#vypočtení skoru independence z coauthorské síte
+centr_ind <- centr_full %>% 
+    mutate(ind = network_independence(eigen_ctr, transitivity))
+
+#checking robustness
+    #centr_ind %>% arrange(ind)
+    #centr_ind %>% arrange(desc(ind))
+    #cor(centr_full$transitivity, centr_full$eigen_ctr)
 
 # treti cast indikatoru: pocet publikaci daneho vyzkumnika bez vedouciho jako spoluautora deleno poctem vsech jeho publikaci
 
-n <- filter(oneauth, !str_detect(oneauth$list, "Klapilová, Kateřina"))
+ind_pubs <- filter(oneauth, !str_detect(oneauth$list, "Klapilová, Kateřina"))
 
-rpubs = nrow(n)/nrow(oneauth)
+rpubs = nrow(ind_pubs)/nrow(oneauth)
+
+##upravit jmena uz v puvodnim datasetu a tady dat to jmeno vecouciho
 
 
 #vypočtení tematickeho překryvu
+##ideálně by se dopic model mel dělat ze všech publikací všech autorů a jejich vedoucích a pak az z toho kompletního modelu tahat ta témata
 
 library(data.table)
 require(data.table)
 root.direct = here::here()
 text = fread(here::here("data", "raw", 'Binter_Kvapilova_pubs.csv'))
-all.text = text$pubs_title
+all.text = paste(text$pubs_title_eng,
+                 text$abstract, 
+                 str_replace_all(text$keywords, "[:;,]", " "), sep = " ")
 corpus = tolower(all.text)
 
 library(quanteda)
 tokens <-  tokens(corpus, what = "word", 
-                  remove_numbers = F, remove_punct = T,
+                  remove_numbers = T, remove_punct = T,
                   remove_symbols = F, remove_hyphens = F)
 tokens <-  tokens_wordstem(tokens, language="english")
 stopwords("english")
@@ -134,24 +161,19 @@ tokens = tokens_select(tokens, sw,  selection = "remove")
 names(tokens) = text$ID_core_pubs
 
 tokens.dfm = dfm(tokens, tolower = FALSE)
-dfm = dfm_trim(tokens.dfm, min_termfreq = 2, termfreq_type="count") #tady asi dává smysl dát tam nějaké nízké číslo, protože sposutu autorů nebude mít zas tolik publikací a pokud se i třeba jen 10 % svých publikací (což můžou být třeba jen  publikace jako u tohoto autora) odlišují od vedoucího, chcem to zachytit) 
+dfm = dfm_trim(tokens.dfm, min_termfreq = 3, termfreq_type="count") #tady asi dává smysl dát tam nějaké nízké číslo, protože sposutu autorů nebude mít zas tolik publikací a pokud se i třeba jen 10 % svých publikací (což můžou být třeba jen  publikace jako u tohoto autora) odlišují od vedoucího, chcem to zachytit) 
 dim(dfm) 
-terms = colnames(dfm)
-singles = terms[nchar(terms)==1]
-terms = terms[nchar(terms)!=1]
-doubles = terms[nchar(terms)==2]
-terms = terms[nchar(terms)!=2]
-C = terms[grep("[0-9][0-9][A-Za-z]",terms,perl = T)]
-D = terms[grep("[A-Za-z][0-9][0-9]",terms,perl = T)] 
-dfm = dfm[,terms]
-dim(dfm) 
-save(dfm, file = here::here("data", "derived","bitner_dfm_min5_full_text.Rdata"))
-
+# library(tidyverse)
+# tidytext::tidy(dfm) %>%
+#   group_by(term) %>%
+#  summarize(count = sum(count)) %>%
+#  arrange(count) %>%
+#  view()
+     
 library("topicmodels")
 library("ggplot2")
 library("scales")
 library("ldatuning")
-load(here::here("data", "derived", "bitner_dfm_min5_full_text.Rdata"))
 set.seed(123)
 
 dfm <- dfm[which(rowSums(dfm) > 0),] #v tomto momentě zmizí 10 datapointů protože mají nulovou hodnotu (tzn používaly pouze "stopwords? to je nějaké divné) 
@@ -178,15 +200,12 @@ library("tm")
 dfm = dfm[which(rowSums(dfm) > 0),]
 dtm = convert(dfm,to="topicmodels")
 dim(dtm)
-lda.model = LDA(dtm,k = 5, control = list(seed = 123),alpha = 0.1, beta = 0.01 , verbose=1) 
-save(lda.model, file = here::here("data", "derived", "bitner_lda_full_text_5_topics_min5.RDS"))
-
+lda.model = LDA(dtm,k = 10, control = list(seed = 123),alpha = 0.1, beta = 0.01 , verbose=1) 
 rowSums(lda.matrix)
 
 lda.matrix = posterior(lda.model,dfm)$topics
 dim(lda.matrix) 
 
-save(lda.matrix, file = here::here("data", "derived", "bitner_topic_dist_full_text_5_topics_min5.Rdata"))
 library(data.table) 
 library(ggplot2)
 
@@ -230,8 +249,39 @@ RII_1 = ((1-supeig)+clustering+(1-topic_independence_cosine))/3
 
 ##2. zpusob vypoctu indikatoru -> pocet temat ve kterých je autor jedinecne zastoupen
 
-topics <- c(0)
-topics <- as.data.table(topics)
+topics <- as_tibble(t(data))
+colnames(topics) <- paste0("topic_", colnames(topics))
+
+topics %>% 
+    mutate(across(starts_with("topic"), ~ifelse(.x>0.1, 1, 0))) %>% 
+    rownames_to_column("pub_id") %>% 
+    left_join(dat %>% group_by(name) %>% 
+                  right_join(dat, by = "name") %>% 
+                  filter(value.x != value.y) %>% 
+                  mutate(from = pmin(value.x, value.y),
+                         to = pmax(value.x, value.y)) %>% 
+                  select(pub_id = name, from, to) %>% 
+                  distinct() %>% 
+                  ungroup() %>% 
+                  mutate(pub_id = as.character(pub_id)) %>% 
+                  mutate(from = tolower(stringi::stri_trans_general(from, "latin-ascii")),
+                         to = tolower(stringi::stri_trans_general(to, "latin-ascii"))) %>% 
+                  mutate(from = str_trim(str_replace(from, "(.*), (.?){1}.*", "\\1\\2")),
+                         to = str_trim(str_replace(to, "(.*), (.?){1}.*", "\\1\\2"))) 
+    ) %>% 
+filter(from %in% c("kvapilovak", "binterj")|to %in% c("kvapilovak", "binterj") ) %>%
+ 
+view()
+
+
+mutate(supervised = case_when(from == "kvapilovak"~TRUE, 
+                              to == "kvapilovak"~TRUE 
+                              )) %>%  
+                                group_by(pub_id) %>% 
+                                slice(n=1) %>% 
+                                ungroup() %>% 
+    view()
+
 
 #tahle funkce říká: pokud v daném tématu nemá sledovaný výzkumník ani jednu publikaci s loadingem  více než 0,1, pak mi vytiskni "0", pokud má alespoň jednu, ale zároveň i jeho supervisors má alsepoň jednu, tak mi vytiskni "2", a pokud má alespoň jednu ale supervisor nemá žádnou, tak vytiskni "1". Takhle funkce bohužel není škálovatelná, takže se bude muset přepsat.   
 topics$topic_one <- if(sum(ifelse(data[1,1:20]>0.1, 1, 0))<1){print("0")
