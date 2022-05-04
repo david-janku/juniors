@@ -139,6 +139,8 @@ rpubs = nrow(ind_pubs)/nrow(oneauth)
 
 #vypočtení tematickeho překryvu
 ##ideálně by se dopic model mel dělat ze všech publikací všech autorů a jejich vedoucích a pak az z toho kompletního modelu tahat ta témata
+###je potreba pracovat s unikatnima publikacema --> takze jeste chybi krok ktery protridi vsechny publikace autora a vedouciho a vyhodi ty ktere jsou stejne
+
 
 library(data.table)
 require(data.table)
@@ -252,23 +254,41 @@ RII_1 = ((1-supeig)+clustering+(1-topic_independence_cosine))/3
 topics <- as_tibble(t(data))
 colnames(topics) <- paste0("topic_", colnames(topics))
 
+
+two_auth <- read.csv2(here::here("data", "raw", "Binter_Kvapilova_pubs.csv"))
+
+split_authors2 <- strsplit(as.character(two_auth$list), ':')
+head(split_authors2)
+
+dat2 <- enframe(split_authors2) %>% unnest(cols = "value") #co to dela> vem list a udelej y nej data frame /. defualtne to udela sloupce name a value. fce unnest pak veyme v2ci co jsou v listovym formatu a rozbali je a pokud je tam víc hodnot tak pro ně vytvoři nove řadky 
+
+
+supervised_df <- dat2 %>% group_by(name) %>% 
+    right_join(dat2, by = "name") %>% 
+    filter(value.x != value.y) %>% 
+    mutate(from = pmin(value.x, value.y),
+           to = pmax(value.x, value.y)) %>% 
+    select(pub_id = name, from, to) %>% 
+    distinct() %>% 
+    ungroup() %>% 
+    mutate(pub_id = as.character(pub_id)) %>% 
+    mutate(from = tolower(stringi::stri_trans_general(from, "latin-ascii")),
+           to = tolower(stringi::stri_trans_general(to, "latin-ascii"))) %>% 
+    mutate(from = str_trim(str_replace(from, "(.*), (.?){1}.*", "\\1\\2")),
+           to = str_trim(str_replace(to, "(.*), (.?){1}.*", "\\1\\2"))) %>% 
+    group_by(pub_id) %>% 
+    summarize(supervised = list(from, to)) %>% 
+    mutate(supervised = map_lgl(supervised, ~ifelse("klapilovak" %in% .x&"binterj" %in% .x, TRUE, FALSE))) %>% 
+    ungroup() %>% 
+    
+filter(supervised == TRUE) %>% 
+    distinct()
+
+
 topics %>% 
     mutate(across(starts_with("topic"), ~ifelse(.x>0.1, 1, 0))) %>% 
     rownames_to_column("pub_id") %>% 
-    left_join(dat %>% group_by(name) %>% 
-                  right_join(dat, by = "name") %>% 
-                  filter(value.x != value.y) %>% 
-                  mutate(from = pmin(value.x, value.y),
-                         to = pmax(value.x, value.y)) %>% 
-                  select(pub_id = name, from, to) %>% 
-                  distinct() %>% 
-                  ungroup() %>% 
-                  mutate(pub_id = as.character(pub_id)) %>% 
-                  mutate(from = tolower(stringi::stri_trans_general(from, "latin-ascii")),
-                         to = tolower(stringi::stri_trans_general(to, "latin-ascii"))) %>% 
-                  mutate(from = str_trim(str_replace(from, "(.*), (.?){1}.*", "\\1\\2")),
-                         to = str_trim(str_replace(to, "(.*), (.?){1}.*", "\\1\\2"))) 
-    ) %>% 
+    left_join() %>% 
 filter(from %in% c("kvapilovak", "binterj")|to %in% c("kvapilovak", "binterj") ) %>%
  
 view()
@@ -281,6 +301,25 @@ mutate(supervised = case_when(from == "kvapilovak"~TRUE,
                                 slice(n=1) %>% 
                                 ungroup() %>% 
     view()
+
+rm(topics)
+
+
+
+all_pubs <- as_tibble(t(data)) %>% 
+    rownames_to_column("pub_id") %>% 
+    mutate(pub_id = as.integer(pub_id)) %>% 
+    left_join(two_auth %>% 
+                   select(pub_id = ID_core_pubs, list)) 
+
+
+binter_pubs <- filter(all_pubs, str_detect(all_pubs$list, "Binter")) %>% 
+    mutate(author = "binter")
+
+sup_pubs <- filter(all_pubs, str_detect(all_pubs$list, "Klapilová")) %>% 
+    mutate(author = "klap")
+
+pubs <- bind_rows(binter_pubs, sup_pubs)
 
 
 #tahle funkce říká: pokud v daném tématu nemá sledovaný výzkumník ani jednu publikaci s loadingem  více než 0,1, pak mi vytiskni "0", pokud má alespoň jednu, ale zároveň i jeho supervisors má alsepoň jednu, tak mi vytiskni "2", a pokud má alespoň jednu ale supervisor nemá žádnou, tak vytiskni "1". Takhle funkce bohužel není škálovatelná, takže se bude muset přepsat.   
