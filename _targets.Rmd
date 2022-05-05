@@ -3,24 +3,48 @@ title: "Target Markdown"
 output: html_document
 ---
 
+# Set up targets environment
+
+Here we run necessary code for `targets` setup.
+
 ```{r setup, include = FALSE}
 here::set_here()
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 
 # load libraries for targets notebook
 library(targets)
-library(tidyverse, quietly = TRUE)
+library(dplyr, quietly = TRUE)
 
 # clean knitting history
 tar_unscript()
 ```
 
+# Dependencies
+
+Here, we load packages and custom functions required in the pipeline.
 
 ```{targets example-globals, tar_globals = TRUE}
 options(tidyverse.quiet = TRUE)
 
 # load libraries for make
-tar_option_set(packages = c("tidyverse", "quanteda"))
+tar_option_set(packages = c("dplyr",
+                            "tidyr",
+                            "purrr",
+                            "readr",
+                            "quanteda",
+                            "igraph",
+                            "DiagrammeR",
+                            "tibble",
+                            "stringr",
+                            "topicmodels",
+                            "ggplot2",
+                            "scales",
+                            "ldatuning",
+                            "quanteda",
+                            "data.table",
+                            "tidytext",
+                            "tm"
+                            ))
 
 # read custom functions
 lapply(list.files(here::here("R"), full.names = TRUE), source)
@@ -28,32 +52,132 @@ lapply(list.files(here::here("R"), full.names = TRUE), source)
 
 # Data import
 
-```{targets texts, tar_simple = TRUE}
-read_csv2(here::here("data_core_pubs_trim.csv"))
+```{targets data_import}
+list(
+    
+    tar_target(one_author,
+               read.csv2(here::here("data", "raw", "Binter_pubs.csv")),
+               format = "qs"),
+    tar_target(two_authors, read.csv2(here::here("data", "raw", "Binter_Kvapilova_pubs.csv")),
+               format = "qs")
+    
+)
 ```
 
-# Text pre-processing
+# Coauthorship network
 
-```{targets pre_processing}
+```{targets network}
+
 list(
-tar_target(corpus,
-           extract_corpus(texts)),
-
-tar_target(tokens,
-           process_tokens(corpus, texts)),
-
-tar_target(dfm_object,
-           create_dfm(tokens))
+    
+    tar_target(edgelist,
+               make_edgelist(one_author),
+                format = "qs"),
+    tar_target(graph, igraph::graph_from_data_frame(edgelist, directed = FALSE) )
+    
+    
 )
 
 ```
 
-# Check results
+# Topic model
+
+```{targets topic_model}
+list(
+    
+   tar_target(topic_model, 
+              make_topic_model(two_authors),
+               format = "qs")
+    
+    
+)
+```
+
+# Researcher independence indicator (RII) part 1 - eigenvector centrality
+
+```{targets RII1}
+
+list(
+    
+    tar_target(eigen_centr,
+               calc_eigen_centr(graph), 
+               format = "qs")
+    
+)
+
+```
+
+# Researcher independence indicator (RII) part 2 - clustering coefficient
+
+```{targets RII2}
+
+list(
+    
+    tar_target(clustering,
+               calc_clustering(graph), 
+               format = "qs")
+    
+)
+
+```
+
+# Researcher independence indicator (RII) part 3 - independent publications
+
+```{targets RII3}
+
+list(
+    
+    tar_target(ind_pubs,
+               calc_ind_pubs(one_author), 
+               format = "qs")
+    
+)
+
+```
+
+# Researcher independence indicator (RII) part 4 - independent topics
+
+```{targets RII4}
+
+list(
+    
+    tar_target(ind_topics,
+               calc_ind_topics(topic_model, two_authors), 
+               format = "qs")
+    
+)
+
+```
+
+# Researcher independence indicator (RII) part 4 - independent topics: alternative way via cosine similarity
+
+```{targets RII4_2}
+
+list(
+    
+    tar_target(ind_topics_cs,
+               calc_cos_sim(topic_model, two_authors), 
+               format = "qs")
+    
+)
+
+```
+
+# Final indicator
 
 ```{r}
-head(tar_read(tokens))
 
-dim(tar_read(dfm_object))
+
+
+
+```
+# Article
+
+```{targets article}
+list(
+    tarchetypes::tar_render(article, here::here("Rmd", "article.Rmd"))
+)
+
 
 ```
 
