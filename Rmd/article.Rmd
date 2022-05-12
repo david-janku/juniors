@@ -1,0 +1,21 @@
+---
+title: "Draft"
+author: "David Janků"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(targets)
+```
+
+# Název článku
+
+sdvsvsefsefeasfv
+
+zmena
+
+```{r}
+head(tar_read(edgelist))
+
+```

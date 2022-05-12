@@ -309,7 +309,7 @@ rm(topics)
 all_pubs <- as_tibble(t(data)) %>% 
     rownames_to_column("pub_id") %>% 
     mutate(pub_id = as.integer(pub_id)) %>% 
-    left_join(two_auth %>% 
+    left_join(two_authors %>% 
                    select(pub_id = ID_core_pubs, list)) 
 
 

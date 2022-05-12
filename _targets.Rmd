@@ -43,7 +43,12 @@ tar_option_set(packages = c("dplyr",
                             "quanteda",
                             "data.table",
                             "tidytext",
-                            "tm"
+                            "tm",
+                            "httr",
+                            "rjson",
+                            "keyring",
+                            "RSQLite",
+                            "DBI"
                             ))
 
 # read custom functions
@@ -55,11 +60,29 @@ lapply(list.files(here::here("R"), full.names = TRUE), source)
 ```{targets data_import}
 list(
     
-    tar_target(one_author,
-               read.csv2(here::here("data", "raw", "Binter_pubs.csv")),
-               format = "qs"),
-    tar_target(two_authors, read.csv2(here::here("data", "raw", "Binter_Kvapilova_pubs.csv")),
+    # tar_target(one_author,
+    #           read.csv2(here::here("data", "raw",    #"Binter_pubs.csv")),
+ #              format = "qs"),
+      tar_target(ids, read.csv2(here::here("data", "raw", "supervisors.csv")),
+              format = "qs"),
+    tar_target(db_path,
+           here::here("data", "raw", "czech_sci_db.sqlite")),
+    tar_target(all_pubs,
+           get_all_pubs(db_path, ids), 
+              format = "qs")
+    
+)
+```
+
+# Topic model
+
+```{targets topic_model}
+list(
+    
+   tar_target(topic_model, 
+              make_topic_model(all_pubs),
                format = "qs")
+    
     
 )
 ```
@@ -78,19 +101,6 @@ list(
     
 )
 
-```
-
-# Topic model
-
-```{targets topic_model}
-list(
-    
-   tar_target(topic_model, 
-              make_topic_model(two_authors),
-               format = "qs")
-    
-    
-)
 ```
 
 # Researcher independence indicator (RII) part 1 - eigenvector centrality
