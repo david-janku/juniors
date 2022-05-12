@@ -8,33 +8,49 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-read_one_author <- function(db_path, ids) {
+read_one_author <- function(db_path, ids_complete_vector) {
 
   con <-  DBI::dbConnect(RSQLite::SQLite(), db_path)
   on.exit(DBI::dbDisconnect(con))
   
   DBI::dbListTables(con)
   
-  ids_complete <- as_tibble(ids) %>% 
-    filter(!is.na(vedoucí.vedidk)) %>% 
-      filter(!is.na(vedidk_core_researcher))
-       
- ids_complete_vector <- cbind(ids_complete$vedidk_core_researcher, ids_complete$vedoucí.vedidk) %>% 
-     as_tibble() %>% 
-     as_vector() 
+
  
- ids_complete_col <- bind_rows(as_tibble(ids_complete$vedidk_core_researcher), as_tibble(ids_complete$vedoucí.vedidk))
- 
-  one_vedidk_pubids <- DBI::dbReadTable(con, "authors_by_pubs") %>% # colnames()
-      filter(vedidk %in% ids_complete_vector[1]) %>% 
+ one_vedidk_pubids <- DBI::dbReadTable(con, "authors_by_pubs") %>% #colnames()
+      filter(vedidk == ids_complete_vector) %>% 
       select(vedidk, id_unique) %>% 
       distinct() %>% 
       as_tibble()
   
   one_vedidk_coauthors <- DBI::dbReadTable(con, "authors_by_pubs") %>% # colnames()
+      select(id_unique, id_helper) %>% 
       filter(id_unique %in% one_vedidk_pubids$id_unique) %>% 
-      distinct() %>% 
+      distinct() %>%
+      mutate(vedidk = ids_complete_vector) %>% 
       as_tibble()
+  
+  ####
+  
+  # sup_vector <- ids_complete$vedoucí.vedidk %>% 
+  #     as_tibble() %>% 
+  #     as_vector() 
+  # 
+  # a <- DBI::dbReadTable(con, "authors_by_pubs") %>% #colnames()
+  #     filter(vedidk %in% sup_vector[1]) %>% 
+  #     select(id_helper) %>% 
+  #     count(id_helper) %>% 
+  #     filter(n == max(n)) %>% 
+  #     slice_sample(n=1) %>% 
+  #     pull(id_helper)
+      
+  
+      
+  #%>%
+      # filter(row_number() == 1)
+      
+  
+     
   
   # comb_vedidk_pubids <- DBI::dbReadTable(con, "authors_by_pubs") %>%
   #     filter(vedidk == .env$vedidk) %>%

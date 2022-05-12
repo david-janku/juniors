@@ -59,40 +59,41 @@ get_all_pubs <- function(db_path, ids) {
         filter(!is.na(abstract_eng)) %>% 
         as_tibble() 
     
-    #interestingly, we lost 778 (2.7 %) publications in this step, not sure why. Also, many of the remaining publications seem to have missing abstracts or keywords. Analysis of the 778 missing cases below:
     ## we decided to only include papers with full abstracts = 27134 pubs 
     
-    disc_pubs_missing <- DBI::dbReadTable(con, "riv_disc") %>%  #colnames()  
-        filter(id_unique %in% comb_vedidk_pubids$id_unique) %>% 
-        filter(pub_type %in% c("J","B","C","D")) %>% 
-        filter(!id_unique %in% text_pubs$id_unique) %>% 
-        as_tibble() 
+    #interestingly, we lost 778 (2.7 %) publications in this step, not sure why. Also, many of the remaining publications seem to have missing abstracts or keywords. Analysis of the 778 missing cases below:
     
-    text_pubs_missing <- DBI::dbReadTable(con, "riv_text") %>% #colnames()
-        select(id_unique, title_eng, abstract_eng, keywords) %>% 
-        filter(id_unique %in% disc_pubs_missing$id_unique) %>% 
-        filter(!duplicated(id_unique)) %>% 
-        as_tibble() 
-    
-    kod_pubs_missing <- DBI::dbReadTable(con, "riv_unique_ids") %>% #colnames()
-             filter(id_unique %in% disc_pubs_missing$id_unique) %>% 
-             distinct() %>% 
-             as_tibble()
-    
-    year_pubs_missing <- DBI::dbReadTable(con, "riv_details") %>% #colnames()
-        filter(kod %in% kod_pubs_missing$kod) %>% 
-        distinct() %>% 
-        as_tibble()
-    
-    wos_pubs_missing <- DBI::dbReadTable(con, "riv_wos_scopus") %>% #colnames()
-        filter(id_unique %in% disc_pubs_missing$id_unique) %>% 
-        distinct() %>% 
-        as_tibble()
-    
-    authors_pubs_missing <- DBI::dbReadTable(con, "authors_by_pubs") %>% #colnames()
-        filter(id_unique %in% disc_pubs_missing$id_unique) %>% 
-        distinct() %>% 
-        as_tibble()
+    # disc_pubs_missing <- DBI::dbReadTable(con, "riv_disc") %>%  #colnames()  
+    #     filter(id_unique %in% comb_vedidk_pubids$id_unique) %>% 
+    #     filter(pub_type %in% c("J","B","C","D")) %>% 
+    #     filter(!id_unique %in% text_pubs$id_unique) %>% 
+    #     as_tibble() 
+    # 
+    # text_pubs_missing <- DBI::dbReadTable(con, "riv_text") %>% #colnames()
+    #     select(id_unique, title_eng, abstract_eng, keywords) %>% 
+    #     filter(id_unique %in% disc_pubs_missing$id_unique) %>% 
+    #     filter(!duplicated(id_unique)) %>% 
+    #     as_tibble() 
+    # 
+    # kod_pubs_missing <- DBI::dbReadTable(con, "riv_unique_ids") %>% #colnames()
+    #          filter(id_unique %in% disc_pubs_missing$id_unique) %>% 
+    #          distinct() %>% 
+    #          as_tibble()
+    # 
+    # year_pubs_missing <- DBI::dbReadTable(con, "riv_details") %>% #colnames()
+    #     filter(kod %in% kod_pubs_missing$kod) %>% 
+    #     distinct() %>% 
+    #     as_tibble()
+    # 
+    # wos_pubs_missing <- DBI::dbReadTable(con, "riv_wos_scopus") %>% #colnames()
+    #     filter(id_unique %in% disc_pubs_missing$id_unique) %>% 
+    #     distinct() %>% 
+    #     as_tibble()
+    # 
+    # authors_pubs_missing <- DBI::dbReadTable(con, "authors_by_pubs") %>% #colnames()
+    #     filter(id_unique %in% disc_pubs_missing$id_unique) %>% 
+    #     distinct() %>% 
+    #     as_tibble()
     
     # sum(is.na(text_pubs$keywords))
     # sum(nchar(text_pubs$abstract_eng, type = "chars", allowNA = FALSE, keepNA = NA)<25)   #this way we can calculate number of missing values there (complicated because more symbols are used: Annotation not available, N/A, XXX, xxx )          

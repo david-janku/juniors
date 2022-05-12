@@ -63,13 +63,20 @@ list(
     # tar_target(one_author,
     #           read.csv2(here::here("data", "raw",    #"Binter_pubs.csv")),
  #              format = "qs"),
-      tar_target(ids, read.csv2(here::here("data", "raw", "supervisors.csv")),
+      tar_target(ids, read.csv2(here::here("data", "raw", "supervisors.csv"), nrows = 20),
               format = "qs"),
+      tar_target(ids_complete, create_ids_complete(ids),
+              format = "qs"),
+    tar_target(ids_complete_vector,
+               make_ids_complete_vector(ids)),
     tar_target(db_path,
            here::here("data", "raw", "czech_sci_db.sqlite")),
     tar_target(all_pubs,
            get_all_pubs(db_path, ids), 
-              format = "qs")
+              format = "qs"),
+    tar_target(one_author,
+           read_one_author(db_path, ids_complete_vector), 
+              format = "qs", pattern = map(ids_complete_vector), iteration = "list")
     
 )
 ```
@@ -79,10 +86,14 @@ list(
 ```{targets topic_model}
 list(
     
-   tar_target(topic_model, 
-              make_topic_model(all_pubs),
-               format = "qs")
-    
+   tar_target(topic_model_input,
+              make_topic_model_input(all_pubs),
+                format = "qs") #,
+   # --> fce find k 
+   # tar_target(topic_model,
+   #            make_topic_model(topic_model_input),
+   #             format = "qs")
+
     
 )
 ```
@@ -95,8 +106,8 @@ list(
     
     tar_target(edgelist,
                make_edgelist(one_author),
-                format = "qs"),
-    tar_target(graph, igraph::graph_from_data_frame(edgelist, directed = FALSE) )
+                format = "qs", pattern = map(one_author), iteration = "list"),
+    tar_target(graph, igraph::graph_from_data_frame(edgelist, directed = FALSE), pattern = map(edgelist), iteration = "list")
     
     
 )
@@ -110,8 +121,8 @@ list(
 list(
     
     tar_target(eigen_centr,
-               calc_eigen_centr(graph), 
-               format = "qs")
+               calc_eigen_centr(graph, ids_complete, one_author, db_path),
+               format = "qs", pattern = map(graph, one_author), iteration = "list")
     
 )
 
@@ -123,10 +134,10 @@ list(
 
 list(
     
-    tar_target(clustering,
-               calc_clustering(graph), 
-               format = "qs")
-    
+    # tar_target(clustering,
+    #            calc_clustering(graph), 
+    #            format = "qs")
+    # 
 )
 
 ```
@@ -137,10 +148,10 @@ list(
 
 list(
     
-    tar_target(ind_pubs,
-               calc_ind_pubs(one_author), 
-               format = "qs")
-    
+    # tar_target(ind_pubs,
+    #            calc_ind_pubs(one_author), 
+    #            format = "qs")
+    # 
 )
 
 ```
@@ -151,9 +162,9 @@ list(
 
 list(
     
-    tar_target(ind_topics,
-               calc_ind_topics(topic_model, two_authors), 
-               format = "qs")
+    # tar_target(ind_topics,
+    #            calc_ind_topics(topic_model, two_authors), 
+    #            format = "qs")
     
 )
 
@@ -165,19 +176,25 @@ list(
 
 list(
     
-    tar_target(ind_topics_cs,
-               calc_cos_sim(topic_model, two_authors), 
-               format = "qs")
-    
+    # tar_target(ind_topics_cs,
+    #            calc_cos_sim(topic_model, two_authors), 
+    #            format = "qs")
+    # 
 )
 
 ```
 
 # Final indicator
 
-```{r}
+```{targets final}
 
-
+list(
+    
+    tar_target(final_data,
+               calc_final_data(eigen_centr, clustering = NULL, ind_topics = NULL, ind_pubs = NULL),
+               format = "qs")
+    
+)
 
 
 ```
