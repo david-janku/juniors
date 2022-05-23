@@ -8,7 +8,7 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-read_one_author <- function(db_path, ids_complete_vector) {
+read_one_author <- function(db_path, ids_complete_vector, ids_complete) {
 
   con <-  DBI::dbConnect(RSQLite::SQLite(), db_path)
   on.exit(DBI::dbDisconnect(con))
@@ -22,12 +22,33 @@ read_one_author <- function(db_path, ids_complete_vector) {
       select(vedidk, id_unique) %>% 
       distinct() %>% 
       as_tibble()
-  
+ 
+ # mozna by bylo fajn v tomto kroku vyselektovat vsechny nepublikacni vystupy, protoze ty jsou asi defaultne zapocitane:
+     one_vedidk_filtered_pubs <- DBI::dbReadTable(con, "riv_disc") %>%  #colnames()
+     select(id_unique, pub_type) %>%
+     filter(id_unique %in% one_vedidk_pubids$id_unique) %>%
+     filter(pub_type %in% c("J","B","C","D")) %>%
+     as_tibble()
+     
+ 
+    sup_vector <- ids_complete %>% 
+        filter(vedidk_core_researcher == ids_complete_vector) %>% 
+        pull(vedoucí.vedidk) 
+    
+    sup_name <- DBI::dbReadTable(con, "authors_by_pubs") %>% #colnames()
+        filter(vedidk == sup_vector) %>% 
+        select(id_helper) %>% 
+        count(id_helper) %>% 
+        filter(n == max(n)) %>% 
+        slice_sample(n=1) %>% 
+        pull(id_helper)
+ 
   one_vedidk_coauthors <- DBI::dbReadTable(con, "authors_by_pubs") %>% # colnames()
       select(id_unique, id_helper) %>% 
-      filter(id_unique %in% one_vedidk_pubids$id_unique) %>% 
+      filter(id_unique %in% one_vedidk_filtered_pubs$id_unique) %>% 
       distinct() %>%
       mutate(vedidk = ids_complete_vector) %>% 
+      mutate(vedouci = sup_name) %>% 
       as_tibble()
   
   ####

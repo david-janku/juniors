@@ -10,7 +10,7 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-calc_final_data <- function(eigen_centr, clustering = NULL, ind_topics = NULL, ind_pubs = NULL) {
+calc_final_data <- function(eigen_centr, clustering, ind_topics, ind_pubs) {
 # 
 #     vedidk_researcher <- one_author %>% 
 #         map("vedidk") %>% 
@@ -26,8 +26,12 @@ calc_final_data <- function(eigen_centr, clustering = NULL, ind_topics = NULL, i
   #                      ) 
       
 
-    bind_rows(eigen_centr)
+    a <- left_join(bind_rows(eigen_centr), bind_rows(clustering), by = "vedidk")
+    b <- left_join(bind_rows(a), bind_rows(ind_pubs), by = "vedidk")        
+    c <- left_join(bind_rows(b), bind_rows(ind_topics), by = "vedidk")    
     
-    # left_join(eigen_centr, eigen_centr, by = "vedidk")
-
+    c$RII <- ((1-c$eig)+c$clustr+c$ind_pubs+c$ind_topics*2)/4
+    
+    c
+    
 }

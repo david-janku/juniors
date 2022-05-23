@@ -101,9 +101,9 @@ make_topic_model_input <- function(all_pubs) {
     set.seed(123)
     
     dfm <- dfm[which(rowSums(dfm) > 0),] #v tomto momentě zmizí 10 datapointů protože mají nulovou hodnotu (tzn používaly pouze "stopwords? to je nějaké divné) 
-    dim(dfm)
+    # dim(dfm)
     dtm <- convert(dfm,to="topicmodels")
-    dim(dtm)
+    # dim(dtm)
     
 
 }

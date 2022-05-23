@@ -23,32 +23,32 @@ calc_eigen_centr <- function(graph, ids_complete, one_author, db_path) {
         pull(vedidk) %>% 
         unique()
     
-    sup_vector <- ids_complete %>% 
-            filter(vedidk_core_researcher == vedidk_researcher) %>% 
-            pull(vedoucí.vedidk)
-        
-    con <-  DBI::dbConnect(RSQLite::SQLite(), db_path)
-    on.exit(DBI::dbDisconnect(con))
+    a <- one_author %>% 
+        pull(vedouci) %>% 
+        unique()
     
-   a <- DBI::dbReadTable(con, "authors_by_pubs") %>% #colnames()
-        filter(vedidk == sup_vector) %>% 
-        select(id_helper) %>% 
-        count(id_helper) %>% 
-        filter(n == max(n)) %>% 
-        slice_sample(n=1) %>% 
-        pull(id_helper)
+   #  sup_vector <- ids_complete %>% 
+   #          filter(vedidk_core_researcher == vedidk_researcher) %>% 
+   #          pull(vedoucí.vedidk)
+   #      
+   #  con <-  DBI::dbConnect(RSQLite::SQLite(), db_path)
+   #  on.exit(DBI::dbDisconnect(con))
+   #  
+   # a <- DBI::dbReadTable(con, "authors_by_pubs") %>% #colnames()
+   #      filter(vedidk == sup_vector) %>% 
+   #      select(id_helper) %>% 
+   #      count(id_helper) %>% 
+   #      filter(n == max(n)) %>% 
+   #      slice_sample(n=1) %>% 
+   #      pull(id_helper)
+    
+    
     
     sup <- centr %>% 
                filter(author == a) %>% 
         pull(eigen_ctr)
     
     table <- tibble(vedidk = vedidk_researcher, eig = sup)
-    
-    
-    # access ïds_complete -> take the vedidk_core_researcher of the given 
-    # current research -> match it with the vedouci.vedidk na stejnem radku 
-    # --> vezmi ten vedidk vedouciho, jdi do databaze "authors by pubs" a 
-    # match it with the id_helper of a given person
     
 
 }
