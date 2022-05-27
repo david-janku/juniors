@@ -10,8 +10,7 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-just_test <- function(eigen_centr, clustering, ind_topics = NULL, ind_pubs =
-                      NULL) {
+just_test <- function(db_path) {
 
    # aa <- one_author[[4]] %>% group_by(id_unique) %>% 
    #      right_join(one_author[[4]], by = "id_unique") %>% 
@@ -57,6 +56,7 @@ just_test <- function(eigen_centr, clustering, ind_topics = NULL, ind_pubs =
      
      all_researchers_vector <- ids_complete$vedidk_core_researcher %>% 
          as_tibble() %>% 
+         distinct() %>% #this was added - I should check that it does change any further results 
          as_vector() 
      
      all_researchers_pubids <- DBI::dbReadTable(con, "authors_by_pubs") %>% 
@@ -83,9 +83,20 @@ just_test <- function(eigen_centr, clustering, ind_topics = NULL, ind_pubs =
      all_researchers_pubs <- all_researchers_pubids %>% 
          group_by(vedidk) %>% 
          count(name = "weight") %>% 
-         ungroup() #this will generate only 239 vedidks, not 248 entered in the all_researchers_vector, which is 4 % 
+         ungroup() #this will generate only 239 vedidks, not 248 entered in the all_researchers_vector, which is 4 % --> explained by duplicates in vedidks (people who received 2 grants)
      
-         
+     
+     #important things that I need to work on further
+     
+     ids_complete$vedidk_core_researcher <- as.character(ids_complete$vedidk_core_researcher)
+     
+     missing_researchers <- anti_join(ids_complete, all_researchers_pubs, by = c("vedidk_core_researcher" = "vedidk"))
+     
+     ids_complete_duplicated <- ids_complete %>% 
+         filter(duplicated(vedidk_core_researcher))  #I should filter out the double vedidks at the beginning (i.e. from the ids_complete dataset) and only include the earlier one (i.e. the date of the first grant, not the second)
+     
+     
+     
      all_researchers_pubs <- all_researchers_pubs %>% 
          filter(vedidk != 4427920)    #one vedidk had over 800 publications, which seemed unrealistic, so I deleted it
      
@@ -209,6 +220,7 @@ just_test <- function(eigen_centr, clustering, ind_topics = NULL, ind_pubs =
      
      all_supervisors_vector <- ids_complete$vedoucí.vedidk %>% 
          as_tibble() %>% 
+         distinct() %>% #this was added - I should check that it does change any further results 
          as_vector() 
      
      all_sup_pubids <- DBI::dbReadTable(con, "authors_by_pubs") %>% 
@@ -235,7 +247,16 @@ just_test <- function(eigen_centr, clustering, ind_topics = NULL, ind_pubs =
      all_sup_pubs <- all_sup_pubids %>% 
          group_by(vedidk) %>% 
          count(name = "weight") %>% 
-         ungroup()    #this will generate only 211 vedidks, not 248 entered in the all_supervisors_vector, which is 15 % loss
+         ungroup()    #this will generate only 211 vedidks, not 248 entered in the all_supervisors_vector, which is 15 % loss --> explained by duplicates in vedidks 
+     
+     
+     # ids_complete$vedoucí.vedidk <- as.character(ids_complete$vedoucí.vedidk)
+     # 
+     # missing_vedouci <- anti_join(ids_complete, all_sup_pubs, by = c("vedoucí.vedidk" = "vedidk"))
+     # 
+     # ids_complete_duplicated_vedouci <- ids_complete %>% 
+     #     filter(duplicated(vedoucí.vedidk)) 
+     
      
      # #when examininsg numbers, I see that vedidk 5500095 has 890 publications, but here I am less sure whether to discard it, so I left it in
      # all_researchers_pubs <- all_researchers_pubs %>% 

@@ -194,7 +194,7 @@ list(
                calc_final_data(eigen_centr, clustering, ind_topics, ind_pubs),
                format = "qs") #,
      # tar_target(testing,
-     #           just_test(eigen_centr, clustering, ind_topics = NULL, ind_pubs = NULL),
+     #           just_test(db_path),
      #           format = "qs")
     
 )
