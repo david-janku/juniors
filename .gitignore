@@ -8,3 +8,4 @@ _targets_r/
 *.html
 
 .DS_Store
+data/raw/czech_sci_db.sqlite
