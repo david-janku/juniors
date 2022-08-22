@@ -17,7 +17,7 @@ create_ids_complete <- function(ids) {
     #these row below are new - their point is to filter the cases of researchers who received 2 grants, such that only the record of receving the first grant will remain
     
     ids_complete$grant_start_year <- substring(ids_complete$grant_start_year, 7)  
-    ids_complete $grant_start_year <- as.numeric(ids_complete$grant_start_year)
+    ids_complete$grant_start_year <- as.numeric(ids_complete$grant_start_year)
     
     ids_complete <- ids_complete %>% 
         group_by(vedidk_core_researcher) %>% 
