@@ -24,12 +24,16 @@ read_one_author <- function(db_path, ids_complete_vector, ids_complete) {
       as_tibble()
  
  # mozna by bylo fajn v tomto kroku vyselektovat vsechny nepublikacni vystupy, protoze ty jsou asi defaultne zapocitane:
+ ## 
      one_vedidk_filtered_pubs <- DBI::dbReadTable(con, "riv_disc") %>%  #colnames()
-     select(id_unique, pub_type) %>%
+     select(id_unique, pub_type, disc, ford) %>%
      filter(id_unique %in% one_vedidk_pubids$id_unique) %>%
      filter(pub_type %in% c("J","B","C","D")) %>%
      as_tibble()
-     
+
+#tabulka nahoře obsahuje obor každé z publikací daného autora, a proto by šlo z ní vypočítat majoritní disciplínu daného autora. K tomu by bylo potřeba:
+#     1) přeložit disciplíny z roku dřívějšího než 2018 do klasifikace ford a 2) udělat nějaký algoritmus který by to agregoval a vytáhl z toho disciplinaritu daného autora - například vzít modus disciplín
+#     3)  tohle by se pak dalo vytisknout do proměnné "discipline" (podobně jako je proměnná sup_name) a tu pak přidat do tabulky níže tí že odstraníme #před mutate)
  
     sup_vector <- ids_complete %>% 
         filter(vedidk_core_researcher == ids_complete_vector) %>% 
@@ -49,7 +53,10 @@ read_one_author <- function(db_path, ids_complete_vector, ids_complete) {
       distinct() %>%
       mutate(vedidk = ids_complete_vector) %>% 
       mutate(vedouci = sup_name) %>% 
+      #mutate(discipline = discipline)
       as_tibble()
+  
+  one_vedidk_coauthors <- left_join(one_vedidk_coauthors, one_vedidk_filtered_pubs, by = )
   
   ####
   
