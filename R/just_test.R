@@ -105,7 +105,7 @@ just_test <- function(db_path) {
      median(all_researchers_pubs$weight) #průměr je 28.9 publikace na autora, median je 22,5 publikace na autora
      
      graph_all_researchers <- ggplot(data=all_researchers_pubs, aes(x = reorder(vedidk, -weight), y=weight)) +
-         geom_col() + ggtitle("Number of publications per research (whole career)") +
+         geom_col() + ggtitle("Number of publications per researcher (whole career)") +
          xlab("Researchers (vedidk)") + ylab("Number of publications")
      
      graph_all_researchers

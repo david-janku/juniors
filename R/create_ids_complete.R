@@ -52,7 +52,7 @@ create_ids_complete <- function(ids) {
     GJ$disc_ford[GJ$disc_ford %in% c("EI")] <- 30400
     GJ$disc_ford[GJ$disc_ford %in% c("FP")] <- 30500
     
-    GJ$disc_ford[GJ$disc_ford %in% c("GD", "GK", "GL", "DF", "GE", "GC")] <- 40100 
+    GJ$disc_ford[GJ$disc_ford %in% c("GD", "GK", "GL", "DF", "GE", "GF", "GC")] <- 40100 
     GJ$disc_ford[GJ$disc_ford %in% c("GG", "GH", "GI")] <- 40200
     GJ$disc_ford[GJ$disc_ford %in% c("GJ")] <- 40300 
     GJ$disc_ford[GJ$disc_ford %in% c("EI", "GM")] <- 40400
