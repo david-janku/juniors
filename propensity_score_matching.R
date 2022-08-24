@@ -288,6 +288,8 @@ pi_final$first_grant <- (pi_final$year_start - pi_final$year)
 count(pi_final$first_grant<0) #seems that 4738 people have negative values, meaning that they received a grant earlier than they pirst published anything - is this plausible? Further, 36483 people did not receive any grant, so have NAs, which might b probematic in Propensity score matching (I think)    
 
 
+
+
 #final data
 
 final_data <- left_join(treatment_data, career_start, by = "vedidk")
@@ -323,6 +325,7 @@ summary(final_data$year)
 summary(final_data$disc_ford)
 summary(final_data$freq)
 
+#matching with whole population
 out <- matchit(treatment~year+freq, method="nearest", data=final_data, ratio = 1, exact = "disc_ford", replace = TRUE)
 
 matched_data <- match.data(out) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
@@ -333,6 +336,23 @@ summary(out)
 
 plot(out)
 plot(out, type="hist")
+
+#matching only with those who previously received grant
+
+pi_final$year <- NULL
+pi_final$year_start <- NULL
+final_data_funded <- left_join(final_data, pi_final, by = "vedidk")
+final_data_funded <- as_tibble(na.omit(final_data_funded))
+sum(is.na(final_data_funded))
+
+out_funded <- matchit(treatment~year+freq+first_grant, method="nearest", data=final_data_funded, ratio = 1, exact = "disc_ford", replace = TRUE)
+
+matched_data_funded <- match.data(out_funded) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
+
+table(matched_data_funded$disc_ford, by = matched_data_funded$treatment)
+
+summary(out_funded)
+
 
 #another method (which was harder to tweak so I didnt end up using it)
 
