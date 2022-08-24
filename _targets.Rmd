@@ -57,9 +57,6 @@ lapply(list.files(here::here("R"), full.names = TRUE), source)
 ```{targets data_import}
 list(
     
-    # tar_target(one_author,
-    #           read.csv2(here::here("data", "raw",    #"Binter_pubs.csv")),
- #              format = "qs"),
      tar_target(ids_path, here::here("data", "raw", "supervisors.csv"), format = "file"),
      tar_target(ids, read.csv2(ids_path, nrows = 20),
               format = "qs"),

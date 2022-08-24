@@ -145,7 +145,8 @@ discipline_data <- left_join(discipline_pubs_short, n_pubs_filtered, by = "id_un
 discipline_data$disc_ford <- as.character(discipline_data$disc_ford)
 
 
-count(discipline_data$disc_ford) #test showed I ned to look closer to things that contain D and F and perhaps J and then perhaps delete all the letters
+count(discipline_data$disc_ford) 
+
 
 disciplines <- discipline_data %>% 
     select(disc_ford, vedidk) %>% 
@@ -164,8 +165,37 @@ count(disciplines$disc_ford)
 
 ### it would be cool to now count how many/what proportion of publications each author has within their "primary discipline" vs in other disciplines
 
+##interdisciplinarity / specialisation
 
-##calculating intervention
+interdisc <- discipline_data %>% 
+    dplyr::select(disc_ford, vedidk) %>% 
+    filter(!is.na(disc_ford)) %>% 
+    filter(vedidk %in% n_pubs_count$vedidk) 
+
+interdisc <- left_join(interdisc, disciplines, by = "vedidk", suffix = c("_pub", "_main"))
+
+interdisc_final <- interdisc %>%  
+      group_by(vedidk) %>% 
+      filter(disc_ford_pub != disc_ford_main) %>% 
+      dplyr::count(name = "interdisc") %>% 
+      ungroup() 
+
+interdisc_final <- left_join(n_pubs_count, interdisc_final, by = "vedidk")
+
+interdisc_final$interdisc <- replace_na(interdisc_final$interdisc, "0")
+
+interdisc_final$interdisc <- as.numeric(interdisc_final$interdisc)
+
+
+interdisc_final <- interdisc_final %>% 
+    mutate(interdisc_proportion = interdisc/freq*100)
+
+plot(hist(interdisc_final$interdisc_proportion))
+
+sum(interdisc_final$interdisc_proportion == 0)
+
+
+##calculating intervention group
 
 GJ <- DBI::dbReadTable(con, "cep_details") %>%
     filter(program_kod == "GJ") %>% 
@@ -199,7 +229,63 @@ treatment_data <- n_pubs_count %>%
 count(treatment_data$treatment) #this shows that it matched only 329 out of 356 treatment vedidks -> not sure why?
 
 
-##calculating whether they have received any grant //in some time period// - maybe first (career) year of receving their grant?
+##calculating first (career) year of receiving any grant
+
+
+career_start_year <- age_data %>% 
+    dplyr::select(vedidk, year) %>% 
+    filter(vedidk %in% n_pubs_count$vedidk) %>% 
+    group_by(vedidk) %>% 
+    slice(which.min(year)) %>% 
+    ungroup() 
+
+# career_start$id_unique <- NULL
+# career_start$year <- as.numeric(career_start$year) 
+# career_start$year <- (2022-career_start$year)
+
+
+funding_codes <- DBI::dbReadTable(con, "cep_investigators") %>%
+    filter(vedidk %in% career_start_year$vedidk) %>% 
+    filter(!is.na(vedidk)) %>% #pozor! více než 50 % projektů v databázi nemá přiřazený vedidk řešitele!
+    # filter(role_researcher == G) %>% filtruje jen hlavní řešitele (G) a ne "další řešitele" (R)
+    dplyr::select(kod, vedidk) %>% 
+    # distinct() %>% 
+    as_tibble
+
+# count(funding_codes$role_researcher)
+
+funding_year <- DBI::dbReadTable(con, "cep_details") %>% 
+    filter(kod %in% funding_codes$kod) %>% #pozor! opět mi to našlo cca jen 50 % z oho přechozího datasetu, který obsahoval všechny projekty které mají vedidky. Nevím proč 
+    dplyr::select(kod, disc, ford, year_start) %>% 
+    # tidyr::unite(disc_ford, c(disc, ford), na.rm = TRUE) %>%
+    distinct() %>% 
+    as_tibble
+
+pi_year <- left_join(funding_year, funding_codes, by = "kod")
+
+pi_year$year_start <- ifelse(nchar(pi_year$year_start, type = "chars", allowNA = FALSE, keepNA = NA)>4, substring(pi_year$year_start, 7), pi_year$year_start)
+    
+pi_year$year_start <- as.numeric(pi_year$year_start)
+
+
+
+pi_first_year <- pi_year %>% 
+    dplyr::select(vedidk, year_start) %>% 
+    filter(!is.na(vedidk)) %>% 
+    filter(!is.na(year_start))  %>% 
+    group_by(vedidk) %>% 
+    slice(which.min(year_start)) %>% 
+    ungroup() 
+
+
+pi_final <- left_join(career_start_year, pi_first_year, by = "vedidk")
+
+pi_final$year <- as.numeric(pi_final$year)
+pi_final$year_start <- as.numeric(pi_final$year_start)
+
+pi_final$first_grant <- (pi_final$year_start - pi_final$year)
+
+count(pi_final$first_grant<0) #seems that 4738 people have negative values, meaning that they received a grant earlier than they pirst published anything - is this plausible? Further, 36483 people did not receive any grant, so have NAs, which might b probematic in Propensity score matching (I think)    
 
 
 #final data
@@ -208,8 +294,20 @@ final_data <- left_join(treatment_data, career_start, by = "vedidk")
 final_data <- left_join(final_data, disciplines, by = "vedidk")
 final_data <- left_join(final_data, n_pubs_count, by = "vedidk")
 
+##excluding rows with missing values
 final_data <- as_tibble(na.omit(final_data))
 sum(is.na(final_data))
+
+##excluding ids from treatment group for which we couldnt find a supervisors manually  
+ids_out <- read.csv2(here::here("data", "raw", "supervisors.csv"))  
+   
+ids_out <- as_tibble(ids_out) %>% 
+    filter(is.na(vedoucí.vedidk)) %>% 
+    filter(!is.na(vedidk_core_researcher))
+
+final_data <- final_data %>% 
+    filter(!vedidk %in% ids_out$vedidk_core_researcher)
+    
 
 # final_data <- final_data %>% 
     # filter(!freq>400)
@@ -231,10 +329,12 @@ matched_data <- match.data(out) # this actually spits out exactly the list of tr
 
 table(matched_data$disc_ford, by = matched_data$treatment)
 
+summary(out)
+
 plot(out)
 plot(out, type="hist")
 
-#another method:
+#another method (which was harder to tweak so I didnt end up using it)
 
 glml <- glm(treatment~year+freq+disc_ford, family = binomial, data = final_data)
 
@@ -254,4 +354,4 @@ myMatchMat <- data.frame("PS"=glml$fitted.values, "trim"=final_data$disc_ford)
 
 glm_data <- data.frame("PS"=glml$fitted.values)
 
-Matchby()
+# I can try using Matchby() - that seems like a flavour I would need
