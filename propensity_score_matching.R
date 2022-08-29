@@ -300,16 +300,62 @@ final_data <- left_join(final_data, n_pubs_count, by = "vedidk")
 final_data <- as_tibble(na.omit(final_data))
 sum(is.na(final_data))
 
-##excluding ids from treatment group for which we couldnt find a supervisors manually  
+##constructing alternative final_data including info about funding
+pi_final$year <- NULL
+pi_final$year_start <- NULL
+final_data_funded <- left_join(final_data, pi_final, by = "vedidk")
+final_data_funded <- as_tibble(na.omit(final_data_funded))
+sum(is.na(final_data_funded))
+
+###comapring those we couldnt find supervisors for with those we could 
 ids_out <- read.csv2(here::here("data", "raw", "supervisors.csv"))  
-   
+
 ids_out <- as_tibble(ids_out) %>% 
     filter(is.na(vedoucí.vedidk)) %>% 
     filter(!is.na(vedidk_core_researcher))
 
+
+sup_found <- final_data_funded %>% 
+    filter(!vedidk %in% ids_out$vedidk_core_researcher) %>% 
+    filter(treatment == 1)
+
+sup_not_found <- final_data_funded %>% 
+    filter(vedidk %in% ids_out$vedidk_core_researcher)
+
+t.test(sup_found$year, sup_not_found$year, var.equal = TRUE) # p-value = 0.359; this says that the group without supervisor is not significantly older than the group with supervisor 
+
+t.test(sup_found$freq, sup_not_found$freq, var.equal = TRUE) #p-value = 0.3132, this says that the group without supervisor has not significantly more publications to this date than the group with supervisor
+
+t.test(sup_found$first_grant, sup_not_found$first_grant, var.equal = TRUE) #p-value = 0.3281, this says that the group without supervisor has not significantly more publications to this date than the group with supervisor
+
+new <- table(sup_found$disc_ford)
+new2 <- table(sup_not_found$disc_ford)
+
+chisq.test(new, new2)
+
+new3 <- as_tibble(new, .name_repair = "minimal")
+new4 <- as_tibble(new2, .name_repair = "minimal")
+full <- left_join(new3, new4, by = "")
+full[1] <- NULL
+full <- as.matrix(full)
+
+chisq.test(full)
+
+full <- t(full)
+
+chisq.test(full)
+
+
+##excluding ids from treatment group for which we couldnt find a supervisors manually  
+
+
 final_data <- final_data %>% 
     filter(!vedidk %in% ids_out$vedidk_core_researcher)
     
+final_data_funded <- final_data_funded %>% 
+    filter(!vedidk %in% ids_out$vedidk_core_researcher)
+
+
 
 # final_data <- final_data %>% 
     # filter(!freq>400)
@@ -339,11 +385,7 @@ plot(out, type="hist")
 
 #matching only with those who previously received grant
 
-pi_final$year <- NULL
-pi_final$year_start <- NULL
-final_data_funded <- left_join(final_data, pi_final, by = "vedidk")
-final_data_funded <- as_tibble(na.omit(final_data_funded))
-sum(is.na(final_data_funded))
+
 
 out_funded <- matchit(treatment~year+freq+first_grant, method="nearest", data=final_data_funded, ratio = 1, exact = "disc_ford", replace = TRUE)
 
