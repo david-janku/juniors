@@ -45,7 +45,9 @@ tar_option_set(packages = c("dplyr",
                             "tidytext",
                             "tm",
                             "RSQLite",
-                            "DBI"
+                            "DBI",
+                            "MatchIt",
+                            "plyr"
                             ))
 
 # read custom functions
@@ -65,9 +67,27 @@ list(
     tar_target(ids_complete_vector,
                make_ids_complete_vector(ids_complete)),
     tar_target(db_path,
-           here::here("data", "raw", "czech_sci_db.sqlite")),
-    tar_target(all_pubs,
-           get_all_pubs(db_path, ids_complete), 
+           here::here("data", "raw", "czech_sci_db.sqlite"))#,
+    # tar_target(all_pubs,
+    #        get_all_pubs(db_path, ids_complete), 
+    #           format = "qs"),
+    # tar_target(one_author,
+    #        read_one_author(db_path, ids_complete_vector, ids_complete), 
+    #           format = "qs", pattern = map(ids_complete_vector), iteration = "list")
+    # 
+)
+```
+
+# Matching and data preparation 
+
+```{targets matching_preparation}
+list(
+    
+     tar_target(matching, match(db_path, ids)
+                format = "qs"),
+     #at this point, I will need to manually search for the supervisors of the control group researchers and upload their vedidks into new ids file
+     tar_target(all_pubs,
+           get_all_pubs(db_path, matching, ids_complete), 
               format = "qs"),
     tar_target(one_author,
            read_one_author(db_path, ids_complete_vector, ids_complete), 

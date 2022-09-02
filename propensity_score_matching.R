@@ -24,7 +24,7 @@ n_pubs_filtered <- DBI::dbReadTable(con, "authors_by_pubs") %>%
     distinct() %>% 
     as_tibble()
 
-n_pubs_count <- count(n_pubs_filtered, vars = "vedidk") %>% 
+n_pubs_count <- plyr::count(n_pubs_filtered, vars = "vedidk") %>% 
     filter(freq > 4) %>%  #filtering out all authors with less than 4 publications
     as_tibble
 
@@ -131,21 +131,21 @@ discipline_pubs$disc_ford <- na_if(discipline_pubs$disc_ford, "J")
 discipline_pubs$disc_ford <- na_if(discipline_pubs$disc_ford, "O9")
 discipline_pubs$disc_ford <- na_if(discipline_pubs$disc_ford, "")
 
-count(discipline_pubs$disc_ford)
+plyr::count(discipline_pubs$disc_ford)
 
 
 
 
 discipline_pubs_short <- discipline_pubs 
 discipline_pubs_short$disc_ford <- substring(discipline_pubs_short$disc_ford, 0, 1)
-    
+
 discipline_data <- left_join(discipline_pubs_short, n_pubs_filtered, by = "id_unique") %>% 
     distinct() 
 
 discipline_data$disc_ford <- as.character(discipline_data$disc_ford)
 
 
-count(discipline_data$disc_ford) 
+plyr::count(discipline_data$disc_ford) 
 
 
 disciplines <- discipline_data %>% 
@@ -156,7 +156,7 @@ disciplines <- discipline_data %>%
     slice(which.max(table(disc_ford))) %>% 
     ungroup() 
 
-count(disciplines$disc_ford)
+plyr::count(disciplines$disc_ford)
 
 # just trying whether the above method actually produces sensible results
 # df <- data.frame(id = 1:10, strings = c("A", "B","C", "A", "B", "D", "B", "C", "C", "C"))
@@ -175,15 +175,15 @@ interdisc <- discipline_data %>%
 interdisc <- left_join(interdisc, disciplines, by = "vedidk", suffix = c("_pub", "_main"))
 
 interdisc_final <- interdisc %>%  
-      group_by(vedidk) %>% 
-      filter(disc_ford_pub != disc_ford_main) %>% 
-      dplyr::count(name = "interdisc") %>% 
-      ungroup() 
+    group_by(vedidk) %>% 
+    filter(disc_ford_pub != disc_ford_main) %>% 
+    dplyr::count(name = "interdisc") %>% 
+    ungroup() 
 
 interdisc_final <- left_join(n_pubs_count, interdisc_final, by = "vedidk")
 
-interdisc_final$interdisc <- replace_na(interdisc_final$interdisc, "0")
-
+interdisc_final$interdisc <- as.character(interdisc_final$interdisc)
+interdisc_final$interdisc <- tidyr::replace_na(interdisc_final$interdisc, "0")
 interdisc_final$interdisc <- as.numeric(interdisc_final$interdisc)
 
 
@@ -204,21 +204,14 @@ GJ <- DBI::dbReadTable(con, "cep_details") %>%
     distinct() %>% 
     as_tibble
 
-    GJ_vector <- GJ$kod %>% 
-        as_tibble() %>% 
-        as_vector() %>% 
-        as_tibble() %>% #from here below it was added - I should check that it does change any further results 
-        distinct() %>% #here
-        as_vector()
-    
-    treatment_group <- DBI::dbReadTable(con, "cep_investigators") %>%
-        select(kod, vedidk) %>% 
-        filter(kod %in% GJ_vector) %>% 
-        distinct() %>% 
-        as_tibble()
-    
+treatment_group <- DBI::dbReadTable(con, "cep_investigators") %>%
+    select(kod, vedidk) %>% 
+    filter(kod %in% GJ$kod) %>% 
+    distinct() %>% 
+    as_tibble()
+
 treatment_refined <- treatment_group %>% 
-     filter(!is.na(vedidk)) 
+    filter(!is.na(vedidk)) 
 # This show that although the database could find 845 distinct pairs of Junior grant code and vedidk, only in 356 cases there were actual vedidks, which means that in 845-356=489 cases there were pairs of existing code but missing vedidk 
 
 treatment_data <- n_pubs_count %>% 
@@ -226,7 +219,7 @@ treatment_data <- n_pubs_count %>%
     mutate(treatment = ifelse(vedidk %in% treatment_refined$vedidk, 1, 0)) %>% 
     as_tibble()
 
-count(treatment_data$treatment) #this shows that it matched only 329 out of 356 treatment vedidks -> not sure why?
+plyr::count(treatment_data$treatment) #this shows that it matched only 329 out of 356 treatment vedidks -> not sure why?
 
 
 ##calculating first (career) year of receiving any grant
@@ -264,7 +257,7 @@ funding_year <- DBI::dbReadTable(con, "cep_details") %>%
 pi_year <- left_join(funding_year, funding_codes, by = "kod")
 
 pi_year$year_start <- ifelse(nchar(pi_year$year_start, type = "chars", allowNA = FALSE, keepNA = NA)>4, substring(pi_year$year_start, 7), pi_year$year_start)
-    
+
 pi_year$year_start <- as.numeric(pi_year$year_start)
 
 
@@ -285,7 +278,7 @@ pi_final$year_start <- as.numeric(pi_final$year_start)
 
 pi_final$first_grant <- (pi_final$year_start - pi_final$year)
 
-count(pi_final$first_grant<0) #seems that 4738 people have negative values, meaning that they received a grant earlier than they pirst published anything - is this plausible? Further, 36483 people did not receive any grant, so have NAs, which might b probematic in Propensity score matching (I think)    
+plyr::count(pi_final$first_grant<0) #seems that 4738 people have negative values, meaning that they received a grant earlier than they pirst published anything - is this plausible? Further, 36483 people did not receive any grant, so have NAs, which might b probematic in Propensity score matching (I think)    
 
 
 
@@ -307,7 +300,7 @@ final_data_funded <- left_join(final_data, pi_final, by = "vedidk")
 final_data_funded <- as_tibble(na.omit(final_data_funded))
 sum(is.na(final_data_funded))
 
-###comapring those we couldnt find supervisors for with those we could 
+###comparing those we couldnt find supervisors for with those we could 
 ids_out <- read.csv2(here::here("data", "raw", "supervisors.csv"))  
 
 ids_out <- as_tibble(ids_out) %>% 
@@ -351,16 +344,16 @@ chisq.test(full)
 
 final_data <- final_data %>% 
     filter(!vedidk %in% ids_out$vedidk_core_researcher)
-    
+
 final_data_funded <- final_data_funded %>% 
     filter(!vedidk %in% ids_out$vedidk_core_researcher)
 
 
 
 # final_data <- final_data %>% 
-    # filter(!freq>400)
+# filter(!freq>400)
 
-                        
+
 # final_data <- left_join(treatment_data, career_start, disciplines, n_pubs_count, by = "vedidk")
 
 
@@ -395,25 +388,3 @@ table(matched_data_funded$disc_ford, by = matched_data_funded$treatment)
 
 summary(out_funded)
 
-
-#another method (which was harder to tweak so I didnt end up using it)
-
-glml <- glm(treatment~year+freq+disc_ford, family = binomial, data = final_data)
-
-summary(glml)
-
-
-# tr <- cbind(final_data$treatment)
-# x <- cbind(final_data$year, final_data$disc_ford, final_data$freq)
-# var1 <- final_data$disc_ford
-
-rr1 <- Match(Tr = final_data$treatment, X = myMatchMat$PS, exact = c(0,1))
-summary(rr1)
-
-MatchBalance(treatment~year+freq, match.out = rr1, nboots = 0, data = final_data)
-
-myMatchMat <- data.frame("PS"=glml$fitted.values, "trim"=final_data$disc_ford)
-
-glm_data <- data.frame("PS"=glml$fitted.values)
-
-# I can try using Matchby() - that seems like a flavour I would need
