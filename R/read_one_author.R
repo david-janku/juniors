@@ -8,7 +8,7 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-read_one_author <- function(db_path, ids_complete_vector, ids_complete) {
+read_one_author <- function(db_path, ids_complete_vector, ids_complete, matching, ids_full_vector) {
 
   con <-  DBI::dbConnect(RSQLite::SQLite(), db_path)
   on.exit(DBI::dbDisconnect(con))
@@ -16,21 +16,33 @@ read_one_author <- function(db_path, ids_complete_vector, ids_complete) {
   DBI::dbListTables(con)
   
 
- 
- one_vedidk_pubids <- DBI::dbReadTable(con, "authors_by_pubs") %>% #colnames()
-      filter(vedidk == ids_complete_vector) %>% 
+  one_vedidk_pubids <- DBI::dbReadTable(con, "authors_by_pubs") %>% #colnames()
+      filter(vedidk == ids_full_vector) %>% 
       select(vedidk, id_unique) %>% 
       distinct() %>% 
       as_tibble()
+  
+ matching <- matching %>%    # tohle asi bude dělat problémy když se tam budou opakovat vedidky, a oni se opakují -> nevím jak to vyřešit - ledaže bych měl nějaké pořadí toho vektoru a pracoval s tím pořadím
+     filter(vedidk == ids_full_vector)
+ 
+ #  saving just for case that something goes bad and I will need to return to this / this is the last version that worked
+ # one_vedidk_pubids <- DBI::dbReadTable(con, "authors_by_pubs") %>% #colnames()
+ #      filter(vedidk == ids_complete_vector) %>% 
+ #      select(vedidk, id_unique) %>% 
+ #      distinct() %>% 
+ #      as_tibble()
  
  # mozna by bylo fajn v tomto kroku vyselektovat vsechny nepublikacni vystupy, protoze ty jsou asi defaultne zapocitane:
  ## 
-     one_vedidk_filtered_pubs <- DBI::dbReadTable(con, "riv_disc") %>%  #colnames()
-     select(id_unique, pub_type, disc, ford) %>%
+     one_vedidk_filtered_pubs <- DBI::dbReadTable(con, "riv_disc") %>%  # colnames()
+     select(id_unique, pub_type, disc, ford, year) %>%
      filter(id_unique %in% one_vedidk_pubids$id_unique) %>%
      filter(pub_type %in% c("J","B","C","D")) %>%
+     purrr::when(matching$independence_timing == "before_intervention" ~ filter(., year <= matching$treatment_year), ~ filter(., year >= matching$treatment_year)) %>% 
      as_tibble()
-
+     
+     
+     
 #tabulka nahoře obsahuje obor každé z publikací daného autora, a proto by šlo z ní vypočítat majoritní disciplínu daného autora. K tomu by bylo potřeba:
 #     1) přeložit disciplíny z roku dřívějšího než 2018 do klasifikace ford a 2) udělat nějaký algoritmus který by to agregoval a vytáhl z toho disciplinaritu daného autora - například vzít modus disciplín
 #     3)  tohle by se pak dalo vytisknout do proměnné "discipline" (podobně jako je proměnná sup_name) a tu pak přidat do tabulky níže tí že odstraníme #před mutate)
@@ -51,12 +63,10 @@ read_one_author <- function(db_path, ids_complete_vector, ids_complete) {
       select(id_unique, id_helper) %>% 
       filter(id_unique %in% one_vedidk_filtered_pubs$id_unique) %>% 
       distinct() %>%
-      mutate(vedidk = ids_complete_vector) %>% 
+      mutate(vedidk = matching$vedidk) %>% 
       mutate(vedouci = sup_name) %>% 
       #mutate(discipline = discipline)
       as_tibble()
-  
-  one_vedidk_coauthors <- left_join(one_vedidk_coauthors, one_vedidk_filtered_pubs, by = )
   
   ####
   

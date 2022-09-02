@@ -226,10 +226,28 @@ match <- function(db_path, ids) {
         filter(!is.na(vedidk)) 
     # This show that although the database could find 845 distinct pairs of Junior grant code and vedidk, only in 356 cases there were actual vedidks, which means that in 845-356=489 cases there were pairs of existing code but missing vedidk 
     
+    treatment_refined <- left_join(treatment_refined, GJ, by = "kod")
+    
+    treatment_refined$year_start <- ifelse(nchar(treatment_refined$year_start, type = "chars", allowNA = FALSE, keepNA = NA)>4, substring(treatment_refined$year_start, 7), treatment_refined$year_start)
+    
+    treatment_refined$year_start <- as.numeric(treatment_refined$year_start)
+    
+    tr <- treatment_refined %>%  #z tohoto plyne že všech 356 kódů je unikátních, tzn nikde tam nejsou 2 vedidky napsané na jednom grantu
+        select(vedidk) %>%
+        distinct()
+    
+    treatment_refined <-  treatment_refined %>% 
+        group_by(vedidk) %>% 
+        slice(which.min(year_start)) %>% 
+        ungroup()
+    #tímto krokem vyfiltruju pryč vedidky, které dostly více juniorských grantů a vezmu v potaz jen jejich první grant (celkem se to týká 7 lidí)
+    
     treatment_data <- n_pubs_count %>% 
         select(vedidk) %>% 
         mutate(treatment = ifelse(vedidk %in% treatment_refined$vedidk, 1, 0)) %>% 
+        mutate(treatment_year = ifelse(vedidk %in% treatment_refined$vedidk, treatment_refined$year_start, NA)) %>% 
         as_tibble()
+    #?v tomto kroku z původních 349 unique treatment vedidků zbyde jen 329. Když místo n_pubs_count použiju dataset all_auth jako výchozí (což v praxi znamená, že vezmu v potaz i autory, kteří mají méně něž 5 publikací), tak mi to i tak klesne na 343, což nevím proč se děje  
     
     plyr::count(treatment_data$treatment) #this shows that it matched only 329 out of 356 treatment vedidks -> not sure why?
     
@@ -301,8 +319,10 @@ match <- function(db_path, ids) {
     final_data <- left_join(final_data, disciplines, by = "vedidk")
     final_data <- left_join(final_data, n_pubs_count, by = "vedidk")
     
+    final_data$treatment_year <- NULL
+    
     ##excluding rows with missing values
-    final_data <- as_tibble(na.omit(final_data))
+    final_data <- as_tibble(na.omit(final_data)) #this deletes 2 rows
     sum(is.na(final_data))
     
     ##constructing alternative final_data including info about funding
@@ -317,7 +337,8 @@ match <- function(db_path, ids) {
     
     ids_out <- as_tibble(ids) %>% 
         filter(is.na(vedoucí.vedidk)) %>% 
-        filter(!is.na(vedidk_core_researcher))
+        filter(!is.na(vedidk_core_researcher)) 
+        
     
     
     sup_found <- final_data_funded %>% 
@@ -327,38 +348,42 @@ match <- function(db_path, ids) {
     sup_not_found <- final_data_funded %>% 
         filter(vedidk %in% ids_out$vedidk_core_researcher)
     
-    t.test(sup_found$year, sup_not_found$year, var.equal = TRUE) # p-value = 0.359; this says that the group without supervisor is not significantly older than the group with supervisor 
-    
-    t.test(sup_found$freq, sup_not_found$freq, var.equal = TRUE) #p-value = 0.3132, this says that the group without supervisor has not significantly more publications to this date than the group with supervisor
-    
-    t.test(sup_found$first_grant, sup_not_found$first_grant, var.equal = TRUE) #p-value = 0.3281, this says that the group without supervisor has not significantly more publications to this date than the group with supervisor
-    
-    new <- table(sup_found$disc_ford)
-    new2 <- table(sup_not_found$disc_ford)
-    
-    chisq.test(new, new2)
-    
-    new3 <- as_tibble(new, .name_repair = "minimal")
-    new4 <- as_tibble(new2, .name_repair = "minimal")
-    full <- left_join(new3, new4, by = "")
-    full[1] <- NULL
-    full <- as.matrix(full)
-    
-    chisq.test(full)
-    
-    full <- t(full)
-    
-    chisq.test(full)
-    
+    # t.test(sup_found$year, sup_not_found$year, var.equal = TRUE) # p-value = 0.359; this says that the group without supervisor is not significantly older than the group with supervisor 
+    # 
+    # t.test(sup_found$freq, sup_not_found$freq, var.equal = TRUE) #p-value = 0.3132, this says that the group without supervisor has not significantly more publications to this date than the group with supervisor
+    # 
+    # t.test(sup_found$first_grant, sup_not_found$first_grant, var.equal = TRUE) #p-value = 0.3281, this says that the group without supervisor has not significantly more publications to this date than the group with supervisor
+    # 
+    # new <- table(sup_found$disc_ford)
+    # new2 <- table(sup_not_found$disc_ford)
+    # 
+    # chisq.test(new, new2)
+    # 
+    # new3 <- as_tibble(new, .name_repair = "minimal")
+    # new4 <- as_tibble(new2, .name_repair = "minimal")
+    # full <- left_join(new3, new4, by = "")
+    # full[1] <- NULL
+    # full <- as.matrix(full)
+    # 
+    # chisq.test(full)
+    # 
+    # full <- t(full)
+    # 
+    # chisq.test(full)
+    # 
     
     ##excluding ids from treatment group for which we couldnt find a supervisors manually  
     
     
     final_data <- final_data %>% 
-        filter(!vedidk %in% ids_out$vedidk_core_researcher)
+        filter(!vedidk %in% ids_out$vedidk_core_researcher) %>% 
+        filter(vedidk != 4427920)     #one vedidk had over 800 publications, which seemed unrealistic, so I deleted it
+    
     
     final_data_funded <- final_data_funded %>% 
-        filter(!vedidk %in% ids_out$vedidk_core_researcher)
+        filter(!vedidk %in% ids_out$vedidk_core_researcher) %>% 
+        filter(vedidk != 4427920)     #one vedidk had over 800 publications, which seemed unrealistic, so I deleted it
+    
     
     
     
@@ -383,14 +408,58 @@ match <- function(db_path, ids) {
     
     table(matched_data$disc_ford, by = matched_data$treatment)
     
-    summary(out)
+    # summary(out)
+    
+    #adding treatment year
+    
+    m <- out[["match.matrix"]]%>% 
+        as.data.frame() %>% 
+        tibble::rownames_to_column("treatment_number") %>% 
+        as_tibble()
+    
+    names(m)[2] <- "control_number"
+   
+    m_final <- final_data %>% 
+        tibble::rownames_to_column("case_number") %>% 
+        mutate(treatment_year = ifelse(vedidk %in% treatment_refined$vedidk, treatment_refined$year_start, NA)) 
+    
+    
+    m_semi_final <- left_join(m_final, m, by = c("case_number" = "treatment_number")) %>% 
+        select(treatment_year, control_number)
+    
+    m_semi_final <- as_tibble(na.omit(m_semi_final))
+      
+    # plyr::count(m_final$treatment_year)
+    
+    #tady je problem -> když jeden člověk z kontrolní skupiny matchuje na více lidí z experimentální, tak tady se to vymaže a dá mu to jen jeden "treatment start", i když by měl mít více "treatment startss za každého člověk z experimentální skupiny s kým matchuje
+    # m_final <- m_final %>% 
+    #     mutate(treat_year = ifelse(case_number %in% m_semi_final$control_number, m_semi_final$treatment_year, treatment_year)) %>% 
+    #     select(vedidk, treat_year)
+    # 
+    # plyr::count(m_final$treat_year)
+    
+    m_final <- full_join(m_final, m_semi_final, by = c("case_number" = "control_number")) %>% 
+        tidyr::unite(treatment_year, c(treatment_year.x, treatment_year.y), na.rm = TRUE) %>% 
+        select(vedidk, treatment_year)
+    
+    m_final$treatment_year <- dplyr::na_if(m_final$treatment_year, "")
+    # plyr::count(m_final2_final$treatment_year)
+    
+    m_final <- as_tibble(na.omit(m_final))
+    
+    # plyr::count(m_final2_final$vedidk)
+    
+    matched_data <- full_join(matched_data, m_final, by = "vedidk")
+    
+    plyr::count(matched_data$treatment)
+    table(matched_data$treatment_year, by = matched_data$treatment)
     
     # plot(out)
     # plot(out, type="hist")
     
+    
+    
     #matching only with those who previously received grant
-    
-    
     
     out_funded <- matchit(treatment~year+freq+first_grant, method="nearest", data=final_data_funded, ratio = 1, exact = "disc_ford", replace = TRUE)
     
@@ -399,6 +468,55 @@ match <- function(db_path, ids) {
     table(matched_data_funded$disc_ford, by = matched_data_funded$treatment)
     
     summary(out_funded)
+    
+    plyr::count(matched_data_funded$treatment)
+    
+    #adding treatment year
+    
+    m2 <- out_funded[["match.matrix"]]%>% 
+        as.data.frame() %>% 
+        tibble::rownames_to_column("treatment_number") %>% 
+        as_tibble()
+    
+    names(m2)[2] <- "control_number"
+    
+    # plyr::count(m2$control_number)
+    
+    
+    m_final2 <- final_data_funded %>% 
+        tibble::rownames_to_column("case_number") %>% 
+        mutate(treatment_year = ifelse(vedidk %in% treatment_refined$vedidk, treatment_refined$year_start, NA)) 
+    
+    
+    m_semi_final2 <- left_join(m_final2, m2, by = c("case_number" = "treatment_number")) %>% 
+        select(treatment_year, control_number)
+    
+    # plyr::count(m_semi_final2$control_number)
+    
+    m_semi_final2 <- as_tibble(na.omit(m_semi_final2))
+    
+    # plyr::count(m_semi_final2$control_number)
+   
+    #tady je problem -> když jeden člověk z kontrolní skupiny matchuje na více lidí z experimentální, tak tady se to vymaže a dá mu to jen jeden "treatment start", i když by měl mít více "treatment startss za každého člověk z experimentální skupiny s kým matchuje
+    # m_final2 <- m_final2 %>% 
+    #     mutate(treat_year = ifelse(case_number %in% m_semi_final2$control_number, m_semi_final2$treatment_year, treatment_year)) %>% 
+    #     select(vedidk, treat_year)
+    # 
+    m_final2_final <- full_join(m_final2, m_semi_final2, by = c("case_number" = "control_number")) %>% 
+        tidyr::unite(treatment_year, c(treatment_year.x, treatment_year.y), na.rm = TRUE) %>% 
+        select(vedidk, treatment_year)
+    
+    m_final2_final$treatment_year <- dplyr::na_if(m_final2_final$treatment_year, "")
+    # plyr::count(m_final2_final$treatment_year)
+    
+    m_final2_final <- as_tibble(na.omit(m_final2_final))
+    
+    # plyr::count(m_final2_final$vedidk)
+    
+    matched_data_funded <- full_join(matched_data_funded, m_final2_final, by = "vedidk")
+    
+    plyr::count(matched_data_funded$treatment)
+    table(matched_data_funded$treatment_year, by = matched_data_funded$treatment)
     
     
     # joining funded and unfunded tables
@@ -422,11 +540,18 @@ match <- function(db_path, ids) {
     matched_data_funded$funded_control <- ifelse(matched_data_funded$treatment == 0, 1, 0)
     matched_data_funded$treatment <- ifelse(matched_data_funded$treatment == 0, 2, matched_data_funded$treatment)
     
-    matched_data_funded <-  matched_data_funded %>% 
-        filter(!vedidk %in% matched_data$vedidk)
+    #uz nevim proc jsem tam tohle zaradil, ale myslím ze to nechci dělat 
+    # matched_data_funded <-  matched_data_funded %>% 
+    #     filter(!vedidk %in% matched_data$vedidk)
     
     full_data_revised <- rbind2(matched_data, matched_data_funded)
     
-    full_data_revised
+    #doubling data so we can calculate indepedence indicator independently from the pubs before the intevention and after the intevention
+    full_data_revised2 <- full_data_revised 
+    full_data_revised2$independence_timing <- "before_intervention"
+    full_data_revised$independence_timing <- "after_intervention"
+
+    full_data_final <-  rbind2(full_data_revised2, full_data_revised)   
     
+    full_data_final
 }

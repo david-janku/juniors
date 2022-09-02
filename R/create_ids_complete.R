@@ -7,7 +7,7 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-create_ids_complete <- function(ids) {
+create_ids_complete <- function(ids, db_path) {
 
     ids_complete <- as_tibble(ids) %>% 
         select(vedidk_core_researcher, vedoucí.vedidk) %>% 

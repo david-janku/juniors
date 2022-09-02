@@ -62,12 +62,13 @@ list(
      tar_target(ids_path, here::here("data", "raw", "supervisors.csv"), format = "file"),
      tar_target(ids, read.csv2(ids_path, nrows = 20),
               format = "qs"),
-      tar_target(ids_complete, create_ids_complete(ids),
+     tar_target(db_path,
+           here::here("data", "raw", "czech_sci_db.sqlite")),
+      tar_target(ids_complete, create_ids_complete(ids, db_path),
               format = "qs"),
     tar_target(ids_complete_vector,
-               make_ids_complete_vector(ids_complete)),
-    tar_target(db_path,
-           here::here("data", "raw", "czech_sci_db.sqlite"))#,
+               make_ids_complete_vector(ids_complete))#,
+    
     # tar_target(all_pubs,
     #        get_all_pubs(db_path, ids_complete), 
     #           format = "qs"),
@@ -83,15 +84,17 @@ list(
 ```{targets matching_preparation}
 list(
     
-     tar_target(matching, match(db_path, ids)
+     tar_target(matching, match(db_path, ids),
                 format = "qs"),
      #at this point, I will need to manually search for the supervisors of the control group researchers and upload their vedidks into new ids file
+     tar_target(ids_full_vector,
+               make_ids_full_vector(matching)),
      tar_target(all_pubs,
            get_all_pubs(db_path, matching, ids_complete), 
               format = "qs"),
     tar_target(one_author,
-           read_one_author(db_path, ids_complete_vector, ids_complete), 
-              format = "qs", pattern = map(ids_complete_vector), iteration = "list")
+           read_one_author(db_path, ids_complete_vector, ids_complete, matching, ids_full_vector), 
+              format = "qs", pattern = map(head(ids_full_vector,3)), iteration = "list")
     
 )
 ```
@@ -209,7 +212,7 @@ list(
 list(
     
     tar_target(final_data,
-               calc_final_data(eigen_centr, clustering, ind_topics, ind_pubs),
+               calc_final_data(eigen_centr, clustering, ind_topics, ind_pubs, matching),
                format = "qs") #,
      # tar_target(testing,
      #           just_test(db_path),
