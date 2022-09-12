@@ -92,9 +92,12 @@ list(
      tar_target(all_pubs,
            get_all_pubs(db_path, matching, ids_complete), 
               format = "qs"),
-    tar_target(one_author,
-           read_one_author(db_path, ids_complete_vector, ids_complete, matching, ids_full_vector), 
-              format = "qs", pattern = map(head(ids_full_vector,3)), iteration = "list")
+    # tar_target(one_author,
+           # read_one_author(db_path, ids_complete_vector, ids_complete, matching, ids_full_vector), 
+           #    format = "qs", pattern = map(head(ids_full_vector,3)), iteration = "list"),
+    tar_target(all_authors,
+           read_all_authors(db_path, ids_complete_vector, ids_complete, matching, ids_full_vector), 
+              format = "qs")
     
 )
 ```

@@ -8,7 +8,7 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-read_one_author <- function(db_path, ids_complete_vector, ids_complete, matching, ids_full_vector) {
+read_one_author <- function(db_path, ids_complete_vector, ids_complete, matching, ids_full_vector, intervention_year, timing) {
 
   con <-  DBI::dbConnect(RSQLite::SQLite(), db_path)
   on.exit(DBI::dbDisconnect(con))
@@ -22,9 +22,9 @@ read_one_author <- function(db_path, ids_complete_vector, ids_complete, matching
       distinct() %>% 
       as_tibble()
   
- matching <- matching %>%    # tohle asi bude dělat problémy když se tam budou opakovat vedidky, a oni se opakují -> nevím jak to vyřešit - ledaže bych měl nějaké pořadí toho vektoru a pracoval s tím pořadím
-     filter(vedidk == ids_full_vector)
- 
+ # matching <- matching %>%    # tohle asi bude dělat problémy když se tam budou opakovat vedidky, a oni se opakují -> nevím jak to vyřešit - ledaže bych měl nějaké pořadí toho vektoru a pracoval s tím pořadím
+ #     filter(vedidk == ids_full_vector)
+ # 
  #  saving just for case that something goes bad and I will need to return to this / this is the last version that worked
  # one_vedidk_pubids <- DBI::dbReadTable(con, "authors_by_pubs") %>% #colnames()
  #      filter(vedidk == ids_complete_vector) %>% 
@@ -38,7 +38,11 @@ read_one_author <- function(db_path, ids_complete_vector, ids_complete, matching
      select(id_unique, pub_type, disc, ford, year) %>%
      filter(id_unique %in% one_vedidk_pubids$id_unique) %>%
      filter(pub_type %in% c("J","B","C","D")) %>%
-     purrr::when(matching$independence_timing == "before_intervention" ~ filter(., year <= matching$treatment_year), ~ filter(., year >= matching$treatment_year)) %>% 
+         left_join(one_vedidk_pubids) %>% 
+         inner_join(matching %>% select(vedidk, treatment_year, independence_timing)) %>% 
+         filter(treatment_year == intervention_year, independence_timing == timing) %>% 
+         purrr::when(.$independence_timing == "before_intervention" ~ filter(., year <= treatment_year), ~ filter(., year >= treatment_year)) %>% 
+     # purrr::when(matching$independence_timing == "before_intervention" ~ filter(., year <= matching$treatment_year), ~ filter(., year >= matching$treatment_year)) %>% 
      as_tibble()
      
      
@@ -47,24 +51,25 @@ read_one_author <- function(db_path, ids_complete_vector, ids_complete, matching
 #     1) přeložit disciplíny z roku dřívějšího než 2018 do klasifikace ford a 2) udělat nějaký algoritmus který by to agregoval a vytáhl z toho disciplinaritu daného autora - například vzít modus disciplín
 #     3)  tohle by se pak dalo vytisknout do proměnné "discipline" (podobně jako je proměnná sup_name) a tu pak přidat do tabulky níže tí že odstraníme #před mutate)
  
-    sup_vector <- ids_complete %>% 
-        filter(vedidk_core_researcher == ids_complete_vector) %>% 
-        pull(vedoucí.vedidk) 
-    
-    sup_name <- DBI::dbReadTable(con, "authors_by_pubs") %>% #colnames()
-        filter(vedidk == sup_vector) %>% 
-        select(id_helper) %>% 
-        count(id_helper) %>% 
-        filter(n == max(n)) %>% 
-        slice_sample(n=1) %>% 
-        pull(id_helper)
+    # sup_vector <- ids_complete %>% 
+    #     filter(vedidk_core_researcher == ids_complete_vector) %>% 
+    #     pull(vedoucí.vedidk) 
+    # 
+    # sup_name <- DBI::dbReadTable(con, "authors_by_pubs") %>% #colnames()
+    #     filter(vedidk == sup_vector) %>% 
+    #     select(id_helper) %>% 
+    #     count(id_helper) %>% 
+    #     filter(n == max(n)) %>% 
+    #     slice_sample(n=1) %>% 
+    #     pull(id_helper)
  
   one_vedidk_coauthors <- DBI::dbReadTable(con, "authors_by_pubs") %>% # colnames()
       select(id_unique, id_helper) %>% 
       filter(id_unique %in% one_vedidk_filtered_pubs$id_unique) %>% 
       distinct() %>%
-      mutate(vedidk = matching$vedidk) %>% 
-      mutate(vedouci = sup_name) %>% 
+      left_join(one_vedidk_filtered_pubs, by ="id_unique") %>% 
+      mutate(vedidk = one_vedidk_filtered_pubs$vedidk[1]) %>% 
+      # mutate(vedouci = sup_name) %>% 
       #mutate(discipline = discipline)
       as_tibble()
   
