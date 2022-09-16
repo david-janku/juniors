@@ -15,10 +15,16 @@ read_all_authors <- function(db_path, ids_complete_vector, ids_complete,
                              matching, ids_full_vector) {
 
 matching <- as_tibble(matching)
+l <- list(a = matching$vedidk, b = matching$treatment_year, c = matching$independence_timing)
+
+l <- list(a = x, b = y, c = z)
+pmap(l, function(c, b, a) (a + c) * b)
+
+
 new <-  head(matching) %>% 
         select(vedidk, treatment_year, independence_timing) %>% 
-        mutate(pub_table = purrr::map(vedidk, intervention_year = treatment_year, timing = independence_timing, ~read_one_author(db_path, ids_complete_vector, ids_complete,
-                                                                  matching, ..1, ..2, ..3)))
+        mutate(pub_table = purrr::pmap(list(vedidk, treatment_year, independence_timing), 
+                                       read_one_author(db_path, ids_complete_vector, ids_complete, matching, ids_full_vector = vedidk, intervention_year = treatment_year, timing = independence_timing)))
 
 # intervention_year = treatment_year, timing = independence_timing
 #     ids_full_vector = vedidk)
