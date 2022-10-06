@@ -62,12 +62,16 @@ list(
      tar_target(ids_path, here::here("data", "raw", "supervisors.csv"), format = "file"),
      tar_target(ids, read.csv2(ids_path, nrows = 20),
               format = "qs"),
+     tar_target(gender, read.delim(here::here("data", "raw", "names4api_tagged.tsv")),
+              format = "qs"),
      tar_target(db_path,
            here::here("data", "raw", "czech_sci_db.sqlite")),
       tar_target(ids_complete, create_ids_complete(ids, db_path),
               format = "qs"),
     tar_target(ids_complete_vector,
                make_ids_complete_vector(ids_complete))#,
+    
+    
     
     # tar_target(all_pubs,
     #        get_all_pubs(db_path, ids_complete), 
@@ -84,7 +88,7 @@ list(
 ```{targets matching_preparation}
 list(
     
-     tar_target(matching, match(db_path, ids),
+     tar_target(matching, match(db_path, ids, gender),
                 format = "qs"),
      #at this point, I will need to manually search for the supervisors of the control group researchers and upload their vedidks into new ids file
      tar_target(ids_full_vector,
