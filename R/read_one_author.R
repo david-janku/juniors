@@ -35,15 +35,17 @@ read_one_author <- function(db_path, ids_complete_vector, ids_complete, matching
  # mozna by bylo fajn v tomto kroku vyselektovat vsechny nepublikacni vystupy, protoze ty jsou asi defaultne zapocitane:
  ## 
      one_vedidk_filtered_pubs <- DBI::dbReadTable(con, "riv_disc") %>%  # colnames()
-     select(id_unique, pub_type, disc, ford, year) %>%
+     select(id_unique, year) %>%
      filter(id_unique %in% one_vedidk_pubids$id_unique) %>%
-     filter(pub_type %in% c("J","B","C","D")) %>%
-         left_join(one_vedidk_pubids) %>% 
-         inner_join(matching %>% select(vedidk, treatment_year, independence_timing)) %>% 
-         filter(treatment_year == intervention_year, independence_timing == timing) %>% 
-         purrr::when(.$independence_timing == "before_intervention" ~ filter(., year <= treatment_year), ~ filter(., year >= treatment_year)) %>% 
+     # filter(pub_type %in% c("J","B","C","D")) %>%
+     left_join(one_vedidk_pubids) %>% 
+     inner_join(matching %>% select(vedidk, treatment_year, independence_timing)) %>%  #jako další věc do select přidat sup_vedidk - to bude sloupec ve kterém bude vedidk supervisora daného člověka 
+     filter(treatment_year == intervention_year, independence_timing == timing) %>% 
+     # purrr::when(.$independence_timing == "before_intervention" ~ filter(., year <= treatment_year), ~ filter(., year >= treatment_year)) %>% 
      # purrr::when(matching$independence_timing == "before_intervention" ~ filter(., year <= matching$treatment_year), ~ filter(., year >= matching$treatment_year)) %>% 
      as_tibble()
+     
+     one_vedidk_filtered_pubs <- if(unique(one_vedidk_filtered_pubs$independence_timing) == "before_intervention"){filter(one_vedidk_filtered_pubs, year <= intervention_year)}else{filter(one_vedidk_filtered_pubs, year >= intervention_year)}
      
      
      
@@ -51,16 +53,16 @@ read_one_author <- function(db_path, ids_complete_vector, ids_complete, matching
 #     1) přeložit disciplíny z roku dřívějšího než 2018 do klasifikace ford a 2) udělat nějaký algoritmus který by to agregoval a vytáhl z toho disciplinaritu daného autora - například vzít modus disciplín
 #     3)  tohle by se pak dalo vytisknout do proměnné "discipline" (podobně jako je proměnná sup_name) a tu pak přidat do tabulky níže tí že odstraníme #před mutate)
  
-    # sup_vector <- ids_complete %>% 
-    #     filter(vedidk_core_researcher == ids_complete_vector) %>% 
-    #     pull(vedoucí.vedidk) 
+    # sup_vector <- ids_complete %>%
+    #     filter(vedidk_core_researcher == ids_complete_vector) %>%
+    #     pull(vedoucí.vedidk)
     # 
     # sup_name <- DBI::dbReadTable(con, "authors_by_pubs") %>% #colnames()
-    #     filter(vedidk == sup_vector) %>% 
-    #     select(id_helper) %>% 
-    #     count(id_helper) %>% 
-    #     filter(n == max(n)) %>% 
-    #     slice_sample(n=1) %>% 
+    #     filter(vedidk == unique(one_vedidk_filtered_pubs$sup_vedidk) %>% 
+    #     select(id_helper) %>%
+    #     count(id_helper) %>%
+    #     filter(n == max(n)) %>%
+    #     slice_sample(n=1) %>%
     #     pull(id_helper)
  
   one_vedidk_coauthors <- DBI::dbReadTable(con, "authors_by_pubs") %>% # colnames()

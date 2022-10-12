@@ -62,7 +62,7 @@ match <- function(db_path, ids, gender) {
     n_pubs_ws2014 <- plyr::count(n_pubs_ws2014, vars = "vedidk") %>% 
         as_tibble()
     
-    n_pubs_ws2014 <- rename( n_pubs_ws2014, ws_pubs = freq)
+    n_pubs_ws2014 <- rename(n_pubs_ws2014, ws_pubs = freq)
     
     
     #gender
@@ -428,9 +428,9 @@ match <- function(db_path, ids, gender) {
     
     matched_data2015 <- match.data(out2015) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
-    table(matched_data2015$disc_ford, by = matched_data2015$treatment)
+    # table(matched_data2015$disc_ford, by = matched_data2015$treatment)
     
-    summary(out2015)
+    # summary(out2015)
     
     
     m <- out2015[["match.matrix"]]%>% 
@@ -470,9 +470,9 @@ match <- function(db_path, ids, gender) {
     
     matched_data_funded2015 <- match.data(out_funded2015) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
-    table(matched_data_funded2015$disc_ford, by = matched_data_funded2015$treatment)
+    # table(matched_data_funded2015$disc_ford, by = matched_data_funded2015$treatment)
     
-    summary(out_funded2015)
+    # summary(out_funded2015)
     
     
     m <- out_funded2015[["match.matrix"]]%>% 
@@ -526,15 +526,7 @@ match <- function(db_path, ids, gender) {
     
     
     
-    ## 2) decide whether to join "unfunded" and "funded" tables right here (after each year) or only after the very end
     
-    
-    
-    ##potential problem - in the original Matching dataset, there was 48 juniors with treatment year 2015, whereas here are only 38 -> it could be because during the process the researchers with negative career age were deleted (in the step "career age") and some of it will also be because there porbably were some missing values -> e,g, in the "calculating treatment group" step we had 40 in treatment group and in the matching itself there were only 38
-    
-   
-    
-    ##co dal:   3) přidat další proměnné které jsou důležité - gender, instituce, peer review papery, atd... 4) vyrobit 2 kontrolni skupiny - jednu s fundingem a druhou bez 
     
     
     
@@ -708,9 +700,9 @@ match <- function(db_path, ids, gender) {
     
     matched_data2016 <- match.data(out2016) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
-    table(matched_data2016$disc_ford, by = matched_data2016$treatment)
+    # table(matched_data2016$disc_ford, by = matched_data2016$treatment)
     
-    summary(out2016)
+    # summary(out2016)
     
     
     m <- out2016[["match.matrix"]]%>% 
@@ -750,9 +742,9 @@ match <- function(db_path, ids, gender) {
     
     matched_data_funded2016 <- match.data(out_funded2016) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
-    table(matched_data_funded2016$disc_ford, by = matched_data_funded2016$treatment)
+    # table(matched_data_funded2016$disc_ford, by = matched_data_funded2016$treatment)
     
-    summary(out_funded2016)
+    # summary(out_funded2016)
     
     
     m <- out_funded2016[["match.matrix"]]%>% 
@@ -981,9 +973,9 @@ match <- function(db_path, ids, gender) {
     
     matched_data2017 <- match.data(out2017) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
-    table(matched_data2017$disc_ford, by = matched_data2017$treatment)
+    # table(matched_data2017$disc_ford, by = matched_data2017$treatment)
     
-    summary(out2017)
+    # summary(out2017)
     
     
     m <- out2017[["match.matrix"]]%>% 
@@ -1023,9 +1015,9 @@ match <- function(db_path, ids, gender) {
     
     matched_data_funded2017 <- match.data(out_funded2017) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
-    table(matched_data_funded2017$disc_ford, by = matched_data_funded2017$treatment)
+    # table(matched_data_funded2017$disc_ford, by = matched_data_funded2017$treatment)
     
-    summary(out_funded2017)
+    # summary(out_funded2017)
     
     
     m <- out_funded2017[["match.matrix"]]%>% 
@@ -1250,9 +1242,9 @@ match <- function(db_path, ids, gender) {
     
     matched_data2018 <- match.data(out2018) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
-    table(matched_data2018$disc_ford, by = matched_data2018$treatment)
+    # table(matched_data2018$disc_ford, by = matched_data2018$treatment)
     
-    summary(out2018)
+    # summary(out2018)
     
     
     m <- out2018[["match.matrix"]]%>% 
@@ -1292,9 +1284,9 @@ match <- function(db_path, ids, gender) {
     
     matched_data_funded2018 <- match.data(out_funded2018) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
-    table(matched_data_funded2018$disc_ford, by = matched_data_funded2018$treatment)
+    # table(matched_data_funded2018$disc_ford, by = matched_data_funded2018$treatment)
     
-    summary(out_funded2018)
+    # summary(out_funded2018)
     
     
     m <- out_funded2018[["match.matrix"]]%>% 
@@ -1521,9 +1513,9 @@ match <- function(db_path, ids, gender) {
     
     matched_data2019 <- match.data(out2019) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
-    table(matched_data2019$disc_ford, by = matched_data2019$treatment)
+    # table(matched_data2019$disc_ford, by = matched_data2019$treatment)
     
-    summary(out2019)
+    # summary(out2019)
     
     
     m <- out2019[["match.matrix"]]%>% 
@@ -1563,9 +1555,9 @@ match <- function(db_path, ids, gender) {
     
     matched_data_funded2019 <- match.data(out_funded2019) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
-    table(matched_data_funded2019$disc_ford, by = matched_data_funded2019$treatment)
+    # table(matched_data_funded2019$disc_ford, by = matched_data_funded2019$treatment)
     
-    summary(out_funded2019)
+    # summary(out_funded2019)
     
     
     m <- out_funded2019[["match.matrix"]]%>% 
@@ -1793,9 +1785,9 @@ match <- function(db_path, ids, gender) {
     
     matched_data2020 <- match.data(out2020) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
-    table(matched_data2020$disc_ford, by = matched_data2020$treatment)
+    # table(matched_data2020$disc_ford, by = matched_data2020$treatment)
     
-    summary(out2020)
+    # summary(out2020)
     
     
     m <- out2020[["match.matrix"]]%>% 
@@ -1835,9 +1827,9 @@ match <- function(db_path, ids, gender) {
     
     matched_data_funded2020 <- match.data(out_funded2020) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
-    table(matched_data_funded2020$disc_ford, by = matched_data_funded2020$treatment)
+    # table(matched_data_funded2020$disc_ford, by = matched_data_funded2020$treatment)
     
-    summary(out_funded2020)
+    # summary(out_funded2020)
     
     
     m <- out_funded2020[["match.matrix"]]%>% 
@@ -1882,7 +1874,7 @@ match <- function(db_path, ids, gender) {
     
     full_data2020_1 <- rbind2(matched_data2020, matched_data_funded2020)
     
-    #doubling data so we can calculate indepedence indicator independently from the pubs before the intevention and after the intevention
+    #doubling data so we can calculate indepedence indicator independently from the pubs before the intevention and after the intervention
     full_data2020_2 <- full_data2020_1 
     full_data2020_2$independence_timing <- "before_intervention"
     full_data2020_1$independence_timing <- "after_intervention"
@@ -1896,15 +1888,92 @@ match <- function(db_path, ids, gender) {
     
     ##full join of all datasets
     
+    full_data2015 <- rename(full_data2015, career_lenght = lenght2014)
+    full_data2016 <- rename(full_data2016, career_lenght = lenght2015)
+    full_data2017 <- rename(full_data2017, career_lenght = lenght2016)
+    full_data2018 <- rename(full_data2018, career_lenght = lenght2017)
+    full_data2019 <- rename(full_data2019, career_lenght = lenght2018)
+    full_data2020 <- rename(full_data2020, career_lenght = lenght2019)
     
-    full_data_final <- rbind2(full_data2015, full_data2016) 
+    full_data2015 <- rename(full_data2015, grants = grants2014)
+    full_data2016 <- rename(full_data2016, grants = grants2015)
+    full_data2017 <- rename(full_data2017, grants = grants2016)
+    full_data2018 <- rename(full_data2018, grants = grants2017)
+    full_data2019 <- rename(full_data2019, grants = grants2018)
+    full_data2020 <- rename(full_data2020, grants = grants2019)
+
+    
+    full_data_final <- methods::rbind2(full_data2015, full_data2016) 
     full_data_final <- rbind2(full_data_final, full_data2017) 
     full_data_final <- rbind2(full_data_final, full_data2018)
     full_data_final <- rbind2(full_data_final, full_data2019)
     full_data_final <- rbind2(full_data_final, full_data2020)
     
+    # problem: v tomto datasetu mame jen 225 pozorovani v experimentalni skupine -> v predchozi verzi "matching" funkce jsme jich měli 317 
     
-    full_data_final
+    
+    
+    #filtering out observations from treatment group (and their paired observations from control groups) which we couldnt find supervisors for
+    
+    ids_out <- as_tibble(ids) %>% 
+            filter(is.na(vedoucí.vedidk)) %>%
+            filter(!is.na(vedidk_core_researcher))
+    
+    full_data_final_clean <- full_data_final %>% 
+            filter(!vedidk %in% ids_out$vedidk_core_researcher) %>%
+            filter(!vedidk_treatment %in% ids_out$vedidk_core_researcher) %>% 
+            filter(vedidk != 4427920) %>%      #one vedidk had over 800 publications, which seemed unrealistic, so I deleted it
+            subset(!vedidk_treatment %in% c(4427920)) %>% 
+            as_tibble()
+    
+            # table(full_data_final_clean$treatment)
+    
+    # after removing those we coulnt find supúervisors for there is only 159 experimental observations 
+    
+    full_data_final_clean
+    
+    
+    
+    
+    
+    
+    
+    
+    # all_vedidks <- full_data_final_clean %>% 
+    #     filter(treatment != 1) %>% 
+    #     select(vedidk) %>% 
+    #     distinct()
+    # 
+    # supervisors <- DBI::dbReadTable(con, "authors_by_pubs") %>% 
+    #     dplyr::select(vedidk, name_first, name_last) %>% 
+    #     filter(vedidk %in% all_vedidks$vedidk) %>% 
+    #     distinct()
+    # 
+    # write.csv2(supervisors, file = "supervisors_control.csv")
+    # write.csv2(matching, file = "matching_original1.csv")
+    
+    # 
+    # ids_refined <- ids %>% 
+    #     select(vedoucí.vedidk, vedidk_core_researcher) %>% 
+    #     filter(!is.na(vedoucí.vedidk)) %>%
+    #     filter(!is.na(vedidk_core_researcher)) %>% 
+    #     distinct()
+    # 
+    # ids_refined$vedidk_core_researcher <- as.character(ids_refined$vedidk_core_researcher)
+    # ids_refined <- rename(ids_refined, sup_vedidk = vedoucí.vedidk)
+    # ids_refined <- rename(ids_refined, vedidk = vedidk_core_researcher)
+    # 
+    # sup_control <- sup_control %>% 
+    #     select(vedidk, sup_vedidk) %>% 
+    #     distinct()
+    # 
+    # sup_control$vedidk <- as.character(sup_control$vedidk)
+    # 
+    # sup_complete <- rbind2(ids_refined, sup_control)
+    # 
+    # complete_data <- left_join(full_data_final_clean, sup_complete, by = "vedidk")
+
+    
     
     
     

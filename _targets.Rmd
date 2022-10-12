@@ -60,16 +60,19 @@ lapply(list.files(here::here("R"), full.names = TRUE), source)
 list(
     
      tar_target(ids_path, here::here("data", "raw", "supervisors.csv"), format = "file"),
-     tar_target(ids, read.csv2(ids_path, nrows = 20),
+     tar_target(ids, read.csv2(ids_path),
               format = "qs"),
-     tar_target(gender, read.delim(here::here("data", "raw", "names4api_tagged.tsv")),
-              format = "qs"),
-     tar_target(db_path,
+     tar_target(gender_path, here::here("data", "raw", "names4api_tagged.tsv"), format = "file"),
+     tar_target(gender, read.delim(gender_path), format = "qs"),
+     # tar_target(gender, read.delim(here::here("data", "raw", "names4api_tagged.tsv")),
+     #          format = "qs"),
+      tar_target(db_path,
            here::here("data", "raw", "czech_sci_db.sqlite")),
       tar_target(ids_complete, create_ids_complete(ids, db_path),
               format = "qs"),
     tar_target(ids_complete_vector,
-               make_ids_complete_vector(ids_complete))#,
+               make_ids_complete_vector(ids_complete))
+   
     
     
     
@@ -78,7 +81,7 @@ list(
     #           format = "qs"),
     # tar_target(one_author,
     #        read_one_author(db_path, ids_complete_vector, ids_complete), 
-    #           format = "qs", pattern = map(ids_complete_vector), iteration = "list")
+    #           format = "qs")
     # 
 )
 ```
@@ -88,20 +91,24 @@ list(
 ```{targets matching_preparation}
 list(
     
-     tar_target(matching, match(db_path, ids, gender),
-                format = "qs"),
+     # tar_target(matching, match(db_path, ids, gender),
+     #            format = "qs"),
+     # tar_target(sup_path, here::here("data", "raw", "supervisors_control.csv"), format = "file"),
+     # tar_target(sup_control, read.csv2(sup_path),
+     #          format = "qs"),
+     # tar_target(sup_control, read.csv2(here::here("data", "raw", "supervisors_control.csv")),
+     #          format = "qs"),
+     # tar_target(final_data, refine_data(matching, db_path, ids, sup_control),
+     #            format = "qs"),
      #at this point, I will need to manually search for the supervisors of the control group researchers and upload their vedidks into new ids file
-     tar_target(ids_full_vector,
-               make_ids_full_vector(matching)),
-     tar_target(all_pubs,
-           get_all_pubs(db_path, matching, ids_complete), 
-              format = "qs"),
-    # tar_target(one_author,
-           # read_one_author(db_path, ids_complete_vector, ids_complete, matching, ids_full_vector), 
-           #    format = "qs", pattern = map(head(ids_full_vector,3)), iteration = "list"),
-    tar_target(all_authors,
-           read_all_authors(db_path, ids_complete_vector, ids_complete, matching, ids_full_vector), 
-              format = "qs")
+     # tar_target(ids_full_vector,
+     #           make_ids_full_vector(matching)),
+    #  tar_target(all_pubs,
+    #        get_all_pubs(db_path, matching, ids_complete), 
+    #           format = "qs"),
+    # tar_target(all_authors,
+    #        read_all_authors(db_path, ids_complete_vector, ids_complete, matching, ids_full_vector), 
+    #           format = "qs")
     
 )
 ```
@@ -111,15 +118,15 @@ list(
 ```{targets topic_model}
 list(
     
-   tar_target(topic_model_input,
-              make_topic_model_input(all_pubs)) #,
-                              
-    # tar_target(topic_number,
-    #           find_topic_number(topic_model_input),
-    #             format = "qs") #, 
-    # tar_target(topic_model,
-    #            make_topic_model(topic_model_input),
-    #             format = "qs")
+   # tar_target(topic_model_input,
+   #            make_topic_model_input(all_pubs)) #,
+   #                            
+   #  # tar_target(topic_number,
+   #  #           find_topic_number(topic_model_input),
+   #  #             format = "qs") #, 
+   #  # tar_target(topic_model,
+   #  #            make_topic_model(topic_model_input),
+   #  #             format = "qs")
 
     
 )
@@ -130,13 +137,13 @@ list(
 ```{targets network}
 
 list(
-    
-    tar_target(edgelist,
-               make_edgelist(one_author),
-                format = "qs", pattern = map(one_author), iteration = "list"),
-    tar_target(graph, igraph::graph_from_data_frame(edgelist, directed = FALSE), pattern = map(edgelist), iteration = "list")
-    
-    
+
+    # tar_target(edgelist,
+    #            make_edgelist(one_author),
+    #             format = "qs", pattern = map(one_author), iteration = "list"),
+    # tar_target(graph, igraph::graph_from_data_frame(edgelist, directed = FALSE), pattern = map(edgelist), iteration = "list")
+
+
 )
 
 ```
@@ -147,10 +154,10 @@ list(
 
 list(
     
-    tar_target(eigen_centr,
-               calc_eigen_centr(graph, ids_complete, one_author, db_path),
-               format = "qs", pattern = map(graph, one_author), iteration = "list")
-    
+    # tar_target(eigen_centr,
+    #            calc_eigen_centr(graph, ids_complete, one_author, db_path),
+    #            format = "qs", pattern = map(graph, one_author), iteration = "list")
+    # 
 )
 
 ```
@@ -161,11 +168,11 @@ list(
 
 list(
     
-     tar_target(clustering,
-                calc_clustering(graph, ids_complete, one_author, db_path),
-               format = "qs", pattern = map(graph, one_author), iteration = "list") 
-    #            
-    # 
+    #  tar_target(clustering,
+    #             calc_clustering(graph, ids_complete, one_author, db_path),
+    #            format = "qs", pattern = map(graph, one_author), iteration = "list") 
+    # #            
+    # # 
 )
 
 ```
@@ -176,10 +183,10 @@ list(
 
 list(
     
-     tar_target(ind_pubs,
-                calc_ind_pubs(one_author, ids_complete, db_path), 
-                format = "qs", pattern = map(one_author),                  iteration = "list")
-     
+     # tar_target(ind_pubs,
+     #            calc_ind_pubs(one_author, ids_complete, db_path), 
+     #            format = "qs", pattern = map(one_author),                  iteration = "list")
+     # 
 )
 
 ```
@@ -190,10 +197,10 @@ list(
 
 list(
     
-     tar_target(ind_topics,
-                calc_ind_topics(topic_model = NULL, one_author, ids_complete, db_path), 
-                format = "qs", pattern = map(one_author), iteration = "list")
-    
+     # tar_target(ind_topics,
+     #            calc_ind_topics(topic_model = NULL, one_author, ids_complete, db_path), 
+     #            format = "qs", pattern = map(one_author), iteration = "list")
+     # 
 )
 
 ```
@@ -218,13 +225,13 @@ list(
 
 list(
     
-    tar_target(final_data,
-               calc_final_data(eigen_centr, clustering, ind_topics, ind_pubs, matching),
-               format = "qs") #,
-     # tar_target(testing,
-     #           just_test(db_path),
-     #           format = "qs")
-    
+    # tar_target(final_data,
+    #            calc_final_data(eigen_centr, clustering, ind_topics, ind_pubs, matching),
+    #            format = "qs") #,
+    #  # tar_target(testing,
+    #  #           just_test(db_path),
+    #  #           format = "qs")
+    # 
 )
 
 
