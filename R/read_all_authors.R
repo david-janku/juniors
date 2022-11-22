@@ -19,7 +19,7 @@ matching <- as_tibble(matching)
 
 
 new <-  head(matching) %>% 
-        select(vedidk, treatment_year, independence_timing) %>% 
+        dplyr::select(vedidk, treatment_year, independence_timing) %>% 
         mutate(pub_table = purrr::pmap(.l = list(vedidk, treatment_year, independence_timing),
                                        .f = function(first, second, third){
                                            read_one_author(db_path, ids_complete_vector, ids_complete, matching, 

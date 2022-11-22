@@ -19,8 +19,8 @@ refine_data <- function(matching, db_path, ids, sup_control) {
         distinct()
 
     ids_refined$vedidk_core_researcher <- as.character(ids_refined$vedidk_core_researcher)
-    ids_refined <- rename(ids_refined, sup_vedidk = vedoucí.vedidk)
-    ids_refined <- rename(ids_refined, vedidk = vedidk_core_researcher)
+    ids_refined <- dplyr::rename(ids_refined, sup_vedidk = vedoucí.vedidk)
+    ids_refined <- dplyr::rename(ids_refined, vedidk = vedidk_core_researcher)
 
     sup_control <- sup_control %>%
         select(vedidk, sup_vedidk) %>%
@@ -28,7 +28,34 @@ refine_data <- function(matching, db_path, ids, sup_control) {
 
     sup_control$vedidk <- as.character(sup_control$vedidk)
 
-    sup_complete <- rbind2(ids_refined, sup_control)
+    sup_complete <- rbind2(ids_refined, sup_control) %>% 
+        filter(!is.na(sup_vedidk))
+    
+    # sup_vector <- sup_complete %>%
+    #         filter(vedidk_core_researcher %in% ids_complete_vector) %>%
+    #         pull(vedoucí.vedidk)
+
+    con <-  DBI::dbConnect(RSQLite::SQLite(), db_path)
+    on.exit(DBI::dbDisconnect(con))
+    
+   sup_name <- DBI::dbReadTable(con, "authors_by_pubs") %>% #colnames()
+        filter(vedidk %in% sup_complete$sup_vedidk) %>%
+        dplyr::select(id_helper, vedidk) %>%
+        group_by(vedidk) %>% 
+        dplyr::count(id_helper) %>%
+        filter(n == max(n)) %>%
+        slice_sample(n=1) %>%
+        ungroup() %>% 
+        dplyr::select(!n)
+    
+    sup_name <- dplyr::rename(sup_name, sup_name = id_helper)
+   
+    sup_complete$sup_vedidk <- as.character(sup_complete$sup_vedidk)
+    
+    sup_complete <- left_join(sup_complete, sup_name, by = c("sup_vedidk" = "vedidk"))
+    
+   
+    
 
     complete_data <- left_join(matching, sup_complete, by = "vedidk")
     

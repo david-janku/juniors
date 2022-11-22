@@ -18,7 +18,7 @@ read_one_author <- function(db_path, ids_complete_vector, ids_complete, matching
 
   one_vedidk_pubids <- DBI::dbReadTable(con, "authors_by_pubs") %>% #colnames()
       filter(vedidk == ids_full_vector) %>% 
-      select(vedidk, id_unique) %>% 
+      dplyr::select(vedidk, id_unique) %>% 
       distinct() %>% 
       as_tibble()
   
@@ -35,11 +35,11 @@ read_one_author <- function(db_path, ids_complete_vector, ids_complete, matching
  # mozna by bylo fajn v tomto kroku vyselektovat vsechny nepublikacni vystupy, protoze ty jsou asi defaultne zapocitane:
  ## 
      one_vedidk_filtered_pubs <- DBI::dbReadTable(con, "riv_disc") %>%  # colnames()
-     select(id_unique, year) %>%
+     dplyr::select(id_unique, year) %>%
      filter(id_unique %in% one_vedidk_pubids$id_unique) %>%
      # filter(pub_type %in% c("J","B","C","D")) %>%
      left_join(one_vedidk_pubids) %>% 
-     inner_join(matching %>% select(vedidk, treatment_year, independence_timing)) %>%  #jako další věc do select přidat sup_vedidk - to bude sloupec ve kterém bude vedidk supervisora daného člověka 
+     inner_join(matching %>% dplyr::select(vedidk, treatment_year, independence_timing)) %>%  #jako další věc do select přidat sup_vedidk - to bude sloupec ve kterém bude vedidk supervisora daného člověka 
      filter(treatment_year == intervention_year, independence_timing == timing) %>% 
      # purrr::when(.$independence_timing == "before_intervention" ~ filter(., year <= treatment_year), ~ filter(., year >= treatment_year)) %>% 
      # purrr::when(matching$independence_timing == "before_intervention" ~ filter(., year <= matching$treatment_year), ~ filter(., year >= matching$treatment_year)) %>% 
@@ -66,7 +66,7 @@ read_one_author <- function(db_path, ids_complete_vector, ids_complete, matching
     #     pull(id_helper)
  
   one_vedidk_coauthors <- DBI::dbReadTable(con, "authors_by_pubs") %>% # colnames()
-      select(id_unique, id_helper) %>% 
+      dplyr::select(id_unique, id_helper) %>% 
       filter(id_unique %in% one_vedidk_filtered_pubs$id_unique) %>% 
       distinct() %>%
       left_join(one_vedidk_filtered_pubs, by ="id_unique") %>% 

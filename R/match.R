@@ -18,7 +18,7 @@ match <- function(db_path, ids, gender) {
     # setting up the set of all authors
     
     all_auth <- DBI::dbReadTable(con, "authors_by_pubs") %>% #colnames()
-        select(vedidk, id_unique) %>% 
+        dplyr::select(vedidk, id_unique) %>% 
         distinct() %>% 
         as_tibble()
     
@@ -60,26 +60,27 @@ match <- function(db_path, ids, gender) {
         filter(!is.na(vedidk))
         
     n_pubs_ws2014 <- plyr::count(n_pubs_ws2014, vars = "vedidk") %>% 
+        dplyr::rename(ws_pubs = freq) %>% 
         as_tibble()
     
-    n_pubs_ws2014 <- rename(n_pubs_ws2014, ws_pubs = freq)
+  
     
     
     #gender
     
     all_auth_names <- DBI::dbReadTable(con, "authors_by_pubs") %>% #colnames()
-        select(vedidk, name_first, name_last) %>% 
+        dplyr::select(vedidk, name_first, name_last) %>% 
         filter(!is.na(vedidk)) %>% 
         distinct() %>% 
         group_by(vedidk) %>% 
-        count(name_first) %>% 
+        dplyr::count(name_first) %>% 
         filter(n == max(n)) %>%
         slice_sample(n=1) %>%
         ungroup() %>% 
         as_tibble()
     
     all_auth_names$name_first <- tolower(all_auth_names$name_first)
-    all_auth_names$name_first <- stri_trans_general(str = all_auth_names$name_first, id = "Latin-ASCII")
+    all_auth_names$name_first <- stringi::stri_trans_general(str = all_auth_names$name_first, id = "Latin-ASCII")
         
     all_auth_names$name_first <- as.character(all_auth_names$name_first)
     gender$name_first <- as.character(gender$name_first)
@@ -89,7 +90,7 @@ match <- function(db_path, ids, gender) {
         dplyr::select(name, gender) %>%
         filter(!is.na(gender)) %>% 
         group_by(name) %>% 
-        count(gender) %>% 
+        dplyr::count(gender) %>% 
         filter(n == max(n)) %>%
         slice_sample(n=1) %>%
         ungroup() %>% 
@@ -99,7 +100,7 @@ match <- function(db_path, ids, gender) {
     all_auth_gender <- left_join(all_auth_names, gender2, by = c("name_first" = "name"))
     
     all_auth_gender <- all_auth_gender %>%
-        select(vedidk, gender) %>% 
+        dplyr::select(vedidk, gender) %>% 
         filter(!is.na(gender))
     
     
@@ -401,8 +402,8 @@ match <- function(db_path, ids, gender) {
     
     final_data2015$ws_pubs <- tidyr::replace_na(final_data2015$ws_pubs, 0) 
     final_data2015$grants2014 <- tidyr::replace_na(final_data2015$grants2014, 0) 
-    final_data2015 <- rename(final_data2015, career_start_year = year.x)
-    final_data2015 <- rename(final_data2015, pubs_total = freq)
+    final_data2015 <- dplyr::rename(final_data2015, career_start_year = year.x)
+    final_data2015 <- dplyr::rename(final_data2015, pubs_total = freq)
     final_data2015$treatment_year <- as.numeric(final_data2015$treatment_year)
     final_data2015 <-  final_data2015 %>% 
         dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2014, disc_ford, pubs_total, ws_pubs, interdisc_proportion, grants2014, gender)
@@ -447,7 +448,7 @@ match <- function(db_path, ids, gender) {
     
     m_semi_final <- left_join(m, m_final, by = c("treatment_number" = "case_number")) %>% 
         dplyr::select(treatment_number, vedidk, control_number) 
-    m_semi_final <- rename(m_semi_final, vedidk_treatment = vedidk)
+    m_semi_final <- dplyr::rename(m_semi_final, vedidk_treatment = vedidk)
     m_semi_final2 <- left_join(m, m_final, by = c("control_number" = "case_number")) %>% 
         dplyr::select(treatment_number, vedidk, control_number)  
     # dplyr::select(vedidk) %>% 
@@ -489,7 +490,7 @@ match <- function(db_path, ids, gender) {
     
     m_semi_final <- left_join(m, m_final, by = c("treatment_number" = "case_number")) %>% 
         dplyr::select(treatment_number, vedidk, control_number) 
-    m_semi_final <- rename(m_semi_final, vedidk_treatment = vedidk)
+    m_semi_final <- dplyr::rename(m_semi_final, vedidk_treatment = vedidk)
     m_semi_final2 <- left_join(m, m_final, by = c("control_number" = "case_number")) %>% 
         dplyr::select(treatment_number, vedidk, control_number)  
     # dplyr::select(vedidk) %>% 
@@ -574,7 +575,7 @@ match <- function(db_path, ids, gender) {
     n_pubs_ws2015 <- plyr::count(n_pubs_ws2015, vars = "vedidk") %>% 
         as_tibble()
     
-    n_pubs_ws2015 <- rename( n_pubs_ws2015, ws_pubs = freq)
+    n_pubs_ws2015 <- dplyr::rename(n_pubs_ws2015, ws_pubs = freq)
     
     
     #gender - copied from previous year
@@ -673,8 +674,8 @@ match <- function(db_path, ids, gender) {
     
     final_data2016$ws_pubs <- tidyr::replace_na(final_data2016$ws_pubs, 0) 
     final_data2016$grants2015 <- tidyr::replace_na(final_data2016$grants2015, 0) 
-    final_data2016 <- rename(final_data2016, career_start_year = year.x)
-    final_data2016 <- rename(final_data2016, pubs_total = freq)
+    final_data2016 <- dplyr::rename(final_data2016, career_start_year = year.x)
+    final_data2016 <- dplyr::rename(final_data2016, pubs_total = freq)
     final_data2016$treatment_year <- as.numeric(final_data2016$treatment_year)
     final_data2016 <-  final_data2016 %>% 
         dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2015, disc_ford, pubs_total, ws_pubs, interdisc_proportion, grants2015, gender)
@@ -719,7 +720,7 @@ match <- function(db_path, ids, gender) {
     
     m_semi_final <- left_join(m, m_final, by = c("treatment_number" = "case_number")) %>% 
         dplyr::select(treatment_number, vedidk, control_number) 
-    m_semi_final <- rename(m_semi_final, vedidk_treatment = vedidk)
+    m_semi_final <- dplyr::rename(m_semi_final, vedidk_treatment = vedidk)
     m_semi_final2 <- left_join(m, m_final, by = c("control_number" = "case_number")) %>% 
         dplyr::select(treatment_number, vedidk, control_number)  
     # dplyr::select(vedidk) %>% 
@@ -761,7 +762,7 @@ match <- function(db_path, ids, gender) {
     
     m_semi_final <- left_join(m, m_final, by = c("treatment_number" = "case_number")) %>% 
         dplyr::select(treatment_number, vedidk, control_number) 
-    m_semi_final <- rename(m_semi_final, vedidk_treatment = vedidk)
+    m_semi_final <- dplyr::rename(m_semi_final, vedidk_treatment = vedidk)
     m_semi_final2 <- left_join(m, m_final, by = c("control_number" = "case_number")) %>% 
         dplyr::select(treatment_number, vedidk, control_number)  
     # dplyr::select(vedidk) %>% 
@@ -847,7 +848,7 @@ match <- function(db_path, ids, gender) {
     n_pubs_ws2016 <- plyr::count(n_pubs_ws2016, vars = "vedidk") %>% 
         as_tibble()
     
-    n_pubs_ws2016 <- rename( n_pubs_ws2016, ws_pubs = freq)
+    n_pubs_ws2016 <- dplyr::rename(n_pubs_ws2016, ws_pubs = freq)
     
     
     #gender - copied from previous year
@@ -946,8 +947,8 @@ match <- function(db_path, ids, gender) {
     
     final_data2017$ws_pubs <- tidyr::replace_na(final_data2017$ws_pubs, 0) 
     final_data2017$grants2016 <- tidyr::replace_na(final_data2017$grants2016, 0) 
-    final_data2017 <- rename(final_data2017, career_start_year = year.x)
-    final_data2017 <- rename(final_data2017, pubs_total = freq)
+    final_data2017 <- dplyr::rename(final_data2017, career_start_year = year.x)
+    final_data2017 <- dplyr::rename(final_data2017, pubs_total = freq)
     final_data2017$treatment_year <- as.numeric(final_data2017$treatment_year)
     final_data2017 <-  final_data2017 %>% 
         dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2016, disc_ford, pubs_total, ws_pubs, interdisc_proportion, grants2016, gender)
@@ -992,7 +993,7 @@ match <- function(db_path, ids, gender) {
     
     m_semi_final <- left_join(m, m_final, by = c("treatment_number" = "case_number")) %>% 
         dplyr::select(treatment_number, vedidk, control_number) 
-    m_semi_final <- rename(m_semi_final, vedidk_treatment = vedidk)
+    m_semi_final <- dplyr::rename(m_semi_final, vedidk_treatment = vedidk)
     m_semi_final2 <- left_join(m, m_final, by = c("control_number" = "case_number")) %>% 
         dplyr::select(treatment_number, vedidk, control_number)  
     # dplyr::select(vedidk) %>% 
@@ -1034,7 +1035,7 @@ match <- function(db_path, ids, gender) {
     
     m_semi_final <- left_join(m, m_final, by = c("treatment_number" = "case_number")) %>% 
         dplyr::select(treatment_number, vedidk, control_number) 
-    m_semi_final <- rename(m_semi_final, vedidk_treatment = vedidk)
+    m_semi_final <- dplyr::rename(m_semi_final, vedidk_treatment = vedidk)
     m_semi_final2 <- left_join(m, m_final, by = c("control_number" = "case_number")) %>% 
         dplyr::select(treatment_number, vedidk, control_number)  
     # dplyr::select(vedidk) %>% 
@@ -1116,7 +1117,7 @@ match <- function(db_path, ids, gender) {
     n_pubs_ws2017 <- plyr::count(n_pubs_ws2017, vars = "vedidk") %>% 
         as_tibble()
     
-    n_pubs_ws2017 <- rename( n_pubs_ws2017, ws_pubs = freq)
+    n_pubs_ws2017 <- dplyr::rename(n_pubs_ws2017, ws_pubs = freq)
     
     
     #gender - copied from previous year
@@ -1215,8 +1216,8 @@ match <- function(db_path, ids, gender) {
     
     final_data2018$ws_pubs <- tidyr::replace_na(final_data2018$ws_pubs, 0) 
     final_data2018$grants2017 <- tidyr::replace_na(final_data2018$grants2017, 0) 
-    final_data2018 <- rename(final_data2018, career_start_year = year.x)
-    final_data2018 <- rename(final_data2018, pubs_total = freq)
+    final_data2018 <- dplyr::rename(final_data2018, career_start_year = year.x)
+    final_data2018 <- dplyr::rename(final_data2018, pubs_total = freq)
     final_data2018$treatment_year <- as.numeric(final_data2018$treatment_year)
     final_data2018 <-  final_data2018 %>% 
         dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2017, disc_ford, pubs_total, ws_pubs, interdisc_proportion, grants2017, gender)
@@ -1261,7 +1262,7 @@ match <- function(db_path, ids, gender) {
     
     m_semi_final <- left_join(m, m_final, by = c("treatment_number" = "case_number")) %>% 
         dplyr::select(treatment_number, vedidk, control_number) 
-    m_semi_final <- rename(m_semi_final, vedidk_treatment = vedidk)
+    m_semi_final <- dplyr::rename(m_semi_final, vedidk_treatment = vedidk)
     m_semi_final2 <- left_join(m, m_final, by = c("control_number" = "case_number")) %>% 
         dplyr::select(treatment_number, vedidk, control_number)  
     # dplyr::select(vedidk) %>% 
@@ -1303,7 +1304,7 @@ match <- function(db_path, ids, gender) {
     
     m_semi_final <- left_join(m, m_final, by = c("treatment_number" = "case_number")) %>% 
         dplyr::select(treatment_number, vedidk, control_number) 
-    m_semi_final <- rename(m_semi_final, vedidk_treatment = vedidk)
+    m_semi_final <- dplyr::rename(m_semi_final, vedidk_treatment = vedidk)
     m_semi_final2 <- left_join(m, m_final, by = c("control_number" = "case_number")) %>% 
         dplyr::select(treatment_number, vedidk, control_number)  
     # dplyr::select(vedidk) %>% 
@@ -1387,7 +1388,7 @@ match <- function(db_path, ids, gender) {
     n_pubs_ws2018 <- plyr::count(n_pubs_ws2018, vars = "vedidk") %>% 
         as_tibble()
     
-    n_pubs_ws2018 <- rename( n_pubs_ws2018, ws_pubs = freq)
+    n_pubs_ws2018 <- dplyr::rename(n_pubs_ws2018, ws_pubs = freq)
     
     
     #gender - copied from previous year
@@ -1486,8 +1487,8 @@ match <- function(db_path, ids, gender) {
     
     final_data2019$ws_pubs <- tidyr::replace_na(final_data2019$ws_pubs, 0) 
     final_data2019$grants2018 <- tidyr::replace_na(final_data2019$grants2018, 0) 
-    final_data2019 <- rename(final_data2019, career_start_year = year.x)
-    final_data2019 <- rename(final_data2019, pubs_total = freq)
+    final_data2019 <- dplyr::rename(final_data2019, career_start_year = year.x)
+    final_data2019 <- dplyr::rename(final_data2019, pubs_total = freq)
     final_data2019$treatment_year <- as.numeric(final_data2019$treatment_year)
     final_data2019 <-  final_data2019 %>% 
         dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2018, disc_ford, pubs_total, ws_pubs, interdisc_proportion, grants2018, gender)
@@ -1532,7 +1533,7 @@ match <- function(db_path, ids, gender) {
     
     m_semi_final <- left_join(m, m_final, by = c("treatment_number" = "case_number")) %>% 
         dplyr::select(treatment_number, vedidk, control_number) 
-    m_semi_final <- rename(m_semi_final, vedidk_treatment = vedidk)
+    m_semi_final <- dplyr::rename(m_semi_final, vedidk_treatment = vedidk)
     m_semi_final2 <- left_join(m, m_final, by = c("control_number" = "case_number")) %>% 
         dplyr::select(treatment_number, vedidk, control_number)  
     # dplyr::select(vedidk) %>% 
@@ -1574,7 +1575,7 @@ match <- function(db_path, ids, gender) {
     
     m_semi_final <- left_join(m, m_final, by = c("treatment_number" = "case_number")) %>% 
         dplyr::select(treatment_number, vedidk, control_number) 
-    m_semi_final <- rename(m_semi_final, vedidk_treatment = vedidk)
+    m_semi_final <- dplyr::rename(m_semi_final, vedidk_treatment = vedidk)
     m_semi_final2 <- left_join(m, m_final, by = c("control_number" = "case_number")) %>% 
         dplyr::select(treatment_number, vedidk, control_number)  
     # dplyr::select(vedidk) %>% 
@@ -1659,7 +1660,7 @@ match <- function(db_path, ids, gender) {
     n_pubs_ws2019 <- plyr::count(n_pubs_ws2019, vars = "vedidk") %>% 
         as_tibble()
     
-    n_pubs_ws2019 <- rename( n_pubs_ws2019, ws_pubs = freq)
+    n_pubs_ws2019 <- dplyr::rename(n_pubs_ws2019, ws_pubs = freq)
     
     
     #gender - copied from previous year
@@ -1758,8 +1759,8 @@ match <- function(db_path, ids, gender) {
     
     final_data2020$ws_pubs <- tidyr::replace_na(final_data2020$ws_pubs, 0) 
     final_data2020$grants2019 <- tidyr::replace_na(final_data2020$grants2019, 0) 
-    final_data2020 <- rename(final_data2020, career_start_year = year.x)
-    final_data2020 <- rename(final_data2020, pubs_total = freq)
+    final_data2020 <- dplyr::rename(final_data2020, career_start_year = year.x)
+    final_data2020 <- dplyr::rename(final_data2020, pubs_total = freq)
     final_data2020$treatment_year <- as.numeric(final_data2020$treatment_year)
     final_data2020 <-  final_data2020 %>% 
         dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2019, disc_ford, pubs_total, ws_pubs, interdisc_proportion, grants2019, gender)
@@ -1804,7 +1805,7 @@ match <- function(db_path, ids, gender) {
     
     m_semi_final <- left_join(m, m_final, by = c("treatment_number" = "case_number")) %>% 
         dplyr::select(treatment_number, vedidk, control_number) 
-    m_semi_final <- rename(m_semi_final, vedidk_treatment = vedidk)
+    m_semi_final <- dplyr::rename(m_semi_final, vedidk_treatment = vedidk)
     m_semi_final2 <- left_join(m, m_final, by = c("control_number" = "case_number")) %>% 
         dplyr::select(treatment_number, vedidk, control_number)  
     # dplyr::select(vedidk) %>% 
@@ -1846,7 +1847,7 @@ match <- function(db_path, ids, gender) {
     
     m_semi_final <- left_join(m, m_final, by = c("treatment_number" = "case_number")) %>% 
         dplyr::select(treatment_number, vedidk, control_number) 
-    m_semi_final <- rename(m_semi_final, vedidk_treatment = vedidk)
+    m_semi_final <- dplyr::rename(m_semi_final, vedidk_treatment = vedidk)
     m_semi_final2 <- left_join(m, m_final, by = c("control_number" = "case_number")) %>% 
         dplyr::select(treatment_number, vedidk, control_number)  
     # dplyr::select(vedidk) %>% 
@@ -1888,19 +1889,19 @@ match <- function(db_path, ids, gender) {
     
     ##full join of all datasets
     
-    full_data2015 <- rename(full_data2015, career_lenght = lenght2014)
-    full_data2016 <- rename(full_data2016, career_lenght = lenght2015)
-    full_data2017 <- rename(full_data2017, career_lenght = lenght2016)
-    full_data2018 <- rename(full_data2018, career_lenght = lenght2017)
-    full_data2019 <- rename(full_data2019, career_lenght = lenght2018)
-    full_data2020 <- rename(full_data2020, career_lenght = lenght2019)
+    full_data2015 <- dplyr::rename(full_data2015, career_lenght = lenght2014)
+    full_data2016 <- dplyr::rename(full_data2016, career_lenght = lenght2015)
+    full_data2017 <- dplyr::rename(full_data2017, career_lenght = lenght2016)
+    full_data2018 <- dplyr::rename(full_data2018, career_lenght = lenght2017)
+    full_data2019 <- dplyr::rename(full_data2019, career_lenght = lenght2018)
+    full_data2020 <- dplyr::rename(full_data2020, career_lenght = lenght2019)
     
-    full_data2015 <- rename(full_data2015, grants = grants2014)
-    full_data2016 <- rename(full_data2016, grants = grants2015)
-    full_data2017 <- rename(full_data2017, grants = grants2016)
-    full_data2018 <- rename(full_data2018, grants = grants2017)
-    full_data2019 <- rename(full_data2019, grants = grants2018)
-    full_data2020 <- rename(full_data2020, grants = grants2019)
+    full_data2015 <- dplyr::rename(full_data2015, grants = grants2014)
+    full_data2016 <- dplyr::rename(full_data2016, grants = grants2015)
+    full_data2017 <- dplyr::rename(full_data2017, grants = grants2016)
+    full_data2018 <- dplyr::rename(full_data2018, grants = grants2017)
+    full_data2019 <- dplyr::rename(full_data2019, grants = grants2018)
+    full_data2020 <- dplyr::rename(full_data2020, grants = grants2019)
 
     
     full_data_final <- methods::rbind2(full_data2015, full_data2016) 
@@ -1960,8 +1961,8 @@ match <- function(db_path, ids, gender) {
     #     distinct()
     # 
     # ids_refined$vedidk_core_researcher <- as.character(ids_refined$vedidk_core_researcher)
-    # ids_refined <- rename(ids_refined, sup_vedidk = vedoucí.vedidk)
-    # ids_refined <- rename(ids_refined, vedidk = vedidk_core_researcher)
+    # ids_refined <- dplyr::rename(ids_refined, sup_vedidk = vedoucí.vedidk)
+    # ids_refined <- dplyr::rename(ids_refined, vedidk = vedidk_core_researcher)
     # 
     # sup_control <- sup_control %>% 
     #     select(vedidk, sup_vedidk) %>% 

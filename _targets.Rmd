@@ -60,16 +60,14 @@ lapply(list.files(here::here("R"), full.names = TRUE), source)
 list(
     
      tar_target(ids_path, here::here("data", "raw", "supervisors.csv"), format = "file"),
-     tar_target(ids, read.csv2(ids_path),
-              format = "qs"),
+     tar_target(ids, read.csv2(ids_path)),
      tar_target(gender_path, here::here("data", "raw", "names4api_tagged.tsv"), format = "file"),
-     tar_target(gender, read.delim(gender_path), format = "qs"),
+     tar_target(gender, read.delim(gender_path)),
      # tar_target(gender, read.delim(here::here("data", "raw", "names4api_tagged.tsv")),
      #          format = "qs"),
       tar_target(db_path,
            here::here("data", "raw", "czech_sci_db.sqlite")),
-      tar_target(ids_complete, create_ids_complete(ids, db_path),
-              format = "qs"),
+      tar_target(ids_complete, create_ids_complete(ids, db_path)),
     tar_target(ids_complete_vector,
                make_ids_complete_vector(ids_complete))
    
@@ -91,24 +89,22 @@ list(
 ```{targets matching_preparation}
 list(
     
-     # tar_target(matching, match(db_path, ids, gender),
-     #            format = "qs"),
-     # tar_target(sup_path, here::here("data", "raw", "supervisors_control.csv"), format = "file"),
-     # tar_target(sup_control, read.csv2(sup_path),
-     #          format = "qs"),
+      tar_target(matching, match(db_path, ids, gender)),
+      tar_target(sup_path, here::here("data", "raw", "supervisors_control.csv"), format = "file"),
+      tar_target(sup_control, read.csv2(sup_path)),
+              
      # tar_target(sup_control, read.csv2(here::here("data", "raw", "supervisors_control.csv")),
      #          format = "qs"),
-     # tar_target(final_data, refine_data(matching, db_path, ids, sup_control),
-     #            format = "qs"),
+      tar_target(final_data, refine_data(matching, db_path, ids, sup_control)),
+               
      #at this point, I will need to manually search for the supervisors of the control group researchers and upload their vedidks into new ids file
-     # tar_target(ids_full_vector,
-     #           make_ids_full_vector(matching)),
+     tar_target(ids_full_vector,
+               make_ids_full_vector(matching)),
     #  tar_target(all_pubs,
     #        get_all_pubs(db_path, matching, ids_complete), 
     #           format = "qs"),
-    # tar_target(all_authors,
-    #        read_all_authors(db_path, ids_complete_vector, ids_complete, matching, ids_full_vector), 
-    #           format = "qs")
+    tar_target(all_authors,
+           read_all_authors(db_path, ids_complete_vector, ids_complete, matching, ids_full_vector))
     
 )
 ```
@@ -240,7 +236,7 @@ list(
 
 ```{targets article}
 list(
-    tarchetypes::tar_render(article, here::here("Rmd", "article.Rmd"))
+    # tarchetypes::tar_render(article, here::here("Rmd", "article.Rmd"))
 )
 
 
