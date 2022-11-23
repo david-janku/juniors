@@ -7,25 +7,28 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-calc_eigen_centr <- function(graph, ids_complete, one_author, db_path) {
+calc_eigen_centr <- function(graph, one_author, db_path) {
 
-    ecentr <- eigen_centrality(
+    ecentr <- igraph::eigen_centrality(
         graph,
         directed = FALSE,
         scale = TRUE,
-        weights = E(graph)$weight,
-        options = arpack_defaults
+        weights = igraph::E(graph)$weight,
+        # options = arpack_defaults
     )
     
-    centr <- enframe(ecentr$vector, name = "author", value = "eigen_ctr")
+    centr <- tibble::enframe(ecentr$vector, name = "author", value = "eigen_ctr")
     
-    vedidk_researcher <- one_author %>% 
-        pull(vedidk) %>% 
-        unique()
+    # vedidk_researcher <- one_author %>% 
+    #     pull(vedidk) %>% 
+    #     unique()
     
-    a <- one_author %>% 
-        pull(vedouci) %>% 
-        unique()
+    # a <- one_author %>% 
+    #     pull(sup_name) %>% 
+    #     unique()
+    # 
+    
+    a <- one_author
     
    #  sup_vector <- ids_complete %>% 
    #          filter(vedidk_core_researcher == vedidk_researcher) %>% 
@@ -48,7 +51,7 @@ calc_eigen_centr <- function(graph, ids_complete, one_author, db_path) {
                filter(author == a) %>% 
         pull(eigen_ctr)
     
-    table <- tibble(vedidk = vedidk_researcher, eig = sup)
+    # table <- tibble(vedidk = vedidk_researcher, eig = sup)
     
 
 }

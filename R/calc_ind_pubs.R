@@ -7,16 +7,18 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-calc_ind_pubs <- function(one_author, ids_complete, db_path) {
+calc_ind_pubs <- function(one_author, sup_name) {
 
     #hledani jmena vedouciho
-    vedidk_researcher <- one_author %>% 
-        pull(vedidk) %>% 
-        unique()
+    # vedidk_researcher <- one_author %>% 
+    #     pull(vedidk) %>% 
+    #     unique()
+    # 
+    # c <- one_author %>% 
+    #     pull(vedouci) %>% 
+    #     unique()
     
-    c <- one_author %>% 
-        pull(vedouci) %>% 
-        unique()
+    c <- sup_name
     
     # sup_vector <- ids_complete %>% 
     #     filter(vedidk_core_researcher == vedidk_researcher) %>% 
@@ -45,7 +47,7 @@ calc_ind_pubs <- function(one_author, ids_complete, db_path) {
        
     rpubs = nrow(ind_pubs)/nrow(all_pubs_author)
     
-    table <- tibble(vedidk = vedidk_researcher, ind_pubs = rpubs)
+    # table <- tibble(vedidk = vedidk_researcher, ind_pubs = rpubs)
     
     # e <- anti_join(one_author[[1]], sup_pubs, by = "id_unique")
     

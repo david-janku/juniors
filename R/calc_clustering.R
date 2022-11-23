@@ -7,18 +7,20 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-calc_clustering <- function(graph, ids_complete, one_author, db_path) {
+calc_clustering <- function(graph, one_author) {
 
    
-        
-     vedidk_researcher <- one_author %>% 
-         pull(vedidk) %>% 
-         unique()
+     #    
+     # vedidk_researcher <- one_author %>% 
+     #     pull(vedidk) %>% 
+     #     unique()
+     # 
+     # b <- one_author %>% 
+     #     pull(vedouci) %>% 
+     #     unique()
      
-     b <- one_author %>% 
-         pull(vedouci) %>% 
-         unique()
-     
+    
+
     # sup_vector <- ids_complete %>% 
     #     filter(vedidk_core_researcher == vedidk_researcher) %>% 
     #     pull(vedoucí.vedidk)
@@ -34,16 +36,18 @@ calc_clustering <- function(graph, ids_complete, one_author, db_path) {
     #     slice_sample(n=1) %>% 
     #     pull(id_helper)
     
+    b <- one_author
+    
     clustering <-
-        transitivity(
+        igraph::transitivity(
             graph,
             type = c("local"),
-            vids = which(V(graph)$name == b),
-            weights = E(graph)$weight,
+            vids = which(igraph::V(graph)$name == b),
+            weights = igraph::E(graph)$weight,
             isolates = c("NaN", "zero")
         )
     
-    table <- tibble(vedidk = vedidk_researcher, clustr = clustering)
+    # table <- tibble(vedidk = vedidk_researcher, clustr = clustering)
     
     
 

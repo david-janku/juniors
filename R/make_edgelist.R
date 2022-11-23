@@ -14,6 +14,18 @@ make_edgelist <- function(one_author) {
     # 
     # dat <- enframe(split_authors) %>% unnest(cols = "value")
     
+    # testing:
+    # a <- new[3,] %>% 
+    #     tidyr::unnest(pub_table, names_repair = "minimal") 
+    # 
+    # a[,1:3] <- NULL
+    # 
+    # 
+    # 
+    # b <- a %>% 
+    
+    
+    
         one_author %>% group_by(id_unique) %>% 
         right_join(one_author, by = "id_unique") %>% 
         filter(id_helper.x != id_helper.y) %>% 

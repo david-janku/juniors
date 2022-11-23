@@ -7,7 +7,7 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-calc_ind_topics <- function(topic_model = NULL, one_author, ids_complete, db_path) {
+calc_ind_topics <- function(topic_model = NULL, one_author, db_path, sup_vedidk) {
 
     topic_model <- read.csv2(here::here("data", "derived", "tmm.csv"))
     
@@ -27,7 +27,7 @@ calc_ind_topics <- function(topic_model = NULL, one_author, ids_complete, db_pat
     
     author_pubs_topics <- as_tibble(cbind(id_unique = names(topic_model), t(topic_model))) 
        
-    author_pubs_tp <- semi_join(author_pubs_topics, all_pubs_author) 
+    author_pubs_tp <- semi_join(author_pubs_topics, all_pubs_author, by = "id_unique") 
 
     author_pubs_tp <-  as_tibble(author_pubs_tp) %>% 
         tibble::column_to_rownames("id_unique")
@@ -42,26 +42,28 @@ calc_ind_topics <- function(topic_model = NULL, one_author, ids_complete, db_pat
     
     #spočítat poměrné zastoupení každého tématu ve vzorku publikací vedouciho daneho vyzkumnika
    
-    vedidk_researcher <- one_author %>% 
-        pull(vedidk) %>% 
-        unique()
-    
-    sup_vector <- ids_complete %>% 
-        filter(vedidk_core_researcher == vedidk_researcher) %>% 
-        pull(vedoucí.vedidk)
+        # vedidk_researcher <- one_author %>% 
+        #     pull(vedidk) %>% 
+        #     unique()
+        # 
+        # sup_vector <- ids_complete %>% 
+        #     filter(vedidk_core_researcher == vedidk_researcher) %>% 
+        #     pull(vedoucí.vedidk)
+            
+    sup_vedidk <- sup_vedidk
     
     con <-  DBI::dbConnect(RSQLite::SQLite(), db_path)
     on.exit(DBI::dbDisconnect(con))
     
     sup_pubids <- DBI::dbReadTable(con, "authors_by_pubs") %>% #colnames()
-        filter(vedidk == sup_vector) %>% 
+        filter(vedidk == sup_vedidk) %>% 
         select(id_unique) %>% 
         distinct() %>% 
         as_tibble()
     
     sup_pubids$id_unique <- as.character(sup_pubids$id_unique)
     
-    sup_pubs_tp <- semi_join(author_pubs_topics, sup_pubids) 
+    sup_pubs_tp <- semi_join(author_pubs_topics, sup_pubids, by = "id_unique") 
     
     sup_pubs_tp <-  as_tibble(sup_pubs_tp) %>% 
         tibble::column_to_rownames("id_unique")
@@ -81,10 +83,12 @@ calc_ind_topics <- function(topic_model = NULL, one_author, ids_complete, db_pat
     
     topic_model$sup_topic <- ifelse(sup_pubs_tp$sup_means>topic_model$topic_means, 1, 0)
     
+    topic_model$sup_topic <- tidyr::replace_na(topic_model$sup_topic, 0)
+    topic_model$author_topic <- tidyr::replace_na(topic_model$author_topic, 0)
     
     topic_independence_categories = sum(ifelse(topic_model$author_topic>topic_model$sup_topic, 1, 0))/(sum(topic_model$author_topic))
     
-    table <- tibble(vedidk = vedidk_researcher, ind_topics = topic_independence_categories)
+    # table <- tibble(vedidk = vedidk_researcher, ind_topics = topic_independence_categories)
     
     
     # #alternativni zpusob vypoctu
