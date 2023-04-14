@@ -141,7 +141,7 @@ list(
                make_network(all_authors)),
 
      tar_target(coauthorship_graph,
-               make_graph(all_authors))
+               make_graph(coauthorship))
 
 )
 
