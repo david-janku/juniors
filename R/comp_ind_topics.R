@@ -14,7 +14,7 @@ independent_topics <- function(independent_pubs) {
 independent_topics <-  independent_pubs %>% 
                         mutate(ind_topics = purrr::pmap(.l = list(pub_table, sup_vedidk),
                                    .f = function(first, second){
-                                       calc_ind_topics(topic_model = NULL, db_path, 
+                                       calc_ind_topics(topic_model, db_path, 
                                                        one_author = first, sup_vedidk = second)
                                    } ))
 

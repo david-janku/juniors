@@ -46,7 +46,8 @@ tar_option_set(packages = c("dplyr",
                             "tm",
                             "RSQLite",
                             "DBI",
-                            "MatchIt"
+                            "MatchIt",
+                            "qs"
                             ))
 
 # read custom functions
@@ -99,9 +100,8 @@ list(
      #at this point, I will need to manually search for the supervisors of the control group researchers and upload their vedidks into new ids file
      tar_target(ids_full_vector,
                make_ids_full_vector(matching)),
-    #  tar_target(all_pubs,
-    #        get_all_pubs(db_path, matching, ids_complete), 
-    #           format = "qs"),
+     tar_target(all_pubs,
+           get_all_pubs(db_path, final_data)),
     tar_target(all_authors,
            read_all_authors(db_path, ids_complete_vector, ids_complete, final_data, ids_full_vector))
     
@@ -113,15 +113,15 @@ list(
 ```{r, engine="targets", topic_model}
 list(
     
-   # tar_target(topic_model_input,
-   #            make_topic_model_input(all_pubs)) #,
-   #                            
-   #  # tar_target(topic_number,
-   #  #           find_topic_number(topic_model_input),
-   #  #             format = "qs") #, 
-   #  # tar_target(topic_model,
-   #  #            make_topic_model(topic_model_input),
-   #  #             format = "qs")
+   tar_target(topic_model_input,
+              make_topic_model_input(all_pubs)),
+
+    tar_target(topic_number,
+              find_topic_number(topic_model_input),
+                format = "qs"),
+    tar_target(topic_model,
+               make_topic_model(topic_model_input),
+                format = "qs")
 
     
 )

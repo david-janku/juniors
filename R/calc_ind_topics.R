@@ -7,9 +7,9 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-calc_ind_topics <- function(topic_model = NULL, one_author, db_path, sup_vedidk) {
+calc_ind_topics <- function(topic_model, one_author, db_path, sup_vedidk) {
 
-    topic_model <- read.csv2(here::here("data", "derived", "tmm.csv"))
+    # topic_model <- read.csv2(here::here("data", "derived", "tmm.csv"))
     
     # topic_model_2 <- load(paste(here::here("data", c("derivedtopic_dist.Rdata"))))
     

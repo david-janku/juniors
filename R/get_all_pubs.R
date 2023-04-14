@@ -8,20 +8,25 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-get_all_pubs <- function(db_path, matching, ids_complete) {
+get_all_pubs <- function(db_path, final_data) {
 
     con <-  DBI::dbConnect(RSQLite::SQLite(), db_path)
     on.exit(DBI::dbDisconnect(con))
     
     DBI::dbListTables(con)
     
+    final_data <- final_data %>%
+    filter(!is.na(vedidk)) %>%
+    filter(!is.na(sup_vedidk))
     
-    ids_complete_vector <- cbind(ids_complete$vedidk_core_researcher, ids_complete$vedoucí.vedidk) %>% 
-        as_tibble() %>% 
-        as_vector() %>% 
-        as_tibble() %>% #from here below it was added - I should check that it does change any further results 
-        distinct() %>% #here
-        as_vector()  #here
+    ids_complete_vector <- cbind(final_data$vedidk, final_data$sup_vedidk)
+        # as_tibble() %>% 
+        # as_vector() %>% 
+        # as_tibble() %>% #from here below it was added - I should check that it does change any further results 
+        # distinct() %>% #here
+        # as_vector()  #here
+    
+    # ids_complete_vector <- ids_complete_vector[!is.na(ids_complete_vector)] 
     
     # ids_complete_col <- bind_rows(as_tibble(ids_complete$vedidk_core_researcher), as_tibble(ids_complete$vedoucí.vedidk))
     

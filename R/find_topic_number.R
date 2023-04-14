@@ -13,13 +13,13 @@ find_topic_number <- function(topic_model_input) {
         topic_model_input,
         topics = c(15, 30, 100),
         metrics = c("Griffiths2004", "CaoJuan2009", "Deveaud2014"),
-        method = "Gibbs",
+        method = "Gibbs",                         #rozhodnout se jestli použít VEM nebo Gibbs
         control = list(seed = 77),
         mc.cores = parallel::detectCores()-1,
         verbose = TRUE
     )
     
-    FindTopicsNumber_plot(result)
+    # FindTopicsNumber_plot(result)
     
 
 }
