@@ -23,7 +23,7 @@ tar_unscript()
 
 Here, we load packages and custom functions required in the pipeline.
 
-```{targets example-globals, tar_globals = TRUE}
+```{r, engine="targets", example-globals, tar_globals = TRUE}
 options(tidyverse.quiet = TRUE)
 
 # load libraries for make
@@ -55,7 +55,7 @@ lapply(list.files(here::here("R"), full.names = TRUE), source)
 
 # Data import
 
-```{targets data_import}
+```{r, engine="targets", data_import}
 list(
     
      tar_target(ids_path, here::here("data", "raw", "supervisors.csv"), format = "file"),
@@ -85,7 +85,7 @@ list(
 
 # Matching and data preparation 
 
-```{targets matching_preparation}
+```{r, engine="targets", matching_preparation}
 list(
     
       tar_target(matching, match(db_path, ids, gender)),
@@ -110,7 +110,7 @@ list(
 
 # Topic model
 
-```{targets topic_model}
+```{r, engine="targets", topic_model}
 list(
     
    # tar_target(topic_model_input,
@@ -129,7 +129,7 @@ list(
 
 # Coauthorship network
 
-```{targets network}
+```{r, engine="targets", network}
 
 list(
 
@@ -149,7 +149,7 @@ list(
 
 # Researcher independence indicator (RII) part 1 - eigenvector centrality
 
-```{targets RII1}
+```{r, engine="targets", RII1}
 
 list(
     
@@ -166,7 +166,7 @@ list(
 
 # Researcher independence indicator (RII) part 2 - clustering coefficient
 
-```{targets RII2}
+```{r, engine="targets", RII2}
 
 list(
     
@@ -186,7 +186,7 @@ list(
 
 # Researcher independence indicator (RII) part 3 - independent publications
 
-```{targets RII3}
+```{r, engine="targets", RII3}
 
 list(
     
@@ -202,7 +202,7 @@ list(
 
 # Researcher independence indicator (RII) part 4 - independent topics
 
-```{targets RII4}
+```{r, engine="targets", RII4}
 
 list(
     
@@ -218,7 +218,7 @@ list(
 
 # Researcher independence indicator (RII) part 4 - independent topics: alternative way via cosine similarity
 
-```{targets RII4_2}
+```{r, engine="targets", RII4_2}
 
 list(
     
@@ -232,7 +232,7 @@ list(
 
 # Final indicator
 
-```{targets final}
+```{r, engine="targets", final}
 
 list(
     
