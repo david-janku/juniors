@@ -90,7 +90,7 @@ list(
 list(
     
       tar_target(matching, match(db_path, ids, gender)),
-      tar_target(sup_path, here::here("data", "raw", "supervisors_control.csv"), format = "file"),
+      tar_target(sup_path, here::here("data", "raw", "supervisors_control_final.csv"), format = "file"),
       tar_target(sup_control, read.csv2(sup_path)),
               
      # tar_target(sup_control, read.csv2(here::here("data", "raw", "supervisors_control.csv")),
@@ -245,9 +245,9 @@ list(
     #  #           format = "qs")
     
     tar_target(full_indicator,
-               calc_full_indicator(independent_topics)
-    )
-               )
+               calc_full_indicator(independent_topics))
+
+)
 
 
 ```
