@@ -14,6 +14,9 @@
 read_all_authors <- function(db_path, ids_complete_vector, ids_complete,
                              final_data, ids_full_vector) {
 
+final_data <- final_data %>% 
+     filter(!is.na(sup_name))
+    
 matching <- as_tibble(final_data)
 # l <- list(ids_full_vector = matching$vedidk, intervention_year = matching$treatment_year, timing = matching$independence_timing)
 

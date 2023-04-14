@@ -3,8 +3,8 @@
 #' .. content for \details{} ..
 #'
 #' @title
-#' @param dv_path
-#' @param dedidk
+#' @param db_path
+#' @param vedidk
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
@@ -16,7 +16,7 @@ read_one_author <- function(db_path, ids_complete_vector, ids_complete, matching
   DBI::dbListTables(con)
   
 
-  one_vedidk_pubids <- DBI::dbReadTable(con, "authors_by_pubs") %>% #colnames()
+  one_vedidk_pubids <- dplyr::tbl(con, "authors_by_pubs") %>% #colnames()
       filter(vedidk == ids_full_vector) %>% 
       dplyr::select(vedidk, id_unique) %>% 
       distinct() %>% 
@@ -33,10 +33,12 @@ read_one_author <- function(db_path, ids_complete_vector, ids_complete, matching
  #      as_tibble()
  
  # mozna by bylo fajn v tomto kroku vyselektovat vsechny nepublikacni vystupy, protoze ty jsou asi defaultne zapocitane:
- ## 
-     one_vedidk_filtered_pubs <- DBI::dbReadTable(con, "riv_disc") %>%  # colnames()
+ 
+     control_vedidk <- one_vedidk_pubids$id_unique
+     one_vedidk_filtered_pubs <- dplyr::tbl(con, "riv_disc") %>%  # colnames()
      dplyr::select(id_unique, year) %>%
-     filter(id_unique %in% one_vedidk_pubids$id_unique) %>%
+     filter(id_unique %in% control_vedidk) %>% 
+     dplyr::collect() %>% 
      # filter(pub_type %in% c("J","B","C","D")) %>%
      left_join(one_vedidk_pubids) %>% 
      inner_join(matching %>% dplyr::select(vedidk, treatment_year, independence_timing)) %>%  #jako další věc do select přidat sup_vedidk - to bude sloupec ve kterém bude vedidk supervisora daného člověka 
@@ -65,15 +67,18 @@ read_one_author <- function(db_path, ids_complete_vector, ids_complete, matching
     #     slice_sample(n=1) %>%
     #     pull(id_helper)
  
-  one_vedidk_coauthors <- DBI::dbReadTable(con, "authors_by_pubs") %>% # colnames()
+     control_vedidk2 <- one_vedidk_filtered_pubs$id_unique
+  one_vedidk_coauthors <- dplyr::tbl(con, "authors_by_pubs") %>% # colnames()
       dplyr::select(id_unique, id_helper) %>% 
-      filter(id_unique %in% one_vedidk_filtered_pubs$id_unique) %>% 
-      distinct() %>%
+      filter(id_unique %in% control_vedidk2) %>% 
+      distinct() %>% dplyr::collect() %>% 
       left_join(one_vedidk_filtered_pubs, by ="id_unique") %>% 
       mutate(vedidk = one_vedidk_filtered_pubs$vedidk[1]) %>% 
       # mutate(vedouci = sup_name) %>% 
       #mutate(discipline = discipline)
       as_tibble()
+  
+  if(nrow(one_vedidk_coauthors)==0){tibble(id_unique = NA, id_helper = NA, year = NA, vedidk = NA, treatment_year = NA, independence_timing = NA)}else(one_vedidk_coauthors)
   
   ####
   

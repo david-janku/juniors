@@ -37,8 +37,8 @@ read_sup <- function(db_path, ids_full_vector) {
  one_vedidk_coauthors <- DBI::dbReadTable(con, "authors_by_pubs") %>% # colnames()
       dplyr::select(id_unique, id_helper, vedidk) %>% 
       filter(id_unique %in% one_vedidk_filtered_pubs$id_unique) %>% 
-      rename(sup_name = id_helper) %>%
-      rename(sup_vedidk = vedidk) %>%
+      dplyr::rename(sup_name = id_helper) %>%
+      dplyr::rename(sup_vedidk = vedidk) %>%
       distinct() %>%
       left_join(one_vedidk_filtered_pubs, by ="id_unique") %>% 
       filter(id_helper != sup_name) %>% 
