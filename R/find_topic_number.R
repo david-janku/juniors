@@ -9,8 +9,12 @@
 #' @export
 find_topic_number <- function(topic_model_input) {
 
+    
+    dtm <- convert(topic_model_input,to="topicmodels")
+    # dim(dtm)
+    
     result <- FindTopicsNumber(
-        topic_model_input,
+        dtm,
         topics = c(15, 30, 100),
         metrics = c("Griffiths2004", "CaoJuan2009", "Deveaud2014"),
         method = "Gibbs",                         #rozhodnout se jestli použít VEM nebo Gibbs

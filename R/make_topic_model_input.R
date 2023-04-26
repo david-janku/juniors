@@ -9,6 +9,8 @@
 #' @export
 make_topic_model_input <- function(all_pubs) {
 
+    ##guide example: https://bixuansunphd.com/N-R_tutorial.html#overview 
+    
     # text <-  allpubs
     
     # two_authors %>% 
@@ -102,8 +104,7 @@ make_topic_model_input <- function(all_pubs) {
     
     dfm <- dfm[which(rowSums(dfm) > 0),] #v tomto momentě zmizí 10 datapointů protože mají nulovou hodnotu (tzn používaly pouze "stopwords? to je nějaké divné) 
     # dim(dfm)
-    dtm <- convert(dfm,to="topicmodels")
-    # dim(dtm)
+    dfm
     
 
 }

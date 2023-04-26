@@ -120,7 +120,7 @@ list(
               find_topic_number(topic_model_input),
                 format = "qs"),
     tar_target(topic_model,
-               make_topic_model(topic_model_input),
+               make_topic_model(topic_model_input, topic_number),
                 format = "qs")
 
     
@@ -211,7 +211,7 @@ list(
      #            format = "qs", pattern = map(one_author), iteration = "list")
      # 
     tar_target(independent_topics,
-                comp_ind_topics(independent_pubs))
+                comp_ind_topics(independent_pubs, topic_model, db_path))
 )
 
 ```

@@ -8,7 +8,7 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-independent_topics <- function(independent_pubs) {
+comp_ind_topics <- function(independent_pubs, topic_model, db_path) {
 
 
 independent_topics <-  independent_pubs %>% 

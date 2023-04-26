@@ -10,7 +10,13 @@
 calc_full_indicator <- function(independent_topics) {
  
                
-    independent_topics$eig_centr <- ifelse(independent_topics$eig_centr == "numeric(0)", NA, independent_topics$eig_centr)
+    # independent_topics <- independent_topics %>% 
+    #     mutate_all(~ ifelse(. == "numeric(0)", NA, .))
+   
+    independent_topics <- independent_topics %>% 
+        mutate_all(~ na_if(., "numeric(0)"))
+    
+    # independent_topics <- na.omit(independent_topics)
     
     independent_topics$RII <- ((1-independent_topics$eig_centr)+independent_topics$clustr+independent_topics$ind_pubs+independent_topics$ind_topics*2)/4
     

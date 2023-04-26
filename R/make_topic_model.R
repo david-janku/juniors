@@ -7,23 +7,23 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-make_topic_model <- function(topic_model_input) {
+make_topic_model <- function(topic_model_input, topic_number) {
 
     
-    # s <- result %>% 
+    # s <- topic_number %>% 
     #     filter(Griffiths2004 == max(Griffiths2004), CaoJuan2009 == min(CaoJuan2009), Deveaud2014 == min(Deveaud2014)) %>% 
     #     pull(topics)
     # 
-    s <- topic_model_input %>% 
-        filter(Griffiths2004 == max(Griffiths2004)) %>% 
+    # 
+    s <- topic_number %>%
+        filter(Griffiths2004 == max(Griffiths2004)) %>%
         pull(topics)
     
-    # dfm <- dfm[which(rowSums(dfm) > 0),]    podívat se proč jsem tady tenhle řádek a ten pod tím měl --> nějak to nedává smysl, mělo by to být spíš v topic model input nebo v tom kroku předtím
-    # topic_model_input <- convert(dfm,to="topicmodels")
-    # # dim(topic_model_input)
-    lda.model <- LDA(topic_model_input,k = s, control = list(seed = 123),alpha = 0.1, beta = 0.01 , verbose=1) 
+    dtm <- convert(topic_model_input,to="topicmodels")
+  
+    lda.model <- LDA(dtm,k = s, control = list(seed = 123),alpha = 0.1, beta = 0.01 , verbose=1) 
     
-    lda.matrix <- posterior(lda.model,dfm)$topics
+    lda.matrix <- posterior(lda.model,topic_model_input)$topics
     dim(lda.matrix) 
     
     data <- as_tibble(t(lda.matrix))

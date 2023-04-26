@@ -141,6 +141,7 @@ rpubs = nrow(ind_pubs)/nrow(oneauth)
 ##ideálně by se dopic model mel dělat ze všech publikací všech autorů a jejich vedoucích a pak az z toho kompletního modelu tahat ta témata
 ###je potreba pracovat s unikatnima publikacema --> takze jeste chybi krok ktery protridi vsechny publikace autora a vedouciho a vyhodi ty ktere jsou stejne
 
+##guide example: https://bixuansunphd.com/N-R_tutorial.html#overview 
 
 library(data.table)
 require(data.table)
