@@ -23,10 +23,12 @@ make_topic_model <- function(topic_model_input, topic_number) {
   
     lda.model <- LDA(dtm,k = s, control = list(seed = 123),alpha = 0.1, beta = 0.01 , verbose=1) 
     
-    lda.matrix <- posterior(lda.model,topic_model_input)$topics
-    dim(lda.matrix) 
+    # lda.matrix <- posterior(lda.model,topic_model_input)$topics
+    # dim(lda.matrix) 
+    # 
+    # data <- as_tibble(t(lda.matrix))
     
-    data <- as_tibble(t(lda.matrix))
+    
 
     # write.csv2(data, file = here::here("data", "derived", "topic_model_matrix.csv"))
     # write_excel_csv2(data, here("data", "derived", "tmm.csv"), na = "NA")

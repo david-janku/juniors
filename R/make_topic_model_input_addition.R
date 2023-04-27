@@ -3,11 +3,11 @@
 #' .. content for \details{} ..
 #'
 #' @title
-#' @param random_pubs
+#' @param all_pubs
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-make_topic_model_input <- function(random_pubs) {
+make_topic_model_input_addition <- function(all_pubs) {
 
     ##guide example: https://bixuansunphd.com/N-R_tutorial.html#overview 
     
@@ -17,9 +17,9 @@ make_topic_model_input <- function(random_pubs) {
     #      filter(!duplicated(Kód.výsledku)) %>%
     #      as_tibble()
     
-    all.text <-  paste(random_pubs$title_eng,
-                       random_pubs$abstract_eng,
-                       random_pubs$keywords)
+    all.text <-  paste(all_pubs$title_eng,
+                       all_pubs$abstract_eng,
+                       all_pubs$keywords)
     # str_replace_all(text$keywords, "[:;,]", " "), sep = " ")
     corpus <-  tolower(all.text)
     
@@ -31,7 +31,7 @@ make_topic_model_input <- function(random_pubs) {
     sw <- unique(c(stopwords("english"),"also","e.g", "can","includ","said","first","wherein","other","made","make", "later",  "copyright", "fig", "figur", "tabl", "description", "describ", "Annotation", "not", "available", "N/A", "XXX", "xxx"))
     tokens <- tokens_select(tokens, sw,  selection = "remove", min_nchar = 2)
     
-    names(tokens) <- random_pubs$id_unique
+    names(tokens) <- all_pubs$id_unique
     
     
     tokens.dfm <- dfm(tokens, tolower = FALSE)

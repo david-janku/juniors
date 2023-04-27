@@ -115,13 +115,17 @@ list(
 list(
     
    tar_target(topic_model_input,
-              make_topic_model_input(all_pubs)),
-
-    tar_target(topic_number,
+              make_topic_model_input(random_pubs)),
+   tar_target(topic_number,
               find_topic_number(topic_model_input),
                 format = "qs"),
-    tar_target(topic_model,
+   tar_target(topic_model_original,
                make_topic_model(topic_model_input, topic_number),
+                format = "qs"),
+   tar_target(topic_model_input_addition,
+              make_topic_model_input_addition(all_pubs)),
+   tar_target(topic_model,
+               make_topic_model_addition(topic_model_input_addition, topic_model_original),
                 format = "qs")
 
     
