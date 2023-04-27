@@ -48,8 +48,11 @@ calc_eigen_centr <- function(graph, one_author, db_path) {
     
     
     sup <- centr %>% 
-               filter(author == a) %>% 
-        pull(eigen_ctr)
+               filter(author == a) %>%
+        mutate_all(~ na_if(., "numeric(0)")) %>% 
+        pull(eigen_ctr) 
+        
+    
     
     # table <- tibble(vedidk = vedidk_researcher, eig = sup)
     

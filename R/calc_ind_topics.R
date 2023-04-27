@@ -13,7 +13,7 @@ calc_ind_topics <- function(topic_model, one_author, db_path, sup_vedidk) {
     
     # topic_model_2 <- load(paste(here::here("data", c("derivedtopic_dist.Rdata"))))
     
-    names(topic_model)=substring(names(topic_model),2)
+    # names(topic_model)=substring(names(topic_model),2)
     
     #spočítat poměrné zastoupení každého tématu v celém vzorku
      topic_model$topic_means <- rowMeans(topic_model)

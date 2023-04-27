@@ -10,17 +10,23 @@
 calc_full_indicator <- function(independent_topics) {
  
                
-    # independent_topics <- independent_topics %>% 
-    #     mutate_all(~ ifelse(. == "numeric(0)", NA, .))
-   
     independent_topics <- independent_topics %>% 
-        mutate_all(~ na_if(., "numeric(0)"))
+        mutate_all(~ na_if(., "numeric(0)")) 
     
-    # independent_topics <- na.omit(independent_topics)
+    independent_topics$eig_centr <- unlist(independent_topics$eig_centr)
+    independent_topics$clustr <- unlist(independent_topics$clustr)
+    independent_topics$ind_pubs <- unlist(independent_topics$ind_pubs)
+    independent_topics$ind_topics <- unlist(independent_topics$ind_topics)
     
-    independent_topics$RII <- ((1-independent_topics$eig_centr)+independent_topics$clustr+independent_topics$ind_pubs+independent_topics$ind_topics*2)/4
     
-        
+    independent_topics <- independent_topics %>% 
+        mutate(RII = ifelse(is.na(eig_centr) | is.na(clustr) | is.na(ind_pubs) | is.na(ind_topics), NA, ((1-eig_centr)+clustr+ind_pubs+ind_topics*2)/4))
+    
+    
+     # independent_topics$RII <- ifelse(is.na(independent_topics$eig_centr) | is.na(independent_topics$clustr) | is.na(independent_topics$ind_pubs) | is.na(independent_topics$ind_topics), NA, ((1-independent_topics$eig_centr)+independent_topics$clustr+independent_topics$ind_pubs+independent_topics$ind_topics*2)/4)
+    
+     
+
     # a <- right_join(bind_rows(eigen_centr), bind_rows(clustering), by = "vedidk")
     # b <- right_join(bind_rows(a), bind_rows(ind_pubs), by = "vedidk")        
     # c <- right_join(bind_rows(b), bind_rows(ind_topics), by = "vedidk")    
