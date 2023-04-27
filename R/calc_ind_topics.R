@@ -13,7 +13,12 @@ calc_ind_topics <- function(topic_model, one_author, db_path, sup_vedidk) {
     
     # topic_model_2 <- load(paste(here::here("data", c("derivedtopic_dist.Rdata"))))
     
+    #for debugging: this is easy method how to call nested table:
+    # one_author <- as_tibble(do.call(cbind, independent_pubs$pub_table[4]))
+    
+    
     # names(topic_model)=substring(names(topic_model),2)
+    
     
     #spočítat poměrné zastoupení každého tématu v celém vzorku
      topic_model$topic_means <- rowMeans(topic_model)

@@ -103,8 +103,9 @@ list(
      tar_target(all_pubs,
            get_all_pubs(db_path, final_data)),
     tar_target(all_authors,
-           read_all_authors(db_path, ids_complete_vector, ids_complete, final_data, ids_full_vector))
-    
+           read_all_authors(db_path, ids_complete_vector, ids_complete, final_data, ids_full_vector)),
+     tar_target(random_pubs,
+           get_random_pubs(db_path))
 )
 ```
 

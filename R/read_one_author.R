@@ -80,7 +80,7 @@ read_one_author <- function(db_path, ids_complete_vector, ids_complete, matching
   
   if(nrow(one_vedidk_coauthors)==0){tibble(id_unique = NA, id_helper = NA, year = NA, vedidk = NA, treatment_year = NA, independence_timing = NA)}else(one_vedidk_coauthors)
   
-  ####
+  #####
   
   # sup_vector <- ids_complete$vedoucí.vedidk %>% 
   #     as_tibble() %>% 
