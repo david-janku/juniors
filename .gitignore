@@ -9,3 +9,6 @@ _targets_r/
 
 .DS_Store
 data/raw/czech_sci_db.sqlite
+data/raw/names4api_tagged.tsv
+data/raw/supervisors_control_final.csv
+Rplots.pdf
