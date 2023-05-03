@@ -65,8 +65,9 @@ refine_data <- function(matching, db_path, ids, sup_control) {
    #  # # table(d$treatment, by =d$independence_timing)
    #  
     
-    new2 <-  head(matching) %>% 
+    new2 <- matching %>% 
         dplyr::select(vedidk) %>% 
+        distinct() %>% 
         mutate(sup_details = purrr::pmap(.l = list(vedidk),
                                        .f = function(first){
                                            read_sup(db_path, 

@@ -21,7 +21,7 @@ matching <- as_tibble(final_data)
 # l <- list(ids_full_vector = matching$vedidk, intervention_year = matching$treatment_year, timing = matching$independence_timing)
 
 
-new <-  head(matching) %>% 
+new <-  matching %>% 
         dplyr::select(vedidk, treatment_year, independence_timing, sup_name, sup_vedidk) %>% 
         mutate(pub_table = purrr::pmap(.l = list(vedidk, treatment_year, independence_timing),
                                        .f = function(first, second, third){

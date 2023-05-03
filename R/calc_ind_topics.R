@@ -60,10 +60,11 @@ calc_ind_topics <- function(topic_model, one_author, db_path, sup_vedidk) {
     con <-  DBI::dbConnect(RSQLite::SQLite(), db_path)
     on.exit(DBI::dbDisconnect(con))
     
-    sup_pubids <- DBI::dbReadTable(con, "authors_by_pubs") %>% #colnames()
+    sup_pubids <- dplyr::tbl(con, "authors_by_pubs") %>% #colnames()
         filter(vedidk == sup_vedidk) %>% 
         select(id_unique) %>% 
         distinct() %>% 
+        dplyr::collect() %>% 
         as_tibble()
     
     sup_pubids$id_unique <- as.character(sup_pubids$id_unique)

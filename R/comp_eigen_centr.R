@@ -18,8 +18,8 @@ eigen_centrality <-  coauthorship_graph %>%
                                                         graph = first, one_author = second)
                                    } ))
 
-eigen_centrality <- eigen_centrality %>% 
-mutate_all(~ na_if(., "numeric(0)"))
+# eigen_centrality <- eigen_centrality %>% 
+# mutate_all(~ na_if(., "numeric(0)"))
 
 # replace(independent_topics$eig_centr, NA, 0)
 

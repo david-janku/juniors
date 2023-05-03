@@ -15,9 +15,10 @@ read_one_author <- function(db_path, ids_complete_vector, ids_complete, matching
   
   DBI::dbListTables(con)
   
+  # ids_full_vector <- as.character(unname(ids_full_vector))
 
   one_vedidk_pubids <- dplyr::tbl(con, "authors_by_pubs") %>% #colnames()
-      filter(vedidk == ids_full_vector) %>% 
+      dplyr::filter(vedidk == ids_full_vector) %>% 
       dplyr::select(vedidk, id_unique) %>% 
       distinct() %>% 
       as_tibble()
@@ -41,7 +42,7 @@ read_one_author <- function(db_path, ids_complete_vector, ids_complete, matching
      dplyr::collect() %>% 
      # filter(pub_type %in% c("J","B","C","D")) %>%
      left_join(one_vedidk_pubids) %>% 
-     inner_join(matching %>% dplyr::select(vedidk, treatment_year, independence_timing)) %>%  #jako další věc do select přidat sup_vedidk - to bude sloupec ve kterém bude vedidk supervisora daného člověka 
+     inner_join(matching %>% dplyr::select(vedidk, treatment_year, independence_timing), by = "vedidk") %>%  #jako další věc do select přidat sup_vedidk - to bude sloupec ve kterém bude vedidk supervisora daného člověka 
      filter(treatment_year == intervention_year, independence_timing == timing) %>% 
      # purrr::when(.$independence_timing == "before_intervention" ~ filter(., year <= treatment_year), ~ filter(., year >= treatment_year)) %>% 
      # purrr::when(matching$independence_timing == "before_intervention" ~ filter(., year <= matching$treatment_year), ~ filter(., year >= matching$treatment_year)) %>% 

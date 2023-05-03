@@ -17,9 +17,10 @@ match <- function(db_path, ids, gender) {
     
     # setting up the set of all authors
     
-    all_auth <- DBI::dbReadTable(con, "authors_by_pubs") %>% #colnames()
+    all_auth <- dplyr::tbl(con, "authors_by_pubs") %>% #colnames()
         dplyr::select(vedidk, id_unique) %>% 
         distinct() %>% 
+        dplyr::collect() %>% 
         as_tibble()
     
     # # org affiliation
@@ -31,16 +32,18 @@ match <- function(db_path, ids, gender) {
     #number of all publications up to 2014 (ie the year when the grant was awarded
     
     
-    n_pubs_types2014 <- DBI::dbReadTable(con, "riv_disc") %>%  #colnames()  
+    n_pubs_types2014 <- dplyr::tbl(con, "riv_disc") %>%  #colnames()  
         dplyr::select(id_unique, pub_type, year) %>% 
         filter(pub_type %in% c("J","B","C","D")) %>%
         filter(year < 2014) %>% 
         as_tibble() 
     
-    n_pubs_filtered2014 <- DBI::dbReadTable(con, "authors_by_pubs") %>% 
+    control_id <- n_pubs_types2014$id_unique
+    n_pubs_filtered2014 <- dplyr::tbl(con, "authors_by_pubs") %>% 
         dplyr::select(vedidk, id_unique) %>% 
-        filter(id_unique %in% n_pubs_types2014$id_unique) %>% #it doesn't really matter whether I use this filter or not - it always come with the same result which is weird
+        filter(id_unique %in% control_id) %>% #it doesn't really matter whether I use this filter or not - it always come with the same result which is weird
         distinct() %>% 
+        dplyr::collect() %>% 
         as_tibble()
     
     n_pubs_count2014 <- plyr::count(n_pubs_filtered2014, vars = "vedidk") %>% 
@@ -49,9 +52,11 @@ match <- function(db_path, ids, gender) {
     
     #number of wos/scopus publications up to 2014 (ie the year when the grant was awarded)
     
-    n_pubs_ws2014 <- DBI::dbReadTable(con, "riv_wos_scopus") %>% 
-        filter(id_unique %in% n_pubs_types2014$id_unique) %>% #it doesn't really matter whether I use this filter or not - it always come with the same result which is weird
+    control_id <- n_pubs_types2014$id_unique
+    n_pubs_ws2014 <- dplyr::tbl(con, "riv_wos_scopus") %>% 
+        filter(id_unique %in% control_id) %>% #it doesn't really matter whether I use this filter or not - it always come with the same result which is weird
         distinct() %>% 
+        dplyr::collect() %>% 
         as_tibble()
     
     n_pubs_ws2014 <- left_join(n_pubs_ws2014, n_pubs_filtered2014, by = "id_unique") 
@@ -68,7 +73,7 @@ match <- function(db_path, ids, gender) {
     
     #gender
     
-    all_auth_names <- DBI::dbReadTable(con, "authors_by_pubs") %>% #colnames()
+    all_auth_names <- dplyr::tbl(con, "authors_by_pubs") %>% #colnames()
         dplyr::select(vedidk, name_first, name_last) %>% 
         filter(!is.na(vedidk)) %>% 
         distinct() %>% 
@@ -77,6 +82,7 @@ match <- function(db_path, ids, gender) {
         filter(n == max(n)) %>%
         slice_sample(n=1) %>%
         ungroup() %>% 
+        dplyr::collect() %>% 
         as_tibble()
     
     all_auth_names$name_first <- tolower(all_auth_names$name_first)
@@ -107,7 +113,7 @@ match <- function(db_path, ids, gender) {
     
     #career age in 2014
     
-    age_pubs <- DBI::dbReadTable(con, "riv_disc") %>% 
+    age_pubs <- dplyr::tbl(con, "riv_disc") %>% 
         dplyr::select(id_unique, year) %>% 
         distinct() %>% 
         as_tibble()
@@ -1917,7 +1923,7 @@ match <- function(db_path, ids, gender) {
     #filtering out observations from treatment group (and their paired observations from control groups) which we couldnt find supervisors for
     
     ids_out <- as_tibble(ids) %>% 
-            filter(is.na(vedoucí.vedidk)) %>%
+            filter(is.na(sup_vedidk)) %>%
             filter(!is.na(vedidk_core_researcher))
     
     full_data_final_clean <- full_data_final %>% 

@@ -10,8 +10,15 @@
 calc_full_indicator <- function(independent_topics) {
  
                
+    # independent_topics$eig_centr <- as.numeric(independent_topics$eig_centr)
+    # independent_topics$clustr <- as.numeric(independent_topics$clustr)
+    # independent_topics$ind_pubs <- as.numeric(independent_topics$ind_pubs)
+    # independent_topics$ind_topics <- as.numeric(independent_topics$ind_topics)
+    
     independent_topics <- independent_topics %>% 
-        mutate_all(~ na_if(., "numeric(0)")) 
+        # mutate_at(vars(eig_centr, clustr, ind_pubs, ind_topics), as.numeric) %>%  
+        mutate(across(eig_centr:ind_topics, as.numeric))  
+        # mutate_all(~ na_if(., "numeric(0)")) 
     
     independent_topics$eig_centr <- unlist(independent_topics$eig_centr)
     independent_topics$clustr <- unlist(independent_topics$clustr)

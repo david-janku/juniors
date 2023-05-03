@@ -49,7 +49,7 @@ calc_eigen_centr <- function(graph, one_author, db_path) {
     
     sup <- centr %>% 
                filter(author == a) %>%
-        mutate_all(~ na_if(., "numeric(0)")) %>% 
+        # mutate_all(~ na_if(., "numeric(0)")) %>% 
         pull(eigen_ctr) 
         
     

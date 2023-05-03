@@ -10,8 +10,8 @@
 create_ids_complete <- function(ids, db_path) {
 
     ids_complete <- as_tibble(ids) %>% 
-        select(vedidk_core_researcher, vedoucí.vedidk) %>% 
-        filter(!is.na(vedoucí.vedidk)) %>% 
+        select(vedidk_core_researcher, sup_vedidk) %>% 
+        filter(!is.na(sup_vedidk)) %>% 
         filter(!is.na(vedidk_core_researcher))
         
     #adding info about discipline (based on which disciplinary committee evaluated the grant) and year the grant project started
@@ -78,16 +78,16 @@ create_ids_complete <- function(ids, db_path) {
     #here needs to be code that will, in the GJ table, translate old discipline tags to ford discipline tags - here is manual https://www.isvavai.cz/dokumenty/Prevodnik_oboru_Frascati_v2.pdf
     
        
-         
-    GJ_vector <- GJ$kod %>% 
-        as_tibble() %>% 
-        as_vector() %>% 
-        as_tibble() %>% #from here below it was added - I should check that it does change any further results 
-        distinct() %>% #here
-        as_vector()
+    #      
+    # GJ_vector <- GJ$kod %>% 
+    #     as_tibble() %>% 
+    #     as_vector() %>% 
+    #     as_tibble() %>% #from here below it was added - I should check that it does change any further results 
+    #     distinct() %>% #here
+    #     as_vector()
         
     resitele <- DBI::dbReadTable(con, "cep_investigators") %>%
-        filter(kod %in% GJ_vector) %>%
+        filter(kod %in% GJ$kod) %>%
         filter(vedidk %in% ids_complete$vedidk_core_researcher) %>%
         select(kod, vedidk)
     
@@ -105,5 +105,9 @@ create_ids_complete <- function(ids, db_path) {
         group_by(vedidk_core_researcher) %>% 
         slice(which.min(year_start)) %>% 
         ungroup()
+    
+    ids_complete <- dplyr::rename(ids_complete, sup_vedidk = sup_vedidk)
+    ids_complete <- dplyr::rename(ids_complete, vedidk = vedidk_core_researcher)
+     
     
 }
