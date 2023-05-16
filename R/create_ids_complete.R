@@ -10,7 +10,7 @@
 create_ids_complete <- function(ids, db_path) {
 
     ids_complete <- as_tibble(ids) %>% 
-        select(vedidk_core_researcher, sup_vedidk) %>% 
+        select(vedidk_core_researcher, sup_vedidk, statni.prislusnost) %>% 
         filter(!is.na(sup_vedidk)) %>% 
         filter(!is.na(vedidk_core_researcher))
         
@@ -88,8 +88,12 @@ create_ids_complete <- function(ids, db_path) {
         
     resitele <- DBI::dbReadTable(con, "cep_investigators") %>%
         filter(kod %in% GJ$kod) %>%
-        filter(vedidk %in% ids_complete$vedidk_core_researcher) %>%
-        select(kod, vedidk)
+        select(kod, vedidk, nationality) %>% 
+        distinct() %>%
+        filter(nationality == "CZ") %>% 
+        filter(!is.na(vedidk)) %>% 
+        filter(vedidk %in% ids_complete$vedidk_core_researcher)
+    
     
     resitele_complet <- left_join(resitele, GJ, by = "kod")
     resitele_complet$vedidk <- as.integer(resitele_complet$vedidk)

@@ -1926,18 +1926,28 @@ match <- function(db_path, ids, gender) {
             filter(is.na(sup_vedidk)) %>%
             filter(!is.na(vedidk_core_researcher))
     
+    ids_out_SK <- as_tibble(ids) %>% 
+        filter(statni.prislusnost == "SK") %>% 
+        filter(!is.na(vedidk_core_researcher))
+    
+    ids_out <- rbind(ids_out, ids_out_SK)
+    
     full_data_final_clean <- full_data_final %>% 
             filter(!vedidk %in% ids_out$vedidk_core_researcher) %>%
             filter(!vedidk_treatment %in% ids_out$vedidk_core_researcher) %>% 
-            filter(vedidk != 4427920) %>%      #one vedidk had over 800 publications, which seemed unrealistic, so I deleted it
-            subset(!vedidk_treatment %in% c(4427920)) %>% 
+            # filter(vedidk != 4427920) %>%      #one vedidk had over 800 publications, which seemed unrealistic, so I deleted it
+            # subset(!vedidk_treatment %in% c(4427920)) %>% 
             as_tibble()
     
-            # table(full_data_final_clean$treatment)
+            # table(full_data_final_clean$treatment, by = full_data_final_clean$independence_timing)
     
     # after removing those we coulnt find supúervisors for there is only 159 experimental observations 
     
+    
+    full_data_final_clean$id <- seq_along(full_data_final_clean$vedidk)
+    
     full_data_final_clean
+    
     
     
     

@@ -83,5 +83,10 @@ refine_data <- function(matching, db_path, ids, sup_control) {
     d <- anti_join(a_final_data, b, by = "vedidk")
     # table(d$treatment, by =d$independence_timing)
     
+    #by this code below, I attach the cases in which no supervisor was found (i.e. cases where these people had no coauthors in theri first 5 publications) 
+    aa <- anti_join(matching, d, by = "vedidk")
+    bb <- left_join(aa, d)
 
+    cc <- rbind(d, bb)
+    
 }
