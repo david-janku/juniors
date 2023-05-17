@@ -26,6 +26,10 @@ calc_full_indicator <- function(independent_topics) {
     independent_topics$ind_topics <- unlist(independent_topics$ind_topics)
     
     
+    independent_topics <- independent_topics %>% mutate(eig_centr = ifelse(is.na(eig_centr) & !is.na(sup_name), 0, eig_centr)) #this turns all the cases where there is a sup_name but the supervisor was not found in the authors coauthorship network (and therefore eig_centr turned NA) make it a 0, because it should be interpreted as "their independence is at max, because their supervisor is not even in their network anymore" 
+    independent_topics <- independent_topics %>% mutate(clustr = ifelse(is.na(clustr) & !is.na(sup_name), 1, clustr)) #this turns all the cases where there is a sup_name but the supervisor was not found in the authors coauthorship network (and therefore clustr turned NA) make it a 0, because it should be interpreted as "their independence is at max, because their supervisor is not even in their network anymore" 
+    
+    
     independent_topics <- independent_topics %>% 
         mutate(RII = ifelse(is.na(eig_centr) | is.na(clustr) | is.na(ind_pubs) | is.na(ind_topics), NA, ((1-eig_centr)+clustr+ind_pubs+ind_topics)/4))
     
@@ -42,6 +46,8 @@ calc_full_indicator <- function(independent_topics) {
     # 
     # c
     
+    
+    independent_topics$id <- seq_along(independent_topics$vedidk)
     
     
     d <- left_join(final_data, independent_topics)
@@ -84,35 +90,39 @@ calc_full_indicator <- function(independent_topics) {
     
     ##how many of that is because we could not find people's supervisors?
     
-    f <- d %>% filter(pub_table_empty == FALSE)
+    # f <- d %>% filter(pub_table_empty == FALSE)
+    # 
+    # sum(is.na(d$sup_name))
+    # sum(is.na(f$sup_name))
+    # 
+    # sum(is.na(d$sup_name)) / nrow(d) # this shows that X % of observations have no supervisor 
+    # 
+    # sum(is.na(f$sup_name)) / sum(is.na(d$RII)) # this shows that missing supervisors explain X % of all misssing RII scores  
+    # sum(is.na(f$sup_name)) / sum(is.na(f$RII)) # this shows that missing supervisors explain X % of all remaining misssing RII scores  
     
-    sum(is.na(d$sup_name))
-    sum(is.na(f$sup_name))
     
-    sum(is.na(d$sup_name)) / nrow(d) # this shows that X % of observations have no supervisor 
-    
-    sum(is.na(f$sup_name)) / sum(is.na(d$RII)) # this shows that missing supervisors explain X % of all misssing RII scores  
-    sum(is.na(f$sup_name)) / sum(is.na(f$RII)) # this shows that missing supervisors explain X % of all remaining misssing RII scores  
     
     
     ##how many of that is because we could not find supervisors vedidks?
     
-    w <- f %>% filter(!is.na(sup_name))
-    
-    sum(is.na(d$sup_vedidk))
-    sum(is.na(w$sup_vedidk))
-    
-    sum(is.na(d$sup_vedidk)) / nrow(d) # this shows that 12 % of observations have no supervisor vedidk 
-    
-    sum(is.na(w$sup_vedidk)) / sum(is.na(d$RII)) # this shows that missing supervisors explain 24 % of all missing RII scores
-    sum(is.na(w$sup_vedidk)) / sum(is.na(w$RII)) # this shows that missing supervisors explain 24 % of remaining missing RII scores  
     
     
-    q <- w %>% filter(!is.na(sup_vedidk)) %>% filter(is.na(RII))
-    
-    sum(is.na(q$RII))
-    
-    table(q$treatment, by = q$independence_timing) #this suggests that before intervention, there are still about 10 cases in each control group who didnt have RII scores, while only 1 observation in the treatment group -> that suggests that maybe the choice of supervisors for the control groups doesnt work that well, because these supervisors didnt appear in the authors coauthor networks
+    # w <- f %>% filter(!is.na(sup_name))
+    # 
+    # sum(is.na(d$sup_vedidk))
+    # sum(is.na(w$sup_vedidk))
+    # 
+    # sum(is.na(d$sup_vedidk)) / nrow(d) # this shows that 12 % of observations have no supervisor vedidk 
+    # 
+    # sum(is.na(w$sup_vedidk)) / sum(is.na(d$RII)) # this shows that missing supervisors explain 24 % of all missing RII scores
+    # sum(is.na(w$sup_vedidk)) / sum(is.na(w$RII)) # this shows that missing supervisors explain 24 % of remaining missing RII scores  
+    # 
+    # 
+    # q <- w %>% filter(!is.na(sup_vedidk)) %>% filter(is.na(RII))
+    # 
+    # sum(is.na(q$RII))
+    # 
+    # table(q$treatment, by = q$independence_timing) #this suggests that before intervention, there are still about 10 cases in each control group who didnt have RII scores, while only 1 observation in the treatment group -> that suggests that maybe the choice of supervisors for the control groups doesnt work that well, because these supervisors didnt appear in the authors coauthor networks
     
     # write.csv2(final_data, here::here("data", "derived", "final_indicators.csv"), na = "NA")
     # readr::write_excel_csv2(final_data, here::here("data", "derived", "final_indicators.csv"), na = "NA")

@@ -48,7 +48,8 @@ tar_option_set(packages = c("dplyr",
                             "DBI",
                             "MatchIt",
                             "qs",
-                            "tidyverse"
+                            "tidyverse",
+                            "psych"
                             ))
 
 # read custom functions
@@ -251,6 +252,7 @@ list(
     
     tar_target(full_indicator,
                calc_full_indicator(independent_topics))
+    
 
 )
 
@@ -260,6 +262,14 @@ list(
 
 ```{targets article}
 list(
+    
+    # tar_target(results,
+    #            analyse(full_indicator),
+    #            format = "qs") ,
+    # tar_target(sup_testing,
+    #            sup_test(matching, db_path, ids, sup_control, ids_complete),
+    #            format = "qs") ,
+    # 
     # tarchetypes::tar_render(article, here::here("Rmd", "article.Rmd"))
 )
 
