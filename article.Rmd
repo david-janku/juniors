@@ -1,0 +1,50 @@
+---
+title: "Funding programmes for early career researchers do/not influence their independence"
+author: "David Janků"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(targets)
+library(dplyr)
+```
+
+# Intro
+
+Researchers’ independence from their PhD advisor is one of the criteria often used for assessing researchers for hiring, tenure and promotion (Van Arensbergen, Van der Weijden, Van den Besselaar, 2014; Moher et al, 2018), constituting one factor of research excellence.
+The promise of independence is that researchers will “challenge the existing common views and open up new lines of research” (Van den Besselaar & Sandström, 2019, p.2). 
+
+An independent investigator is then defined by the US National Academies of Science (NAS) as “one who enjoys independence of thought—the freedom to define the problem of interest and to choose or develop the best strategies and approaches to address that problem–especially during the earlier career phase” (Van den Besselaar & Sandström, 2019, p.4). Such a definition does not necessarily put independence in relation to other actors (e.g. one’s PhD advisor), but only in relation to one’s own freedom and resources. However other institutions, such as European Research Council via their Starting Grants scheme (Neufeld, Huber & Wegner, 2013) think of independence in a relational manner, in terms of having one (or a few) publications without the former PhD supervisor being co-author; being PI on a grant; or being lab director or research leader. 
+
+Based on some early empirical studies (Rojko & Lužar, 2022), it seems that researchers in disciplines such as philosophy, psychology; religion, theology; social sciences; the arts, recreation, entertainment, sport; language, linguistics, literature; and geography, biography, history experience significantly higher levels of indepedence on their PhD advisor than researchers in disciplines such as science and knowledge, organization, computer science, information, documentation, librarianship, institutions, publications; mathematics, natural sciences; and applied sciences, medicine, technology. 
+There is also some preliminary evidence that higher indepedence modestly correlates with number of citations aquired (Rojko & Lužar, 2022), but others argue that even the research systems with very low indepedence can create a lot of scientific impact, and thus the relationships between independence and impact might not be as clear (Gläser et al., 2021)
+
+
+In recent decades, there has been a worry that researchers’ indepedence is decreasing, illustrated by increase in age at which US (biomedical) researchers received their first grant (NAS, 2005; Daniels, 2015), as well as direct measures of new reserchers becoming more depedent on their PhD advisors across almost all disciplines in Slovenia (Rojko & Lužar, 2022, table 6 on p.9). Perhaps to tackle this trend, many grant agencies decided to start awarding grants for early career researchers, usually up to 8 years after finishing their PhD. Such programmes have often explicitly stated goals of helping researchers become more indepedent, set up their own research group and open up new lines of research. The examples of such programmes could be Starting Grants by European Research Council (2022), Junior project and Junior Star by Czech Science Foundation (2020), Walter N. Benjamin Programme by DFG (2022), Innovation Research Incentives Scheme by Netherlands Organization of Scientific Research (NWO) (2021)... something from the US would be also good)
+
+
+Although researcher independence seems to be important feature that is acknowledged by many actors in the research systems and that research funders try to stimulate, there hasn’t been much effort focused on quantifying this phenomenon. Some studies try to measure independence in a simple way, as a ratio of publications the given researcher produced without their supervisor divided by the total number of publications of the given researchers (e.g. Rojko & Lužar, 2022). However, such indicator could be misleading in the world of team science, and also only focuses on collaborations, not tracking whether given researcher become independent in their thinking and research topics. Van den Besselaar & Sandström (2019) therefore proposed more complex indicator for measuring researcher independence on the individual level, based on co-authorship network and topical overlaps. Their measure uses only information about publications’ characteristics (authorship and reference list) regardless of it’s impacts, unlike other alternative measures that focus solely on the impact of the independent work in terms of received citations (Dey, et al., 2021).
+
+Since the explicit goal of many funding instruments that are being used by research funders all over the world is to help early career researchers become independent, we would like to use the newly created indicators to assess the extent, to which such programmes influence researchers independence.    
+
+H1: Researchers, who received funding from programmes aimed at funding early career researchers, will show more independence on theri PhD advisor 5 years after receiving the funding than researchers who did not receive this kind of funding.
+
+# Method
+
+## Sample / data
+
+We used the database of all publications produced by researchers employed at Czech research institutions (RIV) combined with a database of all publicly funded research projects and grants in the Czech Republic (CEP), both publicly accessible at https://www.isvavai.cz/, and transformed into a single database with cleaned data, unique person and publication identifiers, and better structure (Hladik, XXX).
+This allowed us to identify all researchers who received Junior Grants from the Czech Science Foundation, a funding programme that has an explicit goal to help early career researchers become independent and set up their own research groups. There were 491 projects funded from 2015 to 2020, usually 3 years long (with some being only 2 years long), where the PI must have been up to 8 years after their PhD defence (with potential extension of 2 years for each child the researcher had in that period) and the grant could contribute up to 100 % of their salary (usually, this is limited to 50 % in other funding programmes). From these 491 funded projects, we selected 348 (71 %) grants of the recipients from Czechia, since the remaining recipients were from abroad, and thus would not have their previous publications recorded in the database of researchers employed at Czech research institutions (RIV) that we used for all analyses. There were also 7 cases where one researcher received this grant two times - in these cases, we counted only the first project that was funded, reducing the number of recipients we worked with to 341.
+
+In the second step, we manually searched for PhD advisors of these 341 researchers in the databases of theses and dissertations that cover most universities in Czechia (https://theses.cz and https://dspace.cuni.cz/). We were able to match `r nrow(tar_read(ids_complete))` researchers with a PhD advisor (69,2 % of the Czech subsample). Further, we have not managed to find a suitable matched pair for another `r nrow(tar_read(ids_complete))-nrow(tar_read("matching") %>% filter(treatment == 1) %>% distinct(vedidk))` researchers in the matching procedure, reducing our final sample to `r nrow(tar_read("matching") %>% filter(treatment == 1) %>% distinct(vedidk))`. 
+
+These researchers and their PhD advisors with their full publication history (limited to publications created at Czech institutions) created our final sample.
+
+
+
+
+```{r}
+head(tar_read(matching))
+
+```
