@@ -49,7 +49,8 @@ tar_option_set(packages = c("dplyr",
                             "MatchIt",
                             "qs",
                             "tidyverse",
-                            "psych"
+                            "psych",
+                            "arrow"
                             ))
 
 # read custom functions
@@ -67,22 +68,16 @@ list(
      tar_target(gender, read.delim(gender_path)),
      # tar_target(gender, read.delim(here::here("data", "raw", "names4api_tagged.tsv")),
      #          format = "qs"),
-      tar_target(db_path,
+     tar_target(db_path,
            here::here("data", "raw", "czech_sci_db.sqlite")),
-      tar_target(ids_complete, create_ids_complete(ids, db_path)),
-    tar_target(ids_complete_vector,
-               make_ids_complete_vector(ids_complete))
+     tar_target(authors_arrow_path, here::here("data", "raw", "authors_by_pubs.arrow")),
+     tar_target(authors_arrow, arrow::read_feather(authors_arrow_path)),
+     tar_target(text_arrow_path, here::here("data", "raw", "riv_text.arrow")),
+     tar_target(text_arrow, arrow::read_feather(text_arrow_path)),
+     tar_target(ids_complete, create_ids_complete(ids, db_path)),
+     tar_target(ids_complete_vector, make_ids_complete_vector(ids_complete))
    
-    
-    
-    
-    # tar_target(all_pubs,
-    #        get_all_pubs(db_path, ids_complete), 
-    #           format = "qs"),
-    # tar_target(one_author,
-    #        read_one_author(db_path, ids_complete_vector, ids_complete), 
-    #           format = "qs")
-    # 
+
 )
 ```
 
@@ -91,23 +86,23 @@ list(
 ```{r, engine="targets", matching_preparation}
 list(
     
-      tar_target(matching, match(db_path, ids, gender)),
+      tar_target(matching, match(db_path, ids, gender, authors_arrow)),
       tar_target(sup_path, here::here("data", "raw", "supervisors_control_final.csv"), format = "file"),
       tar_target(sup_control, read.csv2(sup_path)),
               
      # tar_target(sup_control, read.csv2(here::here("data", "raw", "supervisors_control.csv")),
      #          format = "qs"),
-      tar_target(final_data, refine_data(matching, db_path, ids, sup_control)),
+      tar_target(final_data, refine_data(matching, db_path, ids, sup_control, authors_arrow)),
                
      #at this point, I will need to manually search for the supervisors of the control group researchers and upload their vedidks into new ids file
      tar_target(ids_full_vector,
                make_ids_full_vector(matching)),
      tar_target(all_pubs,
-           get_all_pubs(db_path, final_data)),
+           get_all_pubs(db_path, final_data, authors_arrow, text_arrow)),
     tar_target(all_authors,
-           read_all_authors(db_path, ids_complete_vector, ids_complete, final_data, ids_full_vector)),
+           read_all_authors(db_path, ids_complete_vector, ids_complete, final_data, ids_full_vector, authors_arrow)),
      tar_target(random_pubs,
-           get_random_pubs(db_path))
+           get_random_pubs(db_path, authors_arrow, text_arrow))
 )
 ```
 
@@ -140,10 +135,7 @@ list(
 
 list(
 
-    # tar_target(edgelist,
-    #            make_edgelist(one_author),
-    #             format = "qs", pattern = map(one_author), iteration = "list"),
-    # tar_target(graph, igraph::graph_from_data_frame(edgelist, directed = FALSE), pattern = map(edgelist), iteration = "list")
+   
     tar_target(coauthorship,
                make_network(all_authors)),
 
@@ -160,10 +152,6 @@ list(
 
 list(
     
-    # tar_target(eigen_centr,
-    #            calc_eigen_centr(graph, ids_complete, one_author, db_path),
-    #            format = "qs", pattern = map(graph, one_author), iteration = "list")
-    # 
      tar_target(eigen_centrality,
                comp_eigen_centr(coauthorship_graph))
     
@@ -176,12 +164,6 @@ list(
 ```{r, engine="targets", RII2}
 
 list(
-    
-    #  tar_target(clustering,
-    #             calc_clustering(graph, ids_complete, one_author, db_path),
-    #            format = "qs", pattern = map(graph, one_author), iteration = "list") 
-    # #            
-    # # 
     
     tar_target(cluster,
                 comp_clustering(eigen_centrality))
@@ -197,11 +179,7 @@ list(
 
 list(
     
-     # tar_target(ind_pubs,
-     #            calc_ind_pubs(one_author, ids_complete, db_path), 
-     #            format = "qs", pattern = map(one_author),                  iteration = "list")
-     # 
-     tar_target(independent_pubs,
+   tar_target(independent_pubs,
                 comp_ind_pubs(cluster))
 )
 
@@ -213,12 +191,8 @@ list(
 
 list(
     
-     # tar_target(ind_topics,
-     #            calc_ind_topics(topic_model = NULL, one_author, ids_complete, db_path), 
-     #            format = "qs", pattern = map(one_author), iteration = "list")
-     # 
     tar_target(independent_topics,
-                comp_ind_topics(independent_pubs, topic_model, db_path))
+                comp_ind_topics(independent_pubs, topic_model, db_path, authors_arrow))
 )
 
 ```
@@ -243,9 +217,6 @@ list(
 
 list(
     
-    # tar_target(final_data,
-    #            calc_final_data(eigen_centr, clustering, ind_topics, ind_pubs, matching),
-    #            format = "qs") #,
     #  # tar_target(testing,
     #  #           just_test(db_path),
     #  #           format = "qs")

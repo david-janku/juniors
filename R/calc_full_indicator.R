@@ -47,7 +47,7 @@ calc_full_indicator <- function(independent_topics) {
     # c
     
     
-    independent_topics$id <- seq_along(independent_topics$vedidk)
+    # independent_topics$id <- seq_along(independent_topics$vedidk)
     
     
     d <- left_join(final_data, independent_topics)

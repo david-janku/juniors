@@ -8,9 +8,13 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-get_all_pubs <- function(db_path, final_data) {
+get_all_pubs <- function(db_path, final_data, authors_arrow, text_arrow) {
 
+    authors_arrow <- as.data.frame(authors_arrow)
+    text_arrow <- as.data.frame(text_arrow)
     con <-  DBI::dbConnect(RSQLite::SQLite(), db_path)
+    dbWriteTable(con, "authors_by_pubs", authors_arrow, overwrite = TRUE)
+    dbWriteTable(con, "riv_text", text_arrow, overwrite = TRUE)
     on.exit(DBI::dbDisconnect(con))
     
     DBI::dbListTables(con)
@@ -48,17 +52,17 @@ get_all_pubs <- function(db_path, final_data) {
     #     distinct() %>% 
     #     as_tibble()
     
-    filtered_pubs <- DBI::dbReadTable(con, "riv_disc") %>%  #colnames()  
-        select(id_unique, pub_type) %>% 
-        filter(id_unique %in% comb_vedidk_pubids$id_unique) %>% 
-        filter(pub_type %in% c("J","B","C","D")) %>% 
-        as_tibble() 
+    # filtered_pubs <- DBI::dbReadTable(con, "riv_disc") %>%  #colnames()  
+    #     select(id_unique, pub_type) %>% 
+    #     filter(id_unique %in% comb_vedidk_pubids$id_unique) %>% 
+    #     filter(pub_type %in% c("J","B","C","D")) %>% 
+    #     as_tibble() 
   
     # this filtered out all non-publication outputs, n=4676
     
     text_pubs <- DBI::dbReadTable(con, "riv_text") %>% #colnames()
         select(id_unique, title_eng, abstract_eng, keywords) %>% 
-        filter(id_unique %in% filtered_pubs$id_unique) %>% 
+        filter(id_unique %in% comb_vedidk_pubids$id_unique) %>% 
         filter(!duplicated(id_unique)) %>% 
         mutate(abstract_eng = ifelse(nchar(abstract_eng, type = "chars", allowNA = FALSE, keepNA = NA)<27, NA, abstract_eng)) %>% 
         filter(!is.na(abstract_eng)) %>% 

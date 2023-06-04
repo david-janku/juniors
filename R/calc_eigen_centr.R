@@ -7,7 +7,7 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-calc_eigen_centr <- function(graph, one_author, db_path) {
+calc_eigen_centr <- function(graph, one_author) {
 
     ecentr <- igraph::eigen_centrality(
         graph,

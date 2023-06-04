@@ -8,9 +8,11 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-read_sup <- function(db_path, ids_full_vector) {
+read_sup <- function(db_path, ids_full_vector, authors_arrow) {
 
-  con <-  DBI::dbConnect(RSQLite::SQLite(), db_path)
+    authors_arrow <- as.data.frame(authors_arrow)
+    con <-  DBI::dbConnect(RSQLite::SQLite(), db_path)
+    RSQLite::dbWriteTable(con, "authors_by_pubs", authors_arrow, overwrite = TRUE)
   on.exit(DBI::dbDisconnect(con))
   
   DBI::dbListTables(con)
