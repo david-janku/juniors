@@ -7,7 +7,7 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-calc_full_indicator <- function(independent_topics) {
+calc_full_indicator <- function(independent_topics, final_data) {
  
                
     # independent_topics$eig_centr <- as.numeric(independent_topics$eig_centr)

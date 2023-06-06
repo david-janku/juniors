@@ -222,7 +222,7 @@ list(
     #  #           format = "qs")
     
     tar_target(full_indicator,
-               calc_full_indicator(independent_topics))
+               calc_full_indicator(independent_topics, final_data))
     
 
 )
