@@ -26,6 +26,7 @@ Here, we load packages and custom functions required in the pipeline.
 ```{r, engine="targets", example-globals, tar_globals = TRUE}
 options(tidyverse.quiet = TRUE)
 
+
 # load libraries for make
 tar_option_set(packages = c("dplyr",
                             "tidyr",
@@ -40,7 +41,6 @@ tar_option_set(packages = c("dplyr",
                             "ggplot2",
                             "scales",
                             "ldatuning",
-                            "quanteda",
                             "data.table",
                             "tidytext",
                             "tm",
@@ -50,7 +50,8 @@ tar_option_set(packages = c("dplyr",
                             "qs",
                             "tidyverse",
                             "psych",
-                            "arrow"
+                            "arrow",
+                            "tarchetypes"
                             ))
 
 # read custom functions
@@ -62,14 +63,29 @@ lapply(list.files(here::here("R"), full.names = TRUE), source)
 ```{r, engine="targets", data_import}
 list(
     
+   
+  # tarchetypes::tar_download(ids,
+  #     urls = Sys.getenv("link_to_supervisors"),
+  #     paths = here::here("data", "raw", "supervisors.csv")),
+  # tarchetypes::tar_download(gender,
+  #     urls = Sys.getenv("link_to_gender"),
+  #     paths = here::here("data", "raw", "names4api_tagged.tsv")),
+  # tarchetypes::tar_download(authors_arrow,
+  #     urls = Sys.getenv("link_to_updated_authors"),
+  #     paths = here::here("data", "raw", "authors_by_pubs.arrow")),
+  # tarchetypes::tar_download(text_arrow,
+  #     urls = Sys.getenv("link_to_updated_texts"),
+  #     paths = here::here("data", "raw", "riv_text.arrow")),
+  #  tarchetypes::tar_download(sup_control,
+  #     urls = Sys.getenv("link_to_supervisors_control"),
+  #     paths = here::here("data", "raw", "supervisors_control_final.csv")),
+  
+  
      tar_target(ids_path, here::here("data", "raw", "supervisors.csv"), format = "file"),
      tar_target(ids, read.csv2(ids_path)),
      tar_target(gender_path, here::here("data", "raw", "names4api_tagged.tsv"), format = "file"),
      tar_target(gender, read.delim(gender_path)),
-     # tar_target(gender, read.delim(here::here("data", "raw", "names4api_tagged.tsv")),
-     #          format = "qs"),
-     tar_target(db_path,
-           here::here("data", "raw", "czech_sci_db.sqlite")),
+     tar_target(db_path, here::here("data", "raw", "czech_sci_db.sqlite")),
      tar_target(authors_arrow_path, here::here("data", "raw", "authors_by_pubs.arrow")),
      tar_target(authors_arrow, arrow::read_feather(authors_arrow_path)),
      tar_target(text_arrow_path, here::here("data", "raw", "riv_text.arrow")),
@@ -92,7 +108,7 @@ list(
               
      # tar_target(sup_control, read.csv2(here::here("data", "raw", "supervisors_control.csv")),
      #          format = "qs"),
-      tar_target(final_data, refine_data(matching, db_path, ids, sup_control, authors_arrow)),
+      tar_target(final_data, refine_data(matching, db_path, ids_complete, sup_control, authors_arrow)),
                
      #at this point, I will need to manually search for the supervisors of the control group researchers and upload their vedidks into new ids file
      tar_target(ids_full_vector,
@@ -241,7 +257,7 @@ list(
     #            sup_test(matching, db_path, ids, sup_control, ids_complete),
     #            format = "qs") ,
     # 
-    # tarchetypes::tar_render(article, here::here("Rmd", "article.Rmd"))
+    tarchetypes::tar_render(article, here::here("article.Rmd"))
 )
 
 

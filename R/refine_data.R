@@ -10,7 +10,7 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-refine_data <- function(matching, db_path, ids, sup_control, authors_arrow) {
+refine_data <- function(matching, db_path, ids_complete, sup_control, authors_arrow) {
 
    #  ids_refined <- ids %>%
    #      select(vedoucí.vedidk, vedidk_core_researcher) %>%
@@ -65,7 +65,8 @@ refine_data <- function(matching, db_path, ids, sup_control, authors_arrow) {
    #  # # table(d$treatment, by =d$independence_timing)
    #  
     
-    new2 <- matching %>% 
+    new2 <- matching[1,] %>% 
+        filter(treatment != 1) %>% 
         dplyr::select(vedidk) %>% 
         distinct() %>% 
         mutate(sup_details = purrr::pmap(.l = list(vedidk),
@@ -74,7 +75,13 @@ refine_data <- function(matching, db_path, ids, sup_control, authors_arrow) {
                                                     ids_full_vector = first)
                                        } ))
     
+    
+    
     new_unnested <- new2 %>% tidyr::unnest(sup_details)
+    
+    ids_complete_sup <- ids_complete %>% dplyr::select(vedidk, sup_name, sup_vedidk)
+    
+    new_unnested <- rbind(new_unnested, ids_complete_sup)
     
     a_final_data <- left_join(matching, new_unnested, by = "vedidk") %>% 
         filter(!is.na(sup_name))

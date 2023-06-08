@@ -8,6 +8,8 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 library(targets)
 library(dplyr)
+library(cobalt)
+library(knitr)
 ```
 
 # Intro
@@ -28,7 +30,7 @@ Although researcher independence seems to be important feature that is acknowled
 
 Since the explicit goal of many funding instruments that are being used by research funders all over the world is to help early career researchers become independent, we would like to use the newly created indicators to assess the extent, to which such programmes influence researchers independence.    
 
-H1: Researchers, who received funding from programmes aimed at funding early career researchers, will show more independence on theri PhD advisor 5 years after receiving the funding than researchers who did not receive this kind of funding.
+H1: Researchers, who received funding from programmes aimed at funding early career researchers, will show more independence on their PhD advisor 5 years after receiving the funding than researchers who did not receive this kind of funding.
 
 # Method
 
@@ -39,12 +41,198 @@ This allowed us to identify all researchers who received Junior Grants from the 
 
 In the second step, we manually searched for PhD advisors of these 341 researchers in the databases of theses and dissertations that cover most universities in Czechia (https://theses.cz and https://dspace.cuni.cz/). We were able to match `r nrow(tar_read(ids_complete))` researchers with a PhD advisor (69,2 % of the Czech subsample). Further, we have not managed to find a suitable matched pair for another `r nrow(tar_read(ids_complete))-nrow(tar_read("matching") %>% filter(treatment == 1) %>% distinct(vedidk))` researchers in the matching procedure, reducing our final sample to `r nrow(tar_read("matching") %>% filter(treatment == 1) %>% distinct(vedidk))`. 
 
+For the matched researchers from control groups (see the matching description below in the Analysis section), we didn't search for their supervisors manually, but rather used the "most frequent co-author of the first 5 publications" as a proxy to identify supervisors. Crosschecking this proxy with the actual data about supervisors we have, we found that this algorithm was able to identify supervisors correctly in about 50 % of cases (see the Attachment 1). Using this method, we were able to find `r (nrow(tar_read("final_data") %>% filter(treatment != 1) %>% filter(!is.na(sup_name))) / nrow(tar_read("matching") %>% filter(treatment != 1)))*100` % of the observations in the matched control groups. 
+
 These researchers and their PhD advisors with their full publication history (limited to publications created at Czech institutions) created our final sample.
 
 
 
+## Measures
 
-```{r}
-head(tar_read(matching))
+*Independence*
+
+We decided to use the recently created independence indicator by Van den Besselaar & Sandström (2019), since it is based on scientific production (rather than impact) and captures the phenomena in the most complete manner. The indicator has 4 parts: I1: The eigenvector centrality of the supervisor in the researcher’s co-author network; I2: The clustering coefficient of the supervisor in the researcher’s co-author network; I3: The share of own papers of the researcher Pns/Pall where Pns is the number of publications of the researcher, not coauthored with the former supervisor(s) and Pall is the total number of publications of the researcher; and I4: The share of own research topics of the researcher Tns/Tall where Tns is the number of research topics of the researcher in which the former supervisor(s) is not active, and Tall is the total number of topics of the researcher.
+
+
+However, we have made some changes to the indicator. After consulting with its authors, we have changed the aggregation formula to RII = ((1- I1) + I2 + I3 + I4) / 4, since the previous formula had a small error (it weighted I4 double,, i.e. 2*I4). For calculating the share of own research topics of the researcher (I4), we have also not used bibliographic coupling as originally suggested, but text-based topic modelling using publication titles and abstracts. Finally, the original indicator, while tracking not only collaboration independence but also topical independence, is still skewed significantly towards collaboration independence (three-quarters of the indicator measure collaboration, while only one-quarter measures topics). Since we consider cognitive/topical independence an important asset of this indicator, we have decided to adjust the formula a bit further and drop the I3 part, to give more weight to the cognitive/topical independence in the whole indicator. Throughout this paper, we will thus refer to the original indicator as RIIo, our adjusted version as RIIa and the part of the indicator measuring only the cognitive independence RIIc.
+
+*Career age*
+
+We measured researchers’ career age as the number of years since their first publication.
+
+*Discipline*
+
+We used the highest level of the OECD classification of disciplines, containing categories Natural Sciences; Engineering and Technology; Medical and Health Sciences; Agricultural Sciences; Social Sciences; Humanities. We chose this classification because it is widely used and also used in the dataset we worked with. For the matching we used the 42 sub-categories of this classification to achieve more granularity.
+
+We attributed a discipline to a given researcher based on disciplines attributed to their each publication, choosing the most frequent discipline for each author.  
+
+*Interdisciplinary proportion*
+
+This measure was calculated as the ratio of publications authored by the given researcher which were not assigned to the author’s main discipline.  
+
+*Number of publications*
+
+We counted all publications the given researcher produced before the intervention year (i.e. receiving a Junior Grant) while affiliated with the Czech institution (our database only contained publications affiliated with Czech institutions). We only counted publications of types: journal articles, conference proceedings, book chapters, and full books. 
+
+
+*Number of publications in Web of Science and Scopus*
+
+We counted all publications the given researcher produced before the intervention year (i.e. receiving a Junior Grant) while affiliated with the Czech institution (our database only contained publications affiliated with Czech institutions), that were also linked in Web of Science or Scopus (which means they were likely published in more recognised journals). We only counted publications of types: journal articles, conference proceedings, book chapters, and full books. 
+
+
+*Number of grants received prior to Junior Grant*
+
+We calculated how many (Czech) grants each researcher has received prior to the intervention year (i.e. receiving a Junior Grant).
+
+*Career age when receiving the first grant*
+
+We calculated the career age of each researcher when they received their first grant.
+
+*Gender*
+
+We used ??? table ??? to estimate the gender of each researcher.
+
+## Analysis
+
+We analysed the data in the R version 4.2.3. using R studio and [this code](https://github.com/david-janku/juniors). For the construction of the independence indicator, we used network modelling (maybe more specific?) and text-based topic modelling (maybe more specific??).
+
+For the construction of the control group, we implemented propensity matching using the package MatchIt (citation?) and matching exactly by the discipline (42 sub-categories of OECD classification), and approximately by number of publications in total, number of publications in WoS/Scopus, career age, interdisciplinary proportion, number of grants received prior to Junior Grant, career age when receiving the first grant and gender. All of these variables were calculated at the intervention year (i.e. year when the given researcher from experimental group received the Junior Grant). We set caliper to 0.2 standard deviations of the logit of the propensity score by recommendation of Rosenbaum and Rubin (1985b) and Austin (2011) to remove the cases where the distance between experimental and control group observation was too large. __This removed XXXX cases from the experimental group, leaving us with YYY matched observations__. The matching was done in 1:1 ratio and with replacement.  
+
+We have created 2 control groups: one using the matching above and one similar but specifically containing only researchers who received their first grant (other than Junior Grant) around the same career age as researchers in our intervention group. That allowed us to better track the impact of any grant funding vs specifically Junior Grants funding on researchers’ independence.
+
+The difference between groups was tested using paired t-test and subsequent differences between discipline groups was tested using ANOVA post-hoc Tukey test.
+
+# Results 
+
+## Descriptives
+
+### Missing data
+```{r echo=FALSE}
+d <- tar_read(full_indicator)
+na_counts <- sum(is.na(d$RII))
+na_percentage <- round((na_counts / nrow(d))*100, 1)
+
+na_sup <- round((sum(is.na(d$sup_name))/na_counts)*100, 1)
+na_pubs <- round((nrow(d %>% filter(!is.na(sup_name)) %>% filter(pub_table_empty == TRUE))/na_counts)*100, 1)
+
+na_pubs_after <- round((nrow(d %>% filter(!is.na(sup_name)) %>% filter(pub_table_empty == TRUE) %>% filter(independence_timing == "after_intervention"))/nrow(d %>% filter(!is.na(sup_name)) %>% filter(pub_table_empty == TRUE)))*100, 1)
+
+na_treatment <- nrow(d %>% filter(is.na(RII)) %>% filter(treatment == 1))
+na_control1 <- nrow(d %>% filter(is.na(RII)) %>% filter(treatment == 0))
+na_control2 <- nrow(d %>% filter(is.na(RII)) %>% filter(treatment == 2))
+
+s <- d %>% filter(is.na(RII))
+                  
+f_after <- d %>% filter(!is.na(RII)) %>% filter(independence_timing == "after_intervention") 
+f_before <- d %>% filter(!is.na(RII)) %>% filter(independence_timing == "before_intervention") 
+
+
+v_after <- c(f_after$vedidk[f_after$treatment == 1 ], NA)
+v_before <- c(f_before$vedidk[f_before$treatment == 1 ], NA)
+
+r_after <- f_after %>% filter(vedidk_treatment %in% v_after)
+r_before <- f_before %>% filter(vedidk_treatment %in% v_before)
+
+
+
+v_after_control <- c(r_after$vedidk[r_after$treatment != 1 ], r_after$vedidk_treatment)
+v_before_control <- c(r_before$vedidk[r_before$treatment != 1 ], r_before$vedidk_treatment)
+
+r_after_final <- r_after %>% filter(vedidk %in% v_after_control)
+r_before_final <- r_before %>% filter(vedidk %in% v_before_control)
+
+
+# r_test <- r_after %>% filter(treatment != 2)
+# v_after_test <- c(r_test$vedidk[r_test$treatment != 1 ], r_test$vedidk_treatment)
+# r_test_final <- r_test %>% filter(vedidk %in% v_after_test)
+
+
+final_before_control1 <- nrow(r_before_final %>% filter(treatment == 0)) 
+final_before_control2 <- nrow(r_before_final %>% filter(treatment == 2))
+
+
+final_after_control1 <- nrow(r_after_final %>% filter(treatment == 0)) 
+final_after_control2 <- nrow(r_after_final %>% filter(treatment == 2))
+
+
+a <- intersect(
+    r_after_final$vedidk,
+    r_before_final$vedidk
+)
+
+
+all <- r_before_final %>% filter(vedidk %in% a)
+
+
 
 ```
+
+
+The independence indicator was not possible to calculate for `r na_counts` (`r na_percentage` % of observations). This is in `r na_sup` % caused by missing data about supervisors, and in `r na_pubs` % due to given researcher not having any publications in the given period (`r na_pubs_after` % of these cases are in the period after the intervention, which sometimes mean in the past few years).
+
+There are `r na_treatment` missing observations in the treatment group, `r na_control1` in the unfunded control group and  `r na_control2` in the funded control group.
+If we only keep observation that have match with non-missing values, we are left with a sample of `r final_before_control1` matched observations in unfunded control group and `r final_before_control2` matched observations in funded control group before intervention and a sample of `r final_after_control1` matched observations in unfunded control group and `r final_after_control2` matched observations in funded control group after intervention.
+
+
+
+## Matching
+
+
+```{r echo=FALSE}
+# Create a subset for treatment group and control group 1
+subset_1 <- (tar_read(matching)) %>% filter(treatment != 2)
+subset_2 <- (tar_read(matching)) %>% filter(treatment != 0)
+
+# Generate balance table for treatment vs control group 1
+balance_results_1 <- bal.tab(treatment ~ career_lenght + pubs_total + ws_pubs + interdisc_proportion + grants + gender, data = subset_1, disp = c("mean", "std"))
+balance_results_2 <- bal.tab(treatment ~ career_lenght + pubs_total + ws_pubs + interdisc_proportion + grants + gender, data = subset_2, disp = c("mean", "std"))
+
+# Define a function to manually extract balance statistics from bal.tab object
+extract_balance_stats <- function(bal_results) {
+  covariates <- rownames(bal_results$Balance)
+  means_treat <- bal_results$Balance$`M.1.Un`
+  means_ctrl <- bal_results$Balance$`M.0.Un`
+  diff <- bal_results$Balance$`Diff.Un`
+  
+  data.frame(Covariate = covariates, 
+             Mean_Treatment = means_treat, 
+             Mean_Control = means_ctrl, 
+             Diff = diff)
+}
+
+# Extract balance stats for subset_1 and subset_2
+balance_stats_1 <- extract_balance_stats(balance_results_1)
+balance_stats_2 <- extract_balance_stats(balance_results_2)
+
+# Print tables in R Markdown
+knitr::kable(balance_stats_1, caption = "Balance Statistics: Treatment vs Control Group 1")
+knitr::kable(balance_stats_2, caption = "Balance Statistics: Treatment vs Control Group 2")
+
+```
+
+## Main results
+
+
+
+
+# Discussion
+
+
+
+## Limitations
+
+--> the identification of supervisors in the control group (only 50% correct)
+--> only talks about the Czech environment and considers researchers growing up and most of their careers in the Czech republic
+
+# Attachments
+
+## Identification of supervisors
+
+Data about PhD student-PhD advisor connections are usually not available. One must search for these connections manually on the internet, which is time consuming and not fully reliable (we were only able to find about 69 % of these connections in our treatment group). Therefore, we tried to come up with an alternative way of identifying supervisors from the available data: we assumed that since many researchers only start their publication career during their PhD studies, their PhD supervisors might often coauthor their first publications. That led us to creating an algorithm to identify the supervisor solely from the student's publication history as "the most frequent co-author of the first 5 publications".
+
+To check whether we can use "the most frequent co-author of the first 5 publications" as a proxy to identify supervisors, we have compared the supervisors identified via this method with the manually found supervisors for each researcher in our sample.
+In the treatment group of `r nrow(tar_read(ids_complete))`researchers,  118 (49 %) had their most frequent co-author same as their supervisor and 86 (36 %) had someone other than their supervisor as their most frequent co-author in their first 5 publications, and 37 (15%) had no co-author in their first 5 publications.  
+In the control groups, we have manually found supervisors for `r nrow(tar_read(sup_control) %>% filter(!is.na(sup_vedidk)) %>% distinct(name_first, name_last))` researchers, and when we compared them to the supervisors suggested by the most frequent coauthor algorithm, we found that 41 (29 %) had their most frequent co-author the same as their supervisor, 80 (57 %) had someone other than their supervisor as their most frequent co-author in their first 5 publications, and 20 (14 %) had no co-author in their first 5 publications.
+
+Further, we have conducted analysis on an independent sample of researchers from Slovenia (citace Luzar??), and found that  when we filter out all researchers who have not had any publication 4 years prior to their PhD defense (1135, approx 9,5% of the sample), we see that from the remaining researchers, about 50,3 % had their supervisor as the most frequent coauthor in the 4 years prior to their PhD defense.
+

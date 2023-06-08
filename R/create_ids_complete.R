@@ -112,6 +112,19 @@ create_ids_complete <- function(ids, db_path) {
     
     ids_complete <- dplyr::rename(ids_complete, sup_vedidk = sup_vedidk)
     ids_complete <- dplyr::rename(ids_complete, vedidk = vedidk_core_researcher)
+    ids_complete$sup_vedidk <- as.character(ids_complete$sup_vedidk)
+    
+    
+    control_id <-  ids_complete$sup_vedidk
+    sup_names <- dplyr::tbl(con, "authors_by_pubs") %>% # colnames()
+        dplyr::select(id_helper, vedidk) %>% 
+        filter(vedidk %in% control_id) %>% 
+        dplyr::rename(sup_name = id_helper) %>%
+        dplyr::rename(sup_vedidk = vedidk) %>%
+        dplyr::collect() %>% 
+        distinct() #tady ideálně ještě přidat část kódu která říká "pokud je tam nějaký vedidk více než jednou, vyber jeho nejčastější sup_name -> v našem vzorku ale není žádný vedidk více než jednou, takže ok
+    
+    ids_complete <- left_join(ids_complete, sup_names, by = "sup_vedidk")
      
     
 }
