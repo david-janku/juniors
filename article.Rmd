@@ -7,6 +7,7 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(targets)
+library(tidyr)
 library(dplyr)
 library(cobalt)
 library(knitr)
@@ -112,6 +113,7 @@ The difference between groups was tested using paired t-test and subsequent diff
 ### Missing data
 ```{r echo=FALSE}
 d <- tar_read(full_indicator)
+d$disc_ford <- substring(d$disc_ford, 0, 1)
 d$disc_ford <- as.factor(d$disc_ford)
 
 na_counts <- sum(is.na(d$RII))
@@ -168,8 +170,6 @@ a <- intersect(
 
 all <- rbind(r_before_final, r_after_final) %>% filter(vedidk %in% a)
 
-
-
 ```
 
 
@@ -177,6 +177,46 @@ The independence indicator was not possible to calculate for `r na_counts` (`r n
 
 There are `r na_treatment` missing observations in the treatment group, `r na_control1` in the unfunded control group and  `r na_control2` in the funded control group.
 If we only keep observation that have match with non-missing values, we are left with a sample of `r final_before_control1` matched observations in unfunded control group and `r final_before_control2` matched observations in funded control group before intervention and a sample of `r final_after_control1` matched observations in unfunded control group and `r final_after_control2` matched observations in funded control group after intervention.
+
+When Looking at disciplines, we see that there are slightly more missing data in the discipline group 1 (Natural Sciences).
+
+```{r echo=FALSE}
+
+dt <- d
+dt$missing <- ifelse(is.na(dt$RII), "Missing", "Complete")
+
+# Calculate counts and proportions
+df_summary <- dt %>%
+  group_by(disc_ford, missing) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  mutate(Proportion = count / sum(count)) %>%
+  pivot_wider(names_from = missing, values_from = c(count, Proportion))
+
+# Calculate Missing / (Missing + Complete) in percentages for each disc_ford
+df_summary <- df_summary %>%
+  mutate(Proportion = ifelse(!is.na(`count_Missing`) & !is.na(`count_Complete`), `count_Missing` / (`count_Missing` + `count_Complete`) * 100, NA))
+
+# If there are any NA values in the 'Proportion' column, replace them with 0
+df_summary[is.na(df_summary$Proportion)] <- 0
+
+# Remove unnecessary columns and rename the others
+df_summary <- df_summary %>%
+  select(disc_ford, count_Complete, count_Missing, Proportion) %>%
+  rename(
+    Complete = count_Complete,
+    Missing = count_Missing,
+    Proportion_Missing = Proportion
+  )
+
+# Print the updated table
+kable(df_summary, digits = 3, caption = "Counts and Proportions of Missing data by disc_ford") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+
+
+```
+
+
 
 ### Before intervention
 
@@ -298,9 +338,10 @@ summary(before_treatment)
 means_before_treatment <- aggregate(RII ~ treatment, data = d_before, FUN = mean)
      
      
-ggplot(data = means_before_treatment, aes(x = treatment, y = RII)) +
+ggplot(data = means_before_treatment, aes(x = treatment, y = RII, fill = treatment)) +
          geom_bar(stat = "identity", position = "dodge") +
          labs(x = "Treatment", y = "Mean RII") +
+         scale_fill_discrete(name = "treatment") +
          theme_bw()
 
 
@@ -324,9 +365,10 @@ summary(disc_before)
 means_before_disc <- aggregate(RII ~ disc_ford, data = d_before, FUN = mean)
      
      
-ggplot(data = means_before_disc, aes(x = disc_ford, y = RII)) +
+ggplot(data = means_before_disc, aes(x = disc_ford, y = RII, fill = disc_ford)) +
          geom_bar(stat = "identity", position = "dodge") +
          labs(x = "disc_ford", y = "Mean RII") +
+         scale_fill_discrete(name = "disc_ford") +
          theme_bw()
 
 ```
@@ -372,9 +414,10 @@ summary(before_treatment)
 means_before_treatment <- aggregate(RII ~ treatment, data = d_before, FUN = mean)
      
      
-ggplot(data = means_before_treatment, aes(x = treatment, y = RII)) +
+ggplot(data = means_before_treatment, aes(x = treatment, y = RII, fill = treatment)) +
          geom_bar(stat = "identity", position = "dodge") +
          labs(x = "Treatment", y = "Mean RII") +
+         scale_fill_discrete(name = "treatment") +
          theme_bw()
 
 
@@ -398,9 +441,10 @@ summary(disc_before)
 means_before_disc <- aggregate(RII ~ disc_ford, data = d_before, FUN = mean)
      
      
-ggplot(data = means_before_disc, aes(x = disc_ford, y = RII)) +
+ggplot(data = means_before_disc, aes(x = disc_ford, y = RII, fill = disc_ford)) +
          geom_bar(stat = "identity", position = "dodge") +
          labs(x = "disc_ford", y = "Mean RII") +
+         scale_fill_discrete(name = "disc_ford") +
          theme_bw()
 
 ```
