@@ -64,31 +64,31 @@ lapply(list.files(here::here("R"), full.names = TRUE), source)
 list(
     
    
-  # tarchetypes::tar_download(ids,
-  #     urls = Sys.getenv("link_to_supervisors"),
-  #     paths = here::here("data", "raw", "supervisors.csv")),
-  # tarchetypes::tar_download(gender,
-  #     urls = Sys.getenv("link_to_gender"),
-  #     paths = here::here("data", "raw", "names4api_tagged.tsv")),
-  # tarchetypes::tar_download(authors_arrow,
-  #     urls = Sys.getenv("link_to_updated_authors"),
-  #     paths = here::here("data", "raw", "authors_by_pubs.arrow")),
-  # tarchetypes::tar_download(text_arrow,
-  #     urls = Sys.getenv("link_to_updated_texts"),
-  #     paths = here::here("data", "raw", "riv_text.arrow")),
-  #  tarchetypes::tar_download(sup_control,
-  #     urls = Sys.getenv("link_to_supervisors_control"),
-  #     paths = here::here("data", "raw", "supervisors_control_final.csv")),
+  tarchetypes::tar_download(ids_path,
+      urls = Sys.getenv("link_to_supervisors"),
+      paths = here::here("data", "raw", "supervisors.csv")),
+  tarchetypes::tar_download(gender_path,
+      urls = Sys.getenv("link_to_gender"),
+      paths = here::here("data", "raw", "names4api_tagged.tsv")),
+  tarchetypes::tar_download(authors_arrow_path,
+      urls = Sys.getenv("link_to_updated_authors"),
+      paths = here::here("data", "raw", "authors_by_pubs.arrow")),
+  tarchetypes::tar_download(text_arrow_path,
+      urls = Sys.getenv("link_to_updated_texts"),
+      paths = here::here("data", "raw", "riv_text.arrow")),
+   tarchetypes::tar_download(sup_path,
+      urls = Sys.getenv("link_to_supervisors_control"),
+      paths = here::here("data", "raw", "supervisors_control_final.csv")),
+
   
-  
-     tar_target(ids_path, here::here("data", "raw", "supervisors.csv"), format = "file"),
+     # tar_target(ids_path, here::here("data", "raw", "supervisors.csv"), format = "file"),
      tar_target(ids, read.csv2(ids_path)),
-     tar_target(gender_path, here::here("data", "raw", "names4api_tagged.tsv"), format = "file"),
+     # tar_target(gender_path, here::here("data", "raw", "names4api_tagged.tsv"), format = "file"),
      tar_target(gender, read.delim(gender_path)),
      tar_target(db_path, here::here("data", "raw", "czech_sci_db.sqlite")),
-     tar_target(authors_arrow_path, here::here("data", "raw", "authors_by_pubs.arrow")),
+     # tar_target(authors_arrow_path, here::here("data", "raw", "authors_by_pubs.arrow")),
      tar_target(authors_arrow, arrow::read_feather(authors_arrow_path)),
-     tar_target(text_arrow_path, here::here("data", "raw", "riv_text.arrow")),
+     # tar_target(text_arrow_path, here::here("data", "raw", "riv_text.arrow")),
      tar_target(text_arrow, arrow::read_feather(text_arrow_path)),
      tar_target(ids_complete, create_ids_complete(ids, db_path)),
      tar_target(ids_complete_vector, make_ids_complete_vector(ids_complete))
@@ -103,7 +103,7 @@ list(
 list(
     
       tar_target(matching, match(db_path, ids, gender, authors_arrow)),
-      tar_target(sup_path, here::here("data", "raw", "supervisors_control_final.csv"), format = "file"),
+      # tar_target(sup_path, here::here("data", "raw", "supervisors_control_final.csv"), format = "file"),
       tar_target(sup_control, read.csv2(sup_path)),
               
      # tar_target(sup_control, read.csv2(here::here("data", "raw", "supervisors_control.csv")),

@@ -161,7 +161,7 @@ a <- intersect(
 )
 
 
-all <- r_before_final %>% filter(vedidk %in% a)
+all <- rbind(r_before_final, r_after_final) %>% filter(vedidk %in% a)
 
 
 
@@ -172,6 +172,55 @@ The independence indicator was not possible to calculate for `r na_counts` (`r n
 
 There are `r na_treatment` missing observations in the treatment group, `r na_control1` in the unfunded control group and  `r na_control2` in the funded control group.
 If we only keep observation that have match with non-missing values, we are left with a sample of `r final_before_control1` matched observations in unfunded control group and `r final_before_control2` matched observations in funded control group before intervention and a sample of `r final_after_control1` matched observations in unfunded control group and `r final_after_control2` matched observations in funded control group after intervention.
+
+### Before intervention
+
+```{r echo=FALSE}
+
+# assuming df is your dataframe
+df <- r_before_final
+
+# list of numeric columns. Exclude treatment column
+numeric_vars <- df %>% select(where(is.numeric)) %>% names()
+
+# descriptive stats for treatment level 0
+desc_0 <- df %>%
+  filter(treatment == 0) %>%
+  summarise(across(all_of(numeric_vars), list(mean = mean, sd = sd, min = min, max = max)))
+
+# descriptive stats for treatment level 1
+desc_1 <- df %>%
+  filter(treatment == 1) %>%
+  summarise(across(all_of(numeric_vars), list(mean = mean, sd = sd, min = min, max = max)))
+
+# descriptive stats for treatment level 2
+desc_2 <- df %>%
+  filter(treatment == 2) %>%
+  summarise(across(all_of(numeric_vars), list(mean = mean, sd = sd, min = min, max = max)))
+
+# Now you can print these as tables in your Rmd document
+
+# Print table for treatment level 0
+kable(desc_0, caption = "Descriptive statistics for treatment level 0")
+
+# Print table for treatment level 1
+kable(desc_1, caption = "Descriptive statistics for treatment level 1")
+
+# Print table for treatment level 2
+kable(desc_2, caption = "Descriptive statistics for treatment level 2")
+
+```
+
+
+
+### After intervention
+
+```{r echo=FALSE}
+d <- tar_read(full_indicator)
+na_counts <- sum(is.na(d$RII))
+
+
+```
 
 
 

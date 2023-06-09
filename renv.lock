@@ -491,6 +491,23 @@
       ],
       "Hash": "3f038e5ac7f41d4ac41ce658c85e3042"
     },
+    "cobalt": {
+      "Package": "cobalt",
+      "Version": "4.4.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "backports",
+        "crayon",
+        "ggplot2",
+        "grid",
+        "gridExtra",
+        "gtable",
+        "rlang"
+      ],
+      "Hash": "0b006bcddf1b9d0e8059090defb74227"
+    },
     "codetools": {
       "Package": "codetools",
       "Version": "0.2-18",
@@ -963,6 +980,26 @@
       ],
       "Hash": "e3058e4ac77f4fa686f68a1838d5b715"
     },
+    "heplots": {
+      "Package": "heplots",
+      "Version": "1.4-2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "MASS",
+        "R",
+        "broom",
+        "car",
+        "grDevices",
+        "graphics",
+        "magrittr",
+        "purrr",
+        "stats",
+        "tibble",
+        "utils"
+      ],
+      "Hash": "ce3ef8e99a91bf61b71abec74b88380a"
+    },
     "here": {
       "Package": "here",
       "Version": "1.0.1",
@@ -1001,32 +1038,35 @@
     },
     "htmltools": {
       "Package": "htmltools",
-      "Version": "0.5.3",
+      "Version": "0.5.5",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "R",
         "base64enc",
         "digest",
+        "ellipsis",
         "fastmap",
         "grDevices",
         "rlang",
         "utils"
       ],
-      "Hash": "6496090a9e00f8354b811d1a2d47b566"
+      "Hash": "ba0240784ad50a62165058a27459304a"
     },
     "htmlwidgets": {
       "Package": "htmlwidgets",
-      "Version": "1.5.4",
+      "Version": "1.6.2",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "grDevices",
         "htmltools",
         "jsonlite",
+        "knitr",
+        "rmarkdown",
         "yaml"
       ],
-      "Hash": "76147821cd3fcd8c4b04e1ef0498e7fb"
+      "Hash": "a865aa85bcb2697f47505bfd70422471"
     },
     "httr": {
       "Package": "httr",
@@ -1356,6 +1396,16 @@
       ],
       "Hash": "eaee7d2a6f3ed4491df868611cb064cc"
     },
+    "mnormt": {
+      "Package": "mnormt",
+      "Version": "2.1.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R"
+      ],
+      "Hash": "c83992ef63553d1e4b97162a4a753470"
+    },
     "modelr": {
       "Package": "modelr",
       "Version": "0.1.8",
@@ -1588,6 +1638,23 @@
         "utils"
       ],
       "Hash": "68dd03d98a5efd1eb3012436de45ba83"
+    },
+    "psych": {
+      "Package": "psych",
+      "Version": "2.3.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "grDevices",
+        "graphics",
+        "lattice",
+        "methods",
+        "mnormt",
+        "nlme",
+        "parallel",
+        "stats"
+      ],
+      "Hash": "4faaecc12b2eea148097ab5d657e0db5"
     },
     "purrr": {
       "Package": "purrr",
