@@ -12,6 +12,7 @@ library(cobalt)
 library(knitr)
 library(psych)
 library(kableExtra)
+library(ggplot2)
 ```
 
 # Intro
@@ -111,6 +112,8 @@ The difference between groups was tested using paired t-test and subsequent diff
 ### Missing data
 ```{r echo=FALSE}
 d <- tar_read(full_indicator)
+d$disc_ford <- as.factor(d$disc_ford)
+
 na_counts <- sum(is.na(d$RII))
 na_percentage <- round((na_counts / nrow(d))*100, 1)
 
@@ -189,22 +192,19 @@ numeric_vars <- df %>% select(where(is.numeric)) %>% select(-weights, -funded_co
 table_before_1 <- df %>% filter(treatment == 1) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
 
 # Print table for treatment level 1
-kable(table_before_1, digits = 3, caption = "Descriptive statistics for treatment group") 
-  # %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+kable(table_before_1, digits = 3, caption = "Descriptive statistics for treatment group") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 # descriptive stats for treatment level 0
 table_before_0 <- df %>% filter(treatment == 0) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
 
 # Print table for treatment level 0
-kable(table_before_0, digits = 3, caption = "Descriptive statistics for unfunded control group") %>%
-  # kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+kable(table_before_0, digits = 3, caption = "Descriptive statistics for unfunded control group") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 # descriptive stats for treatment level 2
 table_before_2 <- df %>% filter(treatment == 2) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
 
 # Print table for treatment level 2
-kable(table_before_2, digits = 3, caption = "Descriptive statistics for funded control group") %>%
-  # kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+kable(table_before_2, digits = 3, caption = "Descriptive statistics for funded control group") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 ```
 
@@ -213,9 +213,30 @@ kable(table_before_2, digits = 3, caption = "Descriptive statistics for funded c
 ### After intervention
 
 ```{r echo=FALSE}
-d <- tar_read(full_indicator)
-na_counts <- sum(is.na(d$RII))
 
+# assuming df is your dataframe
+df <- r_after_final
+
+# list of numeric columns. Exclude treatment column
+numeric_vars <- df %>% select(where(is.numeric)) %>% select(-weights, -funded_control, -id, -treatment_year, -career_start_year) %>% names()
+
+# descriptive stats for treatment level 1
+table_before_1 <- df %>% filter(treatment == 1) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
+
+# Print table for treatment level 1
+kable(table_before_1, digits = 3, caption = "Descriptive statistics for treatment group") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+# descriptive stats for treatment level 0
+table_before_0 <- df %>% filter(treatment == 0) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
+
+# Print table for treatment level 0
+kable(table_before_0, digits = 3, caption = "Descriptive statistics for unfunded control group") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+# descriptive stats for treatment level 2
+table_before_2 <- df %>% filter(treatment == 2) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
+
+# Print table for treatment level 2
+kable(table_before_2, digits = 3, caption = "Descriptive statistics for funded control group") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 ```
 
@@ -251,14 +272,199 @@ balance_stats_1 <- extract_balance_stats(balance_results_1)
 balance_stats_2 <- extract_balance_stats(balance_results_2)
 
 # Print tables in R Markdown
-knitr::kable(balance_stats_1, caption = "Balance Statistics: Treatment vs Control Group 1")
-knitr::kable(balance_stats_2, caption = "Balance Statistics: Treatment vs Control Group 2")
+knitr::kable(balance_stats_1, caption = "Balance Statistics: Treatment vs Control Group 1") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+knitr::kable(balance_stats_2, caption = "Balance Statistics: Treatment vs Control Group 2") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 ```
 
 ## Main results
 
 
+### Before intervention
+
+Was there a difference between the treatment groups in their level of independence before the intervention?
+
+The analysis of variance (ANOVA) was used to compare the means of the three treatment groups. The results of the ANOVA showed that the effect of treatment was not statistically significant (F(2, 630) = 0.256, p = 0.613). The mean square (MS) within groups was 0.05775, which indicates that the variability within each group is relatively small. The MS between groups was 0.01476, which is smaller than the MS within groups, suggesting that the differences between the means of the treatment groups are small. The model explained only a small proportion of the total variance in the data (R-squared = 0.01). Sixty-five observations were deleted due to missing data. In conclusion, there is no evidence to suggest that the treatment has a significant effect on the outcome variable. However, the small effect size and the missing data should be taken into consideration when interpreting the results. Post-hoc test power was 0.9997622 as calculated by GPower (Faul, Erdfelder, Lang & Buchner, 2007).
+
+
+```{r echo=FALSE}
+set.seed(123)
+
+d_before <- r_before_final
+     
+before_treatment <- aov(RII ~ treatment, data = d_before)
+summary(before_treatment)
+
+means_before_treatment <- aggregate(RII ~ treatment, data = d_before, FUN = mean)
+     
+     
+ggplot(data = means_before_treatment, aes(x = treatment, y = RII)) +
+         geom_bar(stat = "identity", position = "dodge") +
+         labs(x = "Treatment", y = "Mean RII") +
+         theme_bw()
+
+
+```
+
+Further, were there any differences in independence across disciplines?
+
+```{r echo=FALSE}
+set.seed(123)
+
+d_before$disc_ford <- substring(d_before$disc_ford, 0, 1)
+d_before$disc_ford <- as.factor(d_before$disc_ford)
+     
+d_before$treatment <- as.factor(d_before$treatment)
+     
+table(d_before$disc_ford, by = d_before$treatment)
+
+disc_before <- aov(RII ~ disc_ford, data = d_before)
+summary(disc_before)
+     
+means_before_disc <- aggregate(RII ~ disc_ford, data = d_before, FUN = mean)
+     
+     
+ggplot(data = means_before_disc, aes(x = disc_ford, y = RII)) +
+         geom_bar(stat = "identity", position = "dodge") +
+         labs(x = "disc_ford", y = "Mean RII") +
+         theme_bw()
+
+```
+
+
+Was there any interaction between the treatment group and discipline?
+
+```{r echo=FALSE}
+set.seed(123)
+
+before_disc_interaction <- aov(RII ~ treatment*disc_ford, data = d_before)
+summary(before_disc_interaction)
+     
+     
+ means_before_disc_interaction <- aggregate(RII ~ treatment + disc_ford, data = d_before, FUN = mean)
+     
+     # Plot grouped bar plot
+     ggplot(data = means_before_disc_interaction, aes(x = treatment, y = RII, fill = disc_ford)) +
+         geom_bar(stat = "identity", position = "dodge") +
+         labs(x = "Treatment", y = "Mean RII") +
+         scale_fill_discrete(name = "disc_ford") +
+         theme_bw()
+
+```
+
+
+
+### After intervention
+
+Was there a difference between the treatment groups in their level of independence after the intervention?
+
+The analysis of variance (ANOVA) was used to compare the means of the three treatment groups. The results of the ANOVA showed that the effect of treatment was not statistically significant (F(2, 630) = 0.256, p = 0.613). The mean square (MS) within groups was 0.05775, which indicates that the variability within each group is relatively small. The MS between groups was 0.01476, which is smaller than the MS within groups, suggesting that the differences between the means of the treatment groups are small. The model explained only a small proportion of the total variance in the data (R-squared = 0.01). Sixty-five observations were deleted due to missing data. In conclusion, there is no evidence to suggest that the treatment has a significant effect on the outcome variable. However, the small effect size and the missing data should be taken into consideration when interpreting the results. Post-hoc test power was 0.9997622 as calculated by GPower (Faul, Erdfelder, Lang & Buchner, 2007).
+
+
+```{r echo=FALSE}
+set.seed(123)
+
+d_before <- r_after_final
+     
+before_treatment <- aov(RII ~ treatment, data = d_before)
+summary(before_treatment)
+
+means_before_treatment <- aggregate(RII ~ treatment, data = d_before, FUN = mean)
+     
+     
+ggplot(data = means_before_treatment, aes(x = treatment, y = RII)) +
+         geom_bar(stat = "identity", position = "dodge") +
+         labs(x = "Treatment", y = "Mean RII") +
+         theme_bw()
+
+
+```
+
+Further, were there any differences in independence across disciplines?
+
+```{r echo=FALSE}
+set.seed(123)
+
+d_before$disc_ford <- substring(d_before$disc_ford, 0, 1)
+d_before$disc_ford <- as.factor(d_before$disc_ford)
+     
+d_before$treatment <- as.factor(d_before$treatment)
+     
+table(d_before$disc_ford, by = d_before$treatment)
+
+disc_before <- aov(RII ~ disc_ford, data = d_before)
+summary(disc_before)
+     
+means_before_disc <- aggregate(RII ~ disc_ford, data = d_before, FUN = mean)
+     
+     
+ggplot(data = means_before_disc, aes(x = disc_ford, y = RII)) +
+         geom_bar(stat = "identity", position = "dodge") +
+         labs(x = "disc_ford", y = "Mean RII") +
+         theme_bw()
+
+```
+
+
+Was there any interaction between the treatment group and discipline?
+
+```{r echo=FALSE}
+set.seed(123)
+
+before_disc_interaction <- aov(RII ~ treatment*disc_ford, data = d_before)
+summary(before_disc_interaction)
+     
+     
+ means_before_disc_interaction <- aggregate(RII ~ treatment + disc_ford, data = d_before, FUN = mean)
+     
+     # Plot grouped bar plot
+     ggplot(data = means_before_disc_interaction, aes(x = treatment, y = RII, fill = disc_ford)) +
+         geom_bar(stat = "identity", position = "dodge") +
+         labs(x = "Treatment", y = "Mean RII") +
+         scale_fill_discrete(name = "disc_ford") +
+         theme_bw()
+
+```
+
+
+
+### Intervention effect
+
+
+```{r echo=FALSE}
+
+d <- all 
+d$treatment <- as.factor(d$treatment)
+d$independence_timing <- as.factor(d$independence_timing)
+     
+interaction <- aov(RII ~ treatment * independence_timing, data = d)
+summary(interaction)
+heplots::etasq(interaction, anova = TRUE)
+
+ ###calculating r-squared - generated by chatGPT, so not sure this is correct
+     
+     n <- nrow(d)
+     p <- length(coef(interaction))
+     SSresid <- sum(resid(interaction)^2)
+     SStotal <- sum((na.omit(d$RII) - mean(d$RII, na.rm = TRUE))^2)
+     R2 <- 1 - (SSresid / SStotal)
+     adjR2 <- 1 - ((1 - R2) * (n - 1) / (n - p - 1))
+
+ ### visualisations
+     
+     
+means <- aggregate(RII ~ treatment + independence_timing, data = d, FUN = mean)
+
+ ggplot(data = interaction, aes(x = treatment, y = RII, fill = independence_timing)) +
+         geom_violin(scale = "width") +
+         scale_fill_discrete(name = "Independence Timing", labels = c("After intervention", "Before intervention")) +
+         xlab("Treatment Group") +
+         ylab("RII Score") +
+         ggtitle("Violin Plot of RII Scores by Treatment and Time") +
+         theme_bw()
+ 
+ 
+```
 
 
 # Discussion
