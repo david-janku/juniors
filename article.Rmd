@@ -10,6 +10,8 @@ library(targets)
 library(dplyr)
 library(cobalt)
 library(knitr)
+library(psych)
+library(kableExtra)
 ```
 
 # Intro
@@ -181,33 +183,28 @@ If we only keep observation that have match with non-missing values, we are left
 df <- r_before_final
 
 # list of numeric columns. Exclude treatment column
-numeric_vars <- df %>% select(where(is.numeric)) %>% names()
-
-# descriptive stats for treatment level 0
-desc_0 <- df %>%
-  filter(treatment == 0) %>%
-  summarise(across(all_of(numeric_vars), list(mean = mean, sd = sd, min = min, max = max)))
+numeric_vars <- df %>% select(where(is.numeric)) %>% select(-weights, -funded_control, -id, -treatment_year, -career_start_year) %>% names()
 
 # descriptive stats for treatment level 1
-desc_1 <- df %>%
-  filter(treatment == 1) %>%
-  summarise(across(all_of(numeric_vars), list(mean = mean, sd = sd, min = min, max = max)))
-
-# descriptive stats for treatment level 2
-desc_2 <- df %>%
-  filter(treatment == 2) %>%
-  summarise(across(all_of(numeric_vars), list(mean = mean, sd = sd, min = min, max = max)))
-
-# Now you can print these as tables in your Rmd document
-
-# Print table for treatment level 0
-kable(desc_0, caption = "Descriptive statistics for treatment level 0")
+table_before_1 <- df %>% filter(treatment == 1) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
 
 # Print table for treatment level 1
-kable(desc_1, caption = "Descriptive statistics for treatment level 1")
+kable(table_before_1, digits = 3, caption = "Descriptive statistics for treatment group") %>%
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+# descriptive stats for treatment level 0
+table_before_0 <- df %>% filter(treatment == 0) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
+
+# Print table for treatment level 0
+kable(table_before_0, digits = 3, caption = "Descriptive statistics for unfunded control group") %>%
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+# descriptive stats for treatment level 2
+table_before_2 <- df %>% filter(treatment == 2) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
 
 # Print table for treatment level 2
-kable(desc_2, caption = "Descriptive statistics for treatment level 2")
+kable(table_before_2, digits = 3, caption = "Descriptive statistics for funded control group") %>%
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 ```
 
