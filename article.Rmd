@@ -189,22 +189,22 @@ numeric_vars <- df %>% select(where(is.numeric)) %>% select(-weights, -funded_co
 table_before_1 <- df %>% filter(treatment == 1) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
 
 # Print table for treatment level 1
-kable(table_before_1, digits = 3, caption = "Descriptive statistics for treatment group") %>%
-  kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+kable(table_before_1, digits = 3, caption = "Descriptive statistics for treatment group") 
+  # %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 # descriptive stats for treatment level 0
 table_before_0 <- df %>% filter(treatment == 0) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
 
 # Print table for treatment level 0
 kable(table_before_0, digits = 3, caption = "Descriptive statistics for unfunded control group") %>%
-  kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+  # kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 # descriptive stats for treatment level 2
 table_before_2 <- df %>% filter(treatment == 2) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
 
 # Print table for treatment level 2
 kable(table_before_2, digits = 3, caption = "Descriptive statistics for funded control group") %>%
-  kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+  # kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 ```
 
