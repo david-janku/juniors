@@ -29,7 +29,22 @@ new <-  matching %>%
                                                                  ids_full_vector = first, intervention_year = second, timing = third)
                                        } ))
 
-# intervention_year = treatment_year, timing = independence_timing
-#     ids_full_vector = vedidk)
+
+new <- new() %>%
+    mutate(pubs_number = purrr::map_int(pub_table, function(df) {
+        if (is.data.frame(df) && nrow(df) > 0) {
+            return(length(unique(df$id_unique)))
+        } else {
+            return(0)
+        }
+    }))
+
+# w <- plyr::count(all_authors$pubs_number)
+# plot(w)
+
+new <- all_authors %>% filter(pubs_number >= 3)
+
+# wq <- plyr::count(new$pubs_number)
+# plot(wq)
 
     }
