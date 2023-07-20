@@ -433,7 +433,7 @@ match <- function(db_path, ids, gender, authors_arrow) {
     #matching 2015
     
     
-    out2015 <- matchit(treatment~lenght2014+pubs_total+ws_pubs+interdisc_proportion+grants2014+gender, method="nearest", data=final_data2015, ratio = 1, exact = "disc_ford", replace = TRUE)
+    out2015 <- matchit(treatment~lenght2014+pubs_total+ws_pubs+interdisc_proportion+grants2014+gender, method="nearest", data=final_data2015, distance = "mahalanobis", ratio = 1, exact = "disc_ford", replace = TRUE)
     
     matched_data2015 <- match.data(out2015) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
@@ -475,7 +475,7 @@ match <- function(db_path, ids, gender, authors_arrow) {
     #matching 2015 - only funded 
     
     
-    out_funded2015 <- matchit(treatment~lenght2014+pubs_total+ws_pubs+interdisc_proportion+grants2014+first_grant+gender, method="nearest", data=final_data_funded2015, ratio = 1, exact = "disc_ford", replace = TRUE)
+    out_funded2015 <- matchit(treatment~lenght2014+pubs_total+ws_pubs+interdisc_proportion+grants2014+first_grant+gender, method="nearest", data=final_data_funded2015, distance = "mahalanobis", ratio = 1, exact = "disc_ford", replace = TRUE)
     
     matched_data_funded2015 <- match.data(out_funded2015) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
@@ -705,7 +705,7 @@ match <- function(db_path, ids, gender, authors_arrow) {
     #matching 2016
     
     
-    out2016 <- matchit(treatment~lenght2015+pubs_total+ws_pubs+interdisc_proportion+grants2015+gender, method="nearest", data=final_data2016, ratio = 1, exact = "disc_ford", replace = TRUE)
+    out2016 <- matchit(treatment~lenght2015+pubs_total+ws_pubs+interdisc_proportion+grants2015+gender, method="nearest", data=final_data2016, distance = "mahalanobis", ratio = 1, exact = "disc_ford", replace = TRUE)
     
     matched_data2016 <- match.data(out2016) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
@@ -747,7 +747,7 @@ match <- function(db_path, ids, gender, authors_arrow) {
     #matching 2016 - only funded 
     
     
-    out_funded2016 <- matchit(treatment~lenght2015+pubs_total+ws_pubs+interdisc_proportion+grants2015+first_grant+gender, method="nearest", data=final_data_funded2016, ratio = 1, exact = "disc_ford", replace = TRUE)
+    out_funded2016 <- matchit(treatment~lenght2015+pubs_total+ws_pubs+interdisc_proportion+grants2015+first_grant+gender, method="nearest", data=final_data_funded2016, distance = "mahalanobis", ratio = 1, exact = "disc_ford", replace = TRUE)
     
     matched_data_funded2016 <- match.data(out_funded2016) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
@@ -978,7 +978,7 @@ match <- function(db_path, ids, gender, authors_arrow) {
     #matching 2017
     
     
-    out2017 <- matchit(treatment~lenght2016+pubs_total+ws_pubs+interdisc_proportion+grants2016+gender, method="nearest", data=final_data2017, ratio = 1, exact = "disc_ford", replace = TRUE)
+    out2017 <- matchit(treatment~lenght2016+pubs_total+ws_pubs+interdisc_proportion+grants2016+gender, method="nearest", data=final_data2017, distance = "mahalanobis", ratio = 1, exact = "disc_ford", replace = TRUE)
     
     matched_data2017 <- match.data(out2017) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
@@ -1020,7 +1020,7 @@ match <- function(db_path, ids, gender, authors_arrow) {
     #matching 2017 - only funded 
     
     
-    out_funded2017 <- matchit(treatment~lenght2016+pubs_total+ws_pubs+interdisc_proportion+grants2016+first_grant+gender, method="nearest", data=final_data_funded2017, ratio = 1, exact = "disc_ford", replace = TRUE)
+    out_funded2017 <- matchit(treatment~lenght2016+pubs_total+ws_pubs+interdisc_proportion+grants2016+first_grant+gender, method="nearest", data=final_data_funded2017, distance = "mahalanobis", ratio = 1, exact = "disc_ford", replace = TRUE)
     
     matched_data_funded2017 <- match.data(out_funded2017) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
@@ -1247,7 +1247,7 @@ match <- function(db_path, ids, gender, authors_arrow) {
     #matching 2018
     
     
-    out2018 <- matchit(treatment~lenght2017+pubs_total+ws_pubs+interdisc_proportion+grants2017+gender, method="nearest", data=final_data2018, ratio = 1, exact = "disc_ford", replace = TRUE)
+    out2018 <- matchit(treatment~lenght2017+pubs_total+ws_pubs+interdisc_proportion+grants2017+gender, method="nearest", data=final_data2018, distance = "mahalanobis", ratio = 1, exact = "disc_ford", replace = TRUE)
     
     matched_data2018 <- match.data(out2018) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
@@ -1289,7 +1289,7 @@ match <- function(db_path, ids, gender, authors_arrow) {
     #matching 2018 - only funded 
     
     
-    out_funded2018 <- matchit(treatment~lenght2017+pubs_total+ws_pubs+interdisc_proportion+grants2017+first_grant+gender, method="nearest", data=final_data_funded2018, ratio = 1, exact = "disc_ford", replace = TRUE)
+    out_funded2018 <- matchit(treatment~lenght2017+pubs_total+ws_pubs+interdisc_proportion+grants2017+first_grant+gender, method="nearest", data=final_data_funded2018, distance = "mahalanobis", ratio = 1, exact = "disc_ford", replace = TRUE)
     
     matched_data_funded2018 <- match.data(out_funded2018) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
@@ -1518,7 +1518,7 @@ match <- function(db_path, ids, gender, authors_arrow) {
     #matching 2019
     
     
-    out2019 <- matchit(treatment~lenght2018+pubs_total+ws_pubs+interdisc_proportion+grants2018+gender, method="nearest", data=final_data2019, ratio = 1, exact = "disc_ford", replace = TRUE)
+    out2019 <- matchit(treatment~lenght2018+pubs_total+ws_pubs+interdisc_proportion+grants2018+gender, method="nearest", data=final_data2019, distance = "mahalanobis", ratio = 1, exact = "disc_ford", replace = TRUE)
     
     matched_data2019 <- match.data(out2019) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
@@ -1560,7 +1560,7 @@ match <- function(db_path, ids, gender, authors_arrow) {
     #matching 2019 - only funded 
     
     
-    out_funded2019 <- matchit(treatment~lenght2018+pubs_total+ws_pubs+interdisc_proportion+grants2018+first_grant+gender, method="nearest", data=final_data_funded2019, ratio = 1, exact = "disc_ford", replace = TRUE)
+    out_funded2019 <- matchit(treatment~lenght2018+pubs_total+ws_pubs+interdisc_proportion+grants2018+first_grant+gender, method="nearest", data=final_data_funded2019, distance = "mahalanobis", ratio = 1, exact = "disc_ford", replace = TRUE)
     
     matched_data_funded2019 <- match.data(out_funded2019) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
@@ -1790,7 +1790,7 @@ match <- function(db_path, ids, gender, authors_arrow) {
     #matching 2020
     
     
-    out2020 <- matchit(treatment~lenght2019+pubs_total+ws_pubs+interdisc_proportion+grants2019+gender, method="nearest", data=final_data2020, ratio = 1, exact = "disc_ford", replace = TRUE)
+    out2020 <- matchit(treatment~lenght2019+pubs_total+ws_pubs+interdisc_proportion+grants2019+gender, method="nearest", data=final_data2020, distance = "mahalanobis", ratio = 1, exact = "disc_ford", replace = TRUE)
     
     matched_data2020 <- match.data(out2020) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
@@ -1832,7 +1832,7 @@ match <- function(db_path, ids, gender, authors_arrow) {
     #matching 2020 - only funded 
     
     
-    out_funded2020 <- matchit(treatment~lenght2019+pubs_total+ws_pubs+interdisc_proportion+grants2019+first_grant+gender, method="nearest", data=final_data_funded2020, ratio = 1, exact = "disc_ford", replace = TRUE)
+    out_funded2020 <- matchit(treatment~lenght2019+pubs_total+ws_pubs+interdisc_proportion+grants2019+first_grant+gender, method="nearest", data=final_data_funded2020, distance = "mahalanobis", ratio = 1, exact = "disc_ford", replace = TRUE)
     
     matched_data_funded2020 <- match.data(out_funded2020) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
