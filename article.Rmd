@@ -61,7 +61,10 @@ These researchers and their PhD advisors with their full publication history (li
 We decided to use the recently created independence indicator by Van den Besselaar & Sandström (2019), since it is based on scientific production (rather than impact) and captures the phenomena in the most complete manner. The indicator has 4 parts: I1: The eigenvector centrality of the supervisor in the researcher’s co-author network; I2: The clustering coefficient of the supervisor in the researcher’s co-author network; I3: The share of own papers of the researcher Pns/Pall where Pns is the number of publications of the researcher, not coauthored with the former supervisor(s) and Pall is the total number of publications of the researcher; and I4: The share of own research topics of the researcher Tns/Tall where Tns is the number of research topics of the researcher in which the former supervisor(s) is not active, and Tall is the total number of topics of the researcher.
 
 
-However, we have made some changes to the indicator. After consulting with its authors, we have changed the aggregation formula to RII = ((1- I1) + I2 + I3 + I4) / 4, since the previous formula had a small error (it weighted I4 double,, i.e. 2*I4). For calculating the share of own research topics of the researcher (I4), we have also not used bibliographic coupling as originally suggested, but text-based topic modelling using publication titles and abstracts. Finally, the original indicator, while tracking not only collaboration independence but also topical independence, is still skewed significantly towards collaboration independence (three-quarters of the indicator measure collaboration, while only one-quarter measures topics). Since we consider cognitive/topical independence an important asset of this indicator, we have decided to adjust the formula a bit further and drop the I3 part, to give more weight to the cognitive/topical independence in the whole indicator. Throughout this paper, we will thus refer to the original indicator as RIIo, our adjusted version as RIIa and the part of the indicator measuring only the cognitive independence RIIc.
+However, we have made some changes to the indicator. After consulting with its authors, we have changed the aggregation formula to 
+$$RII = ((1- I1) + I2 + I3 + I4) / 4$$, since the previous formula had a small error (it weighted I4 double,, i.e. 2*I4). For calculating the share of own research topics of the researcher (I4), we have also not used bibliographic coupling as originally suggested, but text-based topic modelling using publication titles and abstracts. Finally, the original indicator, while tracking not only collaboration independence but also topical independence, is still skewed significantly towards collaboration independence (three-quarters of the indicator measure collaboration, while only one-quarter measures topics). Since we consider cognitive/topical independence an important asset of this indicator, we have decided to adjust the formula a bit further and drop the I3 part, to give more weight to the cognitive/topical independence in the whole indicator. Throughout this paper, we will thus refer to the original indicator as RIIo, our adjusted version as RIIa and the part of the indicator measuring only the cognitive independence RIIc.
+
+---> popsat víc jak počítám topic model??
 
 *Career age*
 
@@ -97,13 +100,13 @@ We calculated the career age of each researcher when they received their first g
 
 *Gender*
 
-We used ??? table ??? to estimate the gender of each researcher.
+We used Genderize.io API to estimate the probability of perceived gender based on the first names of researchers. Where available, information about the nationality of researchers was included in the API call to improve accuracy.
 
 ## Analysis
 
 We analysed the data in the R version 4.2.3. using R studio and [this code](https://github.com/david-janku/juniors). For the construction of the independence indicator, we used network modelling (maybe more specific?) and text-based topic modelling (maybe more specific??).
 
-For the construction of the control group, we implemented propensity matching using the package MatchIt (citation?) and matching exactly by the discipline (42 sub-categories of OECD classification), and approximately by number of publications in total, number of publications in WoS/Scopus, career age, interdisciplinary proportion, number of grants received prior to Junior Grant, career age when receiving the first grant and gender. All of these variables were calculated at the intervention year (i.e. year when the given researcher from experimental group received the Junior Grant). We set caliper to 0.2 standard deviations of the logit of the propensity score by recommendation of Rosenbaum and Rubin (1985b) and Austin (2011) to remove the cases where the distance between experimental and control group observation was too large. __This removed XXXX cases from the experimental group, leaving us with YYY matched observations__. The matching was done in 1:1 ratio and with replacement.  
+For the construction of the control group, we implemented propensity matching using the package MatchIt (citation?) and matching exactly by the discipline (42 sub-categories of OECD classification), and approximately by number of publications in total, number of publications in WoS/Scopus, career age, interdisciplinary proportion, number of grants received prior to Junior Grant, career age when receiving the first grant and gender. All of these variables were calculated at the intervention year (i.e. year when the given researcher from experimental group received the Junior Grant). The distance was set to "mahalanobis". The matching was done in 1:1 ratio and with replacement.  
 
 We have created 2 control groups: one using the matching above and one similar but specifically containing only researchers who received their first grant (other than Junior Grant) around the same career age as researchers in our intervention group. That allowed us to better track the impact of any grant funding vs specifically Junior Grants funding on researchers’ independence.
 
@@ -287,6 +290,9 @@ kable(table_before_2, digits = 3, caption = "Descriptive statistics for funded c
 
 ## Matching
 
+After matching, all standardized mean differences for the covariates were below 0.1 and all standardized mean differences for squares and two-way interactions between covariates were below .15, indicating adequate balance. __This removed XXXX cases from the experimental group, leaving us with YYY matched observations__.
+ 
+ 
 
 ```{r echo=FALSE}
 # # Create a subset for treatment group and control group 1
@@ -319,24 +325,26 @@ kable(table_before_2, digits = 3, caption = "Descriptive statistics for funded c
 # knitr::kable(balance_stats_2, caption = "Balance Statistics: Treatment vs Control Group 2") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 
-unf_sum <- summary(matched_obj_unfunded, un = FALSE)
 
-summary(matched_obj_unfunded)
+
+unf_sum <- summary(tar_read(matched_obj_unfunded), un = TRUE)
+
+summary(tar_read(matched_obj_unfunded))
     
 plot(unf_sum, var.order = "unmatched")
 
 
-cobalt::bal.tab(matched_obj_unfunded, un = FALSE, stats = c("m", "v", "ks"), binary = "std")
+cobalt::bal.tab(tar_read(matched_obj_unfunded), un = FALSE, stats = c("m", "v", "ks"), binary = "std")
 
-cobalt::love.plot(matched_obj_unfunded, binary = "std", var.order = "unmatched")
-
-
+cobalt::love.plot(tar_read(matched_obj_unfunded), binary = "std", var.order = "adjusted")
 
 
 
-fun_sum <- summary(matched_obj_funded, un = FALSE)
 
-summary(matched_obj_funded)
+
+fun_sum <- summary(tar_read(matched_obj_funded), un = TRUE)
+
+summary(tar_read(matched_obj_funded))
     
 plot(fun_sum, var.order = "unmatched")
 
@@ -347,6 +355,26 @@ plot(fun_sum, var.order = "unmatched")
 ```
 
 ## Main results
+
+
+To estimate the treatment effect and its standard error, we fit a linear regression model with 1978 earnings as the outcome and the treatment, covariates, and their interaction as predictors and included the full matching weights in the estimation. The lm() function was used to fit the outcome, and the comparisons() function in the marginaleffects package was used to perform g-computation in the matched sample to estimate the ATT. A cluster-robust variance was used to estimate its standard error with matching stratum membership as the clustering variable.
+
+The estimated effect was XXXX (SE = XXXX, p = XXXX), indicating that the average effect of the treatment for those who received it is to increase earnings.
+
+```{r echo=FALSE}
+
+# Run regression model with interaction term
+did_model <- plm(researcher_independence ~ independence_timing * treatment + factor(subclass), 
+                 data = tar_read(full_indicator), 
+                 index = c("subclass", "independence_timing"),
+                 model = "within")
+
+# Calculate clustered standard errors
+clustered_se <- coeftest(did_model, vcov = function(x) vcovHC(x, type = "HC1", cluster = "group"))
+print(clustered_se)
+
+
+```
 
 
 ### Before intervention

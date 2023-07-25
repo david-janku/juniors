@@ -43,7 +43,7 @@ match_data <- function(matched_obj_unfunded, matched_obj_funded) {
     
     full_data_1 <- rbind2(matched_data_unfunded, matched_data_funded)
     
-    #doubling data so we can calculate indepedence indicator independently from the pubs before the intevention and after the intervention
+    #doubling data so we can calculate independence indicator independently from the pubs before the intevention and after the intervention
     full_data_2 <- full_data_1 
     full_data_2$independence_timing <- "before_intervention"
     full_data_1$independence_timing <- "after_intervention"

@@ -79,6 +79,24 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
         as_tibble()
     
   
+    # number of coauthors 2014
+    
+    
+    coauthors_by_pubs2014 <- n_pubs_filtered2014 %>% 
+        group_by(id_unique) %>%
+        summarise(coauthor_count = n_distinct(vedidk)) %>%
+        ungroup()
+    
+    
+    coauth2014 <- DBI::dbReadTable(con, "authors_by_pubs") %>%
+        left_join(coauthors_by_pubs2014, by = "id_unique") %>%
+        filter(!is.na(coauthor_count)) %>% 
+        group_by(vedidk) %>%
+        summarise(total_coauthor_count = sum(coauthor_count, na.rm = TRUE) - n_distinct(id_unique)) %>%
+        ungroup()
+    
+    
+    
     
     
     #gender
@@ -401,13 +419,15 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
     treatment_data <- all_auth %>% 
         dplyr::select(vedidk) %>% 
         mutate(treatment = ifelse(vedidk %in% treatment_refined$vedidk, 1, 0)) %>% 
-        distinct() %>% 
-        mutate(treatment_year = ifelse(vedidk %in% treatment_refined$vedidk, treatment_refined$year_start, NA)) %>% 
-        as_tibble()
+        distinct() 
+    
+    treatment_data <- left_join(treatment_data, treatment_refined %>% dplyr::select(vedidk, year_start), by = "vedidk")
+    
+    treatment_data <- dplyr::rename(treatment_data, treatment_year = year_start)
+       
     #?v tomto kroku z původních 349 unique treatment vedidků zbyde jen 329. Když místo n_pubs_count použiju dataset all_auth jako výchozí (což v praxi znamená, že vezmu v potaz i autory, kteří mají méně něž 5 publikací), tak mi to i tak klesne na 343, což nevím proč se děje  
     
     plyr::count(treatment_data$treatment) #this shows that it matched only 329 out of 356 treatment vedidks -> not sure why? - perhaps these are people who were assigned to a vedidk in CEP but then this didnt match up with vedidk they used in RIV?
-    
     
     
     treatment_refined2015 <- treatment_data 
@@ -429,6 +449,7 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
     final_data2015 <- left_join(final_data2015, interdisc_complete2014, by = "vedidk")
     final_data2015 <- left_join(final_data2015, grants2014, by = "vedidk")
     final_data2015 <- left_join(final_data2015, all_auth_gender, by = "vedidk")
+    final_data2015 <- left_join(final_data2015, coauth2014, by = "vedidk")
     
     final_data2015$ws_pubs <- tidyr::replace_na(final_data2015$ws_pubs, 0) 
     final_data2015$grants2014 <- tidyr::replace_na(final_data2015$grants2014, 0) 
@@ -436,7 +457,7 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
     final_data2015 <- dplyr::rename(final_data2015, pubs_total = freq)
     final_data2015$treatment_year <- as.numeric(final_data2015$treatment_year)
     final_data2015 <-  final_data2015 %>% 
-        dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2014, disc_ford, pubs_total, ws_pubs, interdisc_proportion, grants2014, gender)
+        dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2014, disc_ford, pubs_total, ws_pubs, interdisc_proportion, grants2014, gender, total_coauthor_count)
     
     
     #excluding rows with missing values
@@ -489,6 +510,26 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
         as_tibble()
     
     n_pubs_ws2015 <- dplyr::rename(n_pubs_ws2015, ws_pubs = freq)
+    
+    
+    
+    # number of coauthors 2015
+    
+    
+    coauthors_by_pubs2015 <- n_pubs_filtered2015 %>% 
+        group_by(id_unique) %>%
+        summarise(coauthor_count = n_distinct(vedidk)) %>%
+        ungroup()
+    
+    
+    coauth2015 <- DBI::dbReadTable(con, "authors_by_pubs") %>%
+        left_join(coauthors_by_pubs2015, by = "id_unique") %>%
+        filter(!is.na(coauthor_count)) %>% 
+        group_by(vedidk) %>%
+        summarise(total_coauthor_count = sum(coauthor_count, na.rm = TRUE) - n_distinct(id_unique)) %>%
+        ungroup()
+    
+    
     
     
     #gender - copied from previous year
@@ -584,6 +625,7 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
     final_data2016 <- left_join(final_data2016, interdisc_complete2015, by = "vedidk")
     final_data2016 <- left_join(final_data2016, grants2015, by = "vedidk")
     final_data2016 <- left_join(final_data2016, all_auth_gender, by = "vedidk")
+    final_data2016 <- left_join(final_data2016, coauth2015, by = "vedidk")
     
     final_data2016$ws_pubs <- tidyr::replace_na(final_data2016$ws_pubs, 0) 
     final_data2016$grants2015 <- tidyr::replace_na(final_data2016$grants2015, 0) 
@@ -591,7 +633,7 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
     final_data2016 <- dplyr::rename(final_data2016, pubs_total = freq)
     final_data2016$treatment_year <- as.numeric(final_data2016$treatment_year)
     final_data2016 <-  final_data2016 %>% 
-        dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2015, disc_ford, pubs_total, ws_pubs, interdisc_proportion, grants2015, gender)
+        dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2015, disc_ford, pubs_total, ws_pubs, interdisc_proportion, grants2015, gender, total_coauthor_count)
     
     
     #excluding rows with missing values
@@ -642,6 +684,28 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
         as_tibble()
     
     n_pubs_ws2016 <- dplyr::rename(n_pubs_ws2016, ws_pubs = freq)
+    
+    
+    
+    
+    # number of coauthors 2016
+    
+    
+    coauthors_by_pubs2016 <- n_pubs_filtered2016 %>% 
+        group_by(id_unique) %>%
+        summarise(coauthor_count = n_distinct(vedidk)) %>%
+        ungroup()
+    
+    
+    coauth2016 <- DBI::dbReadTable(con, "authors_by_pubs") %>%
+        left_join(coauthors_by_pubs2016, by = "id_unique") %>%
+        filter(!is.na(coauthor_count)) %>% 
+        group_by(vedidk) %>%
+        summarise(total_coauthor_count = sum(coauthor_count, na.rm = TRUE) - n_distinct(id_unique)) %>%
+        ungroup()
+    
+    
+    
     
     
     #gender - copied from previous year
@@ -737,6 +801,7 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
     final_data2017 <- left_join(final_data2017, interdisc_complete2016, by = "vedidk")
     final_data2017 <- left_join(final_data2017, grants2016, by = "vedidk")
     final_data2017 <- left_join(final_data2017, all_auth_gender, by = "vedidk")
+    final_data2017 <- left_join(final_data2017, coauth2016, by = "vedidk")
     
     final_data2017$ws_pubs <- tidyr::replace_na(final_data2017$ws_pubs, 0) 
     final_data2017$grants2016 <- tidyr::replace_na(final_data2017$grants2016, 0) 
@@ -744,7 +809,7 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
     final_data2017 <- dplyr::rename(final_data2017, pubs_total = freq)
     final_data2017$treatment_year <- as.numeric(final_data2017$treatment_year)
     final_data2017 <-  final_data2017 %>% 
-        dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2016, disc_ford, pubs_total, ws_pubs, interdisc_proportion, grants2016, gender)
+        dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2016, disc_ford, pubs_total, ws_pubs, interdisc_proportion, grants2016, gender, total_coauthor_count)
     
     
     #excluding rows with missing values
@@ -795,6 +860,25 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
         as_tibble()
     
     n_pubs_ws2017 <- dplyr::rename(n_pubs_ws2017, ws_pubs = freq)
+    
+    
+    
+    # number of coauthors 2017
+    
+    
+    coauthors_by_pubs2017 <- n_pubs_filtered2017 %>% 
+        group_by(id_unique) %>%
+        summarise(coauthor_count = n_distinct(vedidk)) %>%
+        ungroup()
+    
+    
+    coauth2017 <- DBI::dbReadTable(con, "authors_by_pubs") %>%
+        left_join(coauthors_by_pubs2017, by = "id_unique") %>%
+        filter(!is.na(coauthor_count)) %>% 
+        group_by(vedidk) %>%
+        summarise(total_coauthor_count = sum(coauthor_count, na.rm = TRUE) - n_distinct(id_unique)) %>%
+        ungroup()
+    
     
     
     #gender - copied from previous year
@@ -890,6 +974,7 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
     final_data2018 <- left_join(final_data2018, interdisc_complete2017, by = "vedidk")
     final_data2018 <- left_join(final_data2018, grants2017, by = "vedidk")
     final_data2018 <- left_join(final_data2018, all_auth_gender, by = "vedidk")
+    final_data2018 <- left_join(final_data2018, coauth2017, by = "vedidk")
     
     final_data2018$ws_pubs <- tidyr::replace_na(final_data2018$ws_pubs, 0) 
     final_data2018$grants2017 <- tidyr::replace_na(final_data2018$grants2017, 0) 
@@ -897,7 +982,7 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
     final_data2018 <- dplyr::rename(final_data2018, pubs_total = freq)
     final_data2018$treatment_year <- as.numeric(final_data2018$treatment_year)
     final_data2018 <-  final_data2018 %>% 
-        dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2017, disc_ford, pubs_total, ws_pubs, interdisc_proportion, grants2017, gender)
+        dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2017, disc_ford, pubs_total, ws_pubs, interdisc_proportion, grants2017, gender, total_coauthor_count)
     
     
     #excluding rows with missing values
@@ -956,6 +1041,26 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
         as_tibble()
     
     n_pubs_ws2018 <- dplyr::rename(n_pubs_ws2018, ws_pubs = freq)
+    
+    
+    
+    # number of coauthors 2018
+    
+    
+    coauthors_by_pubs2018 <- n_pubs_filtered2018 %>% 
+        group_by(id_unique) %>%
+        summarise(coauthor_count = n_distinct(vedidk)) %>%
+        ungroup()
+    
+    
+    coauth2018 <- DBI::dbReadTable(con, "authors_by_pubs") %>%
+        left_join(coauthors_by_pubs2018, by = "id_unique") %>%
+        filter(!is.na(coauthor_count)) %>% 
+        group_by(vedidk) %>%
+        summarise(total_coauthor_count = sum(coauthor_count, na.rm = TRUE) - n_distinct(id_unique)) %>%
+        ungroup()
+    
+    
     
     
     #gender - copied from previous year
@@ -1051,6 +1156,7 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
     final_data2019 <- left_join(final_data2019, interdisc_complete2018, by = "vedidk")
     final_data2019 <- left_join(final_data2019, grants2018, by = "vedidk")
     final_data2019 <- left_join(final_data2019, all_auth_gender, by = "vedidk")
+    final_data2019 <- left_join(final_data2019, coauth2018, by = "vedidk")
     
     final_data2019$ws_pubs <- tidyr::replace_na(final_data2019$ws_pubs, 0) 
     final_data2019$grants2018 <- tidyr::replace_na(final_data2019$grants2018, 0) 
@@ -1058,7 +1164,7 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
     final_data2019 <- dplyr::rename(final_data2019, pubs_total = freq)
     final_data2019$treatment_year <- as.numeric(final_data2019$treatment_year)
     final_data2019 <-  final_data2019 %>% 
-        dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2018, disc_ford, pubs_total, ws_pubs, interdisc_proportion, grants2018, gender)
+        dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2018, disc_ford, pubs_total, ws_pubs, interdisc_proportion, grants2018, gender, total_coauthor_count)
     
     
     #excluding rows with missing values
@@ -1107,6 +1213,25 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
         as_tibble()
     
     n_pubs_ws2019 <- dplyr::rename(n_pubs_ws2019, ws_pubs = freq)
+    
+    
+    
+    # number of coauthors 2019
+    
+    
+    coauthors_by_pubs2019 <- n_pubs_filtered2019 %>% 
+        group_by(id_unique) %>%
+        summarise(coauthor_count = n_distinct(vedidk)) %>%
+        ungroup()
+    
+    
+    coauth2019 <- DBI::dbReadTable(con, "authors_by_pubs") %>%
+        left_join(coauthors_by_pubs2019, by = "id_unique") %>%
+        filter(!is.na(coauthor_count)) %>% 
+        group_by(vedidk) %>%
+        summarise(total_coauthor_count = sum(coauthor_count, na.rm = TRUE) - n_distinct(id_unique)) %>%
+        ungroup()
+    
     
     
     #gender - copied from previous year
@@ -1202,6 +1327,7 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
     final_data2020 <- left_join(final_data2020, interdisc_complete2019, by = "vedidk")
     final_data2020 <- left_join(final_data2020, grants2019, by = "vedidk")
     final_data2020 <- left_join(final_data2020, all_auth_gender, by = "vedidk")
+    final_data2020 <- left_join(final_data2020, coauth2019, by = "vedidk")
     
     final_data2020$ws_pubs <- tidyr::replace_na(final_data2020$ws_pubs, 0) 
     final_data2020$grants2019 <- tidyr::replace_na(final_data2020$grants2019, 0) 
@@ -1209,7 +1335,7 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
     final_data2020 <- dplyr::rename(final_data2020, pubs_total = freq)
     final_data2020$treatment_year <- as.numeric(final_data2020$treatment_year)
     final_data2020 <-  final_data2020 %>% 
-        dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2019, disc_ford, pubs_total, ws_pubs, interdisc_proportion, grants2019, gender)
+        dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2019, disc_ford, pubs_total, ws_pubs, interdisc_proportion, grants2019, gender, total_coauthor_count)
     
     
     #excluding rows with missing values

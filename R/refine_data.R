@@ -69,7 +69,7 @@ refine_data <- function(matching, db_path, ids_complete, sup_control, authors_ar
         filter(treatment != 1) %>% 
         dplyr::select(vedidk) %>% 
         distinct() %>% 
-        mutate(sup_details = purrr::pmap(.l = list(vedidk),
+        mutate(sup_details = furrr::future_pmap(.l = list(vedidk),
                                        .f = function(first){
                                            read_sup(db_path, authors_arrow, 
                                                     ids_full_vector = first)

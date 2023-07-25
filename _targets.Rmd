@@ -52,7 +52,8 @@ tar_option_set(packages = c("dplyr",
                             "psych",
                             "arrow",
                             "tarchetypes",
-                            "cobalt"
+                            "cobalt",
+                            "furrr"
                             ))
 
 # read custom functions
