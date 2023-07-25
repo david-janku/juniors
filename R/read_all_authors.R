@@ -30,7 +30,7 @@ new <-  matching %>%
                                        } ))
 
 
-new <- new() %>%
+new <- new %>%
     mutate(pubs_number = purrr::map_int(pub_table, function(df) {
         if (is.data.frame(df) && nrow(df) > 0) {
             return(length(unique(df$id_unique)))
@@ -39,12 +39,16 @@ new <- new() %>%
         }
     }))
 
+
+ 
 # w <- plyr::count(all_authors$pubs_number)
 # plot(w)
 
-new <- all_authors %>% filter(pubs_number >= 3)
+ new <- new %>% filter(pubs_number >= 3)
 
 # wq <- plyr::count(new$pubs_number)
 # plot(wq)
+ 
+ new
 
     }

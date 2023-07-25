@@ -435,40 +435,54 @@ match <- function(db_path, ids, gender, authors_arrow) {
     
     out2015 <- matchit(treatment~lenght2014+pubs_total+ws_pubs+interdisc_proportion+grants2014+gender, method="nearest", data=final_data2015, distance = "mahalanobis", ratio = 1, exact = "disc_ford", replace = TRUE)
     
-    matched_data2015 <- match.data(out2015) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
+    matched_data2015 <- get_matches(out2015) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
     # table(matched_data2015$disc_ford, by = matched_data2015$treatment)
     
     # summary(out2015)
     
     
-    m <- out2015[["match.matrix"]]%>% 
-        as.data.frame() %>% 
-        tibble::rownames_to_column("treatment_number") %>% 
-        as_tibble()
+    # m <- out2015[["match.matrix"]]%>% 
+    #     as.data.frame() %>% 
+    #     tibble::rownames_to_column("treatment_number") %>% 
+    #     as_tibble()
+    # 
+    # names(m)[2:3] <- paste0("control_number", 1:2)
+    # 
+    # m_final <- final_data2015 %>% 
+    #     tibble::rownames_to_column("case_number") 
+    # # mutate(treatment_year2 = ifelse(vedidk %in% treatment_refined2015$vedidk, treatment_refined2015$treatment_year, NA)) 
+    # 
+    # m_long <- m %>%
+    #     tidyr::pivot_longer(
+    #         cols = starts_with("control_number"),
+    #         names_to = "control_group",
+    #         values_to = "control_number"
+    #     ) %>%
+    #     dplyr::select(-control_group) %>% 
+    #     mutate(id = row_number())
+    # 
+    # # Join the treatment group to the match matrix by treatment_number and select the necessary columns
+    # m_semi_final <- left_join(m_long, m_final, by = c("treatment_number" = "case_number")) %>%
+    #     dplyr::select(treatment_number, vedidk = vedidk, control_number, id)
+    # m_semi_final <- rename(m_semi_final, vedidk_treatment = vedidk) 
+    # 
+    # # Join the control group to the match matrix by control_number and select the necessary columns
+    # m_semi_final2 <- left_join(m_long, m_final, by = c("control_number" = "case_number")) %>%
+    #     dplyr::select(control_number, vedidk, id)
+    # m_semi_final2 <- rename(m_semi_final2, vedidk_control = vedidk)
+    # 
+    # m_semi_final <- left_join(m_semi_final, m_semi_final2, by = c("control_number" = "control_number", "id" = "id")) %>%
+    #     dplyr::select(vedidk_control, vedidk_treatment)
+    # 
+    # 
+    # matched_data2015 <- full_join(matched_data2015, m_semi_final, by = c("vedidk" = "vedidk_control"))
+    # 
+    # plyr::count(matched_data2015$treatment)
+    # table(matched_data2015$disc_ford, by = matched_data2015$treatment)
     
-    names(m)[2] <- "control_number"
-    
-    m_final <- final_data2015 %>% 
-        tibble::rownames_to_column("case_number") 
-    # mutate(treatment_year2 = ifelse(vedidk %in% treatment_refined2015$vedidk, treatment_refined2015$treatment_year, NA)) 
     
     
-    m_semi_final <- left_join(m, m_final, by = c("treatment_number" = "case_number")) %>% 
-        dplyr::select(treatment_number, vedidk, control_number) 
-    m_semi_final <- dplyr::rename(m_semi_final, vedidk_treatment = vedidk)
-    m_semi_final2 <- left_join(m, m_final, by = c("control_number" = "case_number")) %>% 
-        dplyr::select(treatment_number, vedidk, control_number)  
-    # dplyr::select(vedidk) %>% 
-    # distinct()
-    
-    m_semi_final <- left_join(m_semi_final, m_semi_final2, by = "treatment_number") %>% 
-        dplyr::select(vedidk, vedidk_treatment)
-    
-    matched_data2015 <- full_join(matched_data2015, m_semi_final, by = "vedidk")
-    
-    plyr::count(matched_data2015$treatment)
-    table(matched_data2015$disc_ford, by = matched_data2015$treatment)
     
     
     
@@ -477,40 +491,51 @@ match <- function(db_path, ids, gender, authors_arrow) {
     
     out_funded2015 <- matchit(treatment~lenght2014+pubs_total+ws_pubs+interdisc_proportion+grants2014+first_grant+gender, method="nearest", data=final_data_funded2015, distance = "mahalanobis", ratio = 1, exact = "disc_ford", replace = TRUE)
     
-    matched_data_funded2015 <- match.data(out_funded2015) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
+    matched_data_funded2015 <- get_matches(out_funded2015) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
     # table(matched_data_funded2015$disc_ford, by = matched_data_funded2015$treatment)
     
     # summary(out_funded2015)
     
     
-    m <- out_funded2015[["match.matrix"]]%>% 
-        as.data.frame() %>% 
-        tibble::rownames_to_column("treatment_number") %>% 
-        as_tibble()
-    
-    names(m)[2] <- "control_number"
-    
-    m_final <- final_data_funded2015 %>% 
-        tibble::rownames_to_column("case_number") 
-    # mutate(treatment_year2 = ifelse(vedidk %in% treatment_refined2015$vedidk, treatment_refined2015$treatment_year, NA)) 
-    
-    
-    m_semi_final <- left_join(m, m_final, by = c("treatment_number" = "case_number")) %>% 
-        dplyr::select(treatment_number, vedidk, control_number) 
-    m_semi_final <- dplyr::rename(m_semi_final, vedidk_treatment = vedidk)
-    m_semi_final2 <- left_join(m, m_final, by = c("control_number" = "case_number")) %>% 
-        dplyr::select(treatment_number, vedidk, control_number)  
-    # dplyr::select(vedidk) %>% 
-    # distinct()
-    
-    m_semi_final <- left_join(m_semi_final, m_semi_final2, by = "treatment_number") %>% 
-        dplyr::select(vedidk, vedidk_treatment)
-    
-    matched_data_funded2015 <- full_join(matched_data_funded2015, m_semi_final, by = "vedidk")
-    
-    plyr::count(matched_data_funded2015$treatment)
-    table(matched_data_funded2015$disc_ford, by = matched_data_funded2015$treatment)
+    # m <- out_funded2015[["match.matrix"]]%>% 
+    #     as.data.frame() %>% 
+    #     tibble::rownames_to_column("treatment_number") %>% 
+    #     as_tibble()
+    # 
+    # names(m)[2:3] <- paste0("control_number", 1:2)
+    # 
+    # m_final <- final_data_funded2015 %>% 
+    #     tibble::rownames_to_column("case_number") 
+    # # mutate(treatment_year2 = ifelse(vedidk %in% treatment_refined_funded2015$vedidk, treatment_refined_funded2015$treatment_year, NA)) 
+    # 
+    # m_long <- m %>%
+    #     tidyr::pivot_longer(
+    #         cols = starts_with("control_number"),
+    #         names_to = "control_group",
+    #         values_to = "control_number"
+    #     ) %>%
+    #     dplyr::select(-control_group) %>% 
+    #     mutate(id = row_number())
+    # 
+    # # Join the treatment group to the match matrix by treatment_number and select the necessary columns
+    # m_semi_final <- left_join(m_long, m_final, by = c("treatment_number" = "case_number")) %>%
+    #     dplyr::select(treatment_number, vedidk = vedidk, control_number, id)
+    # m_semi_final <- rename(m_semi_final, vedidk_treatment = vedidk) 
+    # 
+    # # Join the control group to the match matrix by control_number and select the necessary columns
+    # m_semi_final2 <- left_join(m_long, m_final, by = c("control_number" = "case_number")) %>%
+    #     dplyr::select(control_number, vedidk, id)
+    # m_semi_final2 <- rename(m_semi_final2, vedidk_control = vedidk)
+    # 
+    # m_semi_final <- left_join(m_semi_final, m_semi_final2, by = c("control_number" = "control_number", "id" = "id")) %>%
+    #     dplyr::select(vedidk_control, vedidk_treatment)
+    # 
+    # 
+    # matched_data_funded2015 <- full_join(matched_data_funded2015, m_semi_final, by = c("vedidk" = "vedidk_control"))
+    # 
+    # plyr::count(matched_data_funded2015$treatment)
+    # table(matched_data_funded2015$disc_ford, by = matched_data_funded2015$treatment)
     
     
     ## joining the two control groups into one table
@@ -707,40 +732,51 @@ match <- function(db_path, ids, gender, authors_arrow) {
     
     out2016 <- matchit(treatment~lenght2015+pubs_total+ws_pubs+interdisc_proportion+grants2015+gender, method="nearest", data=final_data2016, distance = "mahalanobis", ratio = 1, exact = "disc_ford", replace = TRUE)
     
-    matched_data2016 <- match.data(out2016) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
+    matched_data2016 <- get_matches(out2016) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
     # table(matched_data2016$disc_ford, by = matched_data2016$treatment)
     
     # summary(out2016)
     
     
-    m <- out2016[["match.matrix"]]%>% 
-        as.data.frame() %>% 
-        tibble::rownames_to_column("treatment_number") %>% 
-        as_tibble()
-    
-    names(m)[2] <- "control_number"
-    
-    m_final <- final_data2016 %>% 
-        tibble::rownames_to_column("case_number") 
-    # mutate(treatment_year2 = ifelse(vedidk %in% treatment_refined2016$vedidk, treatment_refined2016$treatment_year, NA)) 
-    
-    
-    m_semi_final <- left_join(m, m_final, by = c("treatment_number" = "case_number")) %>% 
-        dplyr::select(treatment_number, vedidk, control_number) 
-    m_semi_final <- dplyr::rename(m_semi_final, vedidk_treatment = vedidk)
-    m_semi_final2 <- left_join(m, m_final, by = c("control_number" = "case_number")) %>% 
-        dplyr::select(treatment_number, vedidk, control_number)  
-    # dplyr::select(vedidk) %>% 
-    # distinct()
-    
-    m_semi_final <- left_join(m_semi_final, m_semi_final2, by = "treatment_number") %>% 
-        dplyr::select(vedidk, vedidk_treatment)
-    
-    matched_data2016 <- full_join(matched_data2016, m_semi_final, by = "vedidk")
-    
-    plyr::count(matched_data2016$treatment)
-    table(matched_data2016$disc_ford, by = matched_data2016$treatment)
+    # m <- out2016[["match.matrix"]]%>% 
+    #     as.data.frame() %>% 
+    #     tibble::rownames_to_column("treatment_number") %>% 
+    #     as_tibble()
+    # 
+    # names(m)[2:3] <- paste0("control_number", 1:2)
+    # 
+    # m_final <- final_data2016 %>% 
+    #     tibble::rownames_to_column("case_number") 
+    # # mutate(treatment_year2 = ifelse(vedidk %in% treatment_refined2016$vedidk, treatment_refined2016$treatment_year, NA)) 
+    # 
+    # m_long <- m %>%
+    #     tidyr::pivot_longer(
+    #         cols = starts_with("control_number"),
+    #         names_to = "control_group",
+    #         values_to = "control_number"
+    #     ) %>%
+    #     dplyr::select(-control_group) %>% 
+    #     mutate(id = row_number())
+    # 
+    # # Join the treatment group to the match matrix by treatment_number and select the necessary columns
+    # m_semi_final <- left_join(m_long, m_final, by = c("treatment_number" = "case_number")) %>%
+    #     dplyr::select(treatment_number, vedidk = vedidk, control_number, id)
+    # m_semi_final <- rename(m_semi_final, vedidk_treatment = vedidk) 
+    # 
+    # # Join the control group to the match matrix by control_number and select the necessary columns
+    # m_semi_final2 <- left_join(m_long, m_final, by = c("control_number" = "case_number")) %>%
+    #     dplyr::select(control_number, vedidk, id)
+    # m_semi_final2 <- rename(m_semi_final2, vedidk_control = vedidk)
+    # 
+    # m_semi_final <- left_join(m_semi_final, m_semi_final2, by = c("control_number" = "control_number", "id" = "id")) %>%
+    #     dplyr::select(vedidk_control, vedidk_treatment)
+    # 
+    # 
+    # matched_data2016 <- full_join(matched_data2016, m_semi_final, by = c("vedidk" = "vedidk_control"))
+    # 
+    # plyr::count(matched_data2016$treatment)
+    # table(matched_data2016$disc_ford, by = matched_data2016$treatment)
     
     
     
@@ -749,41 +785,51 @@ match <- function(db_path, ids, gender, authors_arrow) {
     
     out_funded2016 <- matchit(treatment~lenght2015+pubs_total+ws_pubs+interdisc_proportion+grants2015+first_grant+gender, method="nearest", data=final_data_funded2016, distance = "mahalanobis", ratio = 1, exact = "disc_ford", replace = TRUE)
     
-    matched_data_funded2016 <- match.data(out_funded2016) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
+    matched_data_funded2016 <- get_matches(out_funded2016) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
     # table(matched_data_funded2016$disc_ford, by = matched_data_funded2016$treatment)
     
     # summary(out_funded2016)
     
     
-    m <- out_funded2016[["match.matrix"]]%>% 
-        as.data.frame() %>% 
-        tibble::rownames_to_column("treatment_number") %>% 
-        as_tibble()
-    
-    names(m)[2] <- "control_number"
-    
-    m_final <- final_data_funded2016 %>% 
-        tibble::rownames_to_column("case_number") 
-    # mutate(treatment_year2 = ifelse(vedidk %in% treatment_refined2016$vedidk, treatment_refined2016$treatment_year, NA)) 
-    
-    
-    m_semi_final <- left_join(m, m_final, by = c("treatment_number" = "case_number")) %>% 
-        dplyr::select(treatment_number, vedidk, control_number) 
-    m_semi_final <- dplyr::rename(m_semi_final, vedidk_treatment = vedidk)
-    m_semi_final2 <- left_join(m, m_final, by = c("control_number" = "case_number")) %>% 
-        dplyr::select(treatment_number, vedidk, control_number)  
-    # dplyr::select(vedidk) %>% 
-    # distinct()
-    
-    m_semi_final <- left_join(m_semi_final, m_semi_final2, by = "treatment_number") %>% 
-        dplyr::select(vedidk, vedidk_treatment)
-    
-    matched_data_funded2016 <- full_join(matched_data_funded2016, m_semi_final, by = "vedidk")
-    
-    plyr::count(matched_data_funded2016$treatment)
-    table(matched_data_funded2016$disc_ford, by = matched_data_funded2016$treatment)
-    
+    # m <- out_funded2016[["match.matrix"]]%>% 
+    #     as.data.frame() %>% 
+    #     tibble::rownames_to_column("treatment_number") %>% 
+    #     as_tibble()
+    # 
+    # names(m)[2:3] <- paste0("control_number", 1:2)
+    # 
+    # m_final <- final_data_funded2016 %>% 
+    #     tibble::rownames_to_column("case_number") 
+    # # mutate(treatment_year2 = ifelse(vedidk %in% treatment_refined_funded2016$vedidk, treatment_refined_funded2016$treatment_year, NA)) 
+    # 
+    # m_long <- m %>%
+    #     tidyr::pivot_longer(
+    #         cols = starts_with("control_number"),
+    #         names_to = "control_group",
+    #         values_to = "control_number"
+    #     ) %>%
+    #     dplyr::select(-control_group) %>% 
+    #     mutate(id = row_number())
+    # 
+    # # Join the treatment group to the match matrix by treatment_number and select the necessary columns
+    # m_semi_final <- left_join(m_long, m_final, by = c("treatment_number" = "case_number")) %>%
+    #     dplyr::select(treatment_number, vedidk = vedidk, control_number, id)
+    # m_semi_final <- rename(m_semi_final, vedidk_treatment = vedidk) 
+    # 
+    # # Join the control group to the match matrix by control_number and select the necessary columns
+    # m_semi_final2 <- left_join(m_long, m_final, by = c("control_number" = "case_number")) %>%
+    #     dplyr::select(control_number, vedidk, id)
+    # m_semi_final2 <- rename(m_semi_final2, vedidk_control = vedidk)
+    # 
+    # m_semi_final <- left_join(m_semi_final, m_semi_final2, by = c("control_number" = "control_number", "id" = "id")) %>%
+    #     dplyr::select(vedidk_control, vedidk_treatment)
+    # 
+    # 
+    # matched_data_funded2016 <- full_join(matched_data_funded2016, m_semi_final, by = c("vedidk" = "vedidk_control"))
+    # 
+    # plyr::count(matched_data_funded2016$treatment)
+    # table(matched_data_funded2016$disc_ford, by = matched_data_funded2016$treatment)
     
     ## joining the two control groups into one table
     ##the funded will have code 2,treatment will have code 1 and unfunded will have code 0 in the "treatment" variable
@@ -980,40 +1026,51 @@ match <- function(db_path, ids, gender, authors_arrow) {
     
     out2017 <- matchit(treatment~lenght2016+pubs_total+ws_pubs+interdisc_proportion+grants2016+gender, method="nearest", data=final_data2017, distance = "mahalanobis", ratio = 1, exact = "disc_ford", replace = TRUE)
     
-    matched_data2017 <- match.data(out2017) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
+    matched_data2017 <- get_matches(out2017) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
     # table(matched_data2017$disc_ford, by = matched_data2017$treatment)
     
     # summary(out2017)
     
     
-    m <- out2017[["match.matrix"]]%>% 
-        as.data.frame() %>% 
-        tibble::rownames_to_column("treatment_number") %>% 
-        as_tibble()
-    
-    names(m)[2] <- "control_number"
-    
-    m_final <- final_data2017 %>% 
-        tibble::rownames_to_column("case_number") 
-    # mutate(treatment_year2 = ifelse(vedidk %in% treatment_refined2017$vedidk, treatment_refined2017$treatment_year, NA)) 
-    
-    
-    m_semi_final <- left_join(m, m_final, by = c("treatment_number" = "case_number")) %>% 
-        dplyr::select(treatment_number, vedidk, control_number) 
-    m_semi_final <- dplyr::rename(m_semi_final, vedidk_treatment = vedidk)
-    m_semi_final2 <- left_join(m, m_final, by = c("control_number" = "case_number")) %>% 
-        dplyr::select(treatment_number, vedidk, control_number)  
-    # dplyr::select(vedidk) %>% 
-    # distinct()
-    
-    m_semi_final <- left_join(m_semi_final, m_semi_final2, by = "treatment_number") %>% 
-        dplyr::select(vedidk, vedidk_treatment)
-    
-    matched_data2017 <- full_join(matched_data2017, m_semi_final, by = "vedidk")
-    
-    plyr::count(matched_data2017$treatment)
-    table(matched_data2017$disc_ford, by = matched_data2017$treatment)
+    # m <- out2017[["match.matrix"]]%>% 
+    #     as.data.frame() %>% 
+    #     tibble::rownames_to_column("treatment_number") %>% 
+    #     as_tibble()
+    # 
+    # names(m)[2:3] <- paste0("control_number", 1:2)
+    # 
+    # m_final <- final_data2017 %>% 
+    #     tibble::rownames_to_column("case_number") 
+    # # mutate(treatment_year2 = ifelse(vedidk %in% treatment_refined2017$vedidk, treatment_refined2017$treatment_year, NA)) 
+    # 
+    # m_long <- m %>%
+    #     tidyr::pivot_longer(
+    #         cols = starts_with("control_number"),
+    #         names_to = "control_group",
+    #         values_to = "control_number"
+    #     ) %>%
+    #     dplyr::select(-control_group) %>% 
+    #     mutate(id = row_number())
+    # 
+    # # Join the treatment group to the match matrix by treatment_number and select the necessary columns
+    # m_semi_final <- left_join(m_long, m_final, by = c("treatment_number" = "case_number")) %>%
+    #     dplyr::select(treatment_number, vedidk = vedidk, control_number, id)
+    # m_semi_final <- rename(m_semi_final, vedidk_treatment = vedidk) 
+    # 
+    # # Join the control group to the match matrix by control_number and select the necessary columns
+    # m_semi_final2 <- left_join(m_long, m_final, by = c("control_number" = "case_number")) %>%
+    #     dplyr::select(control_number, vedidk, id)
+    # m_semi_final2 <- rename(m_semi_final2, vedidk_control = vedidk)
+    # 
+    # m_semi_final <- left_join(m_semi_final, m_semi_final2, by = c("control_number" = "control_number", "id" = "id")) %>%
+    #     dplyr::select(vedidk_control, vedidk_treatment)
+    # 
+    # 
+    # matched_data2017 <- full_join(matched_data2017, m_semi_final, by = c("vedidk" = "vedidk_control"))
+    # 
+    # plyr::count(matched_data2017$treatment)
+    # table(matched_data2017$disc_ford, by = matched_data2017$treatment)
     
     
     
@@ -1022,40 +1079,51 @@ match <- function(db_path, ids, gender, authors_arrow) {
     
     out_funded2017 <- matchit(treatment~lenght2016+pubs_total+ws_pubs+interdisc_proportion+grants2016+first_grant+gender, method="nearest", data=final_data_funded2017, distance = "mahalanobis", ratio = 1, exact = "disc_ford", replace = TRUE)
     
-    matched_data_funded2017 <- match.data(out_funded2017) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
+    matched_data_funded2017 <- get_matches(out_funded2017) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
     # table(matched_data_funded2017$disc_ford, by = matched_data_funded2017$treatment)
     
     # summary(out_funded2017)
     
     
-    m <- out_funded2017[["match.matrix"]]%>% 
-        as.data.frame() %>% 
-        tibble::rownames_to_column("treatment_number") %>% 
-        as_tibble()
-    
-    names(m)[2] <- "control_number"
-    
-    m_final <- final_data_funded2017 %>% 
-        tibble::rownames_to_column("case_number") 
-    # mutate(treatment_year2 = ifelse(vedidk %in% treatment_refined2017$vedidk, treatment_refined2017$treatment_year, NA)) 
-    
-    
-    m_semi_final <- left_join(m, m_final, by = c("treatment_number" = "case_number")) %>% 
-        dplyr::select(treatment_number, vedidk, control_number) 
-    m_semi_final <- dplyr::rename(m_semi_final, vedidk_treatment = vedidk)
-    m_semi_final2 <- left_join(m, m_final, by = c("control_number" = "case_number")) %>% 
-        dplyr::select(treatment_number, vedidk, control_number)  
-    # dplyr::select(vedidk) %>% 
-    # distinct()
-    
-    m_semi_final <- left_join(m_semi_final, m_semi_final2, by = "treatment_number") %>% 
-        dplyr::select(vedidk, vedidk_treatment)
-    
-    matched_data_funded2017 <- full_join(matched_data_funded2017, m_semi_final, by = "vedidk")
-    
-    plyr::count(matched_data_funded2017$treatment)
-    table(matched_data_funded2017$disc_ford, by = matched_data_funded2017$treatment)
+    # m <- out_funded2017[["match.matrix"]]%>% 
+    #     as.data.frame() %>% 
+    #     tibble::rownames_to_column("treatment_number") %>% 
+    #     as_tibble()
+    # 
+    # names(m)[2:3] <- paste0("control_number", 1:2)
+    # 
+    # m_final <- final_data_funded2017 %>% 
+    #     tibble::rownames_to_column("case_number") 
+    # # mutate(treatment_year2 = ifelse(vedidk %in% treatment_refined_funded2017$vedidk, treatment_refined_funded2017$treatment_year, NA)) 
+    # 
+    # m_long <- m %>%
+    #     tidyr::pivot_longer(
+    #         cols = starts_with("control_number"),
+    #         names_to = "control_group",
+    #         values_to = "control_number"
+    #     ) %>%
+    #     dplyr::select(-control_group) %>% 
+    #     mutate(id = row_number())
+    # 
+    # # Join the treatment group to the match matrix by treatment_number and select the necessary columns
+    # m_semi_final <- left_join(m_long, m_final, by = c("treatment_number" = "case_number")) %>%
+    #     dplyr::select(treatment_number, vedidk = vedidk, control_number, id)
+    # m_semi_final <- rename(m_semi_final, vedidk_treatment = vedidk) 
+    # 
+    # # Join the control group to the match matrix by control_number and select the necessary columns
+    # m_semi_final2 <- left_join(m_long, m_final, by = c("control_number" = "case_number")) %>%
+    #     dplyr::select(control_number, vedidk, id)
+    # m_semi_final2 <- rename(m_semi_final2, vedidk_control = vedidk)
+    # 
+    # m_semi_final <- left_join(m_semi_final, m_semi_final2, by = c("control_number" = "control_number", "id" = "id")) %>%
+    #     dplyr::select(vedidk_control, vedidk_treatment)
+    # 
+    # 
+    # matched_data_funded2017 <- full_join(matched_data_funded2017, m_semi_final, by = c("vedidk" = "vedidk_control"))
+    # 
+    # plyr::count(matched_data_funded2017$treatment)
+    # table(matched_data_funded2017$disc_ford, by = matched_data_funded2017$treatment)
     
     
     ## joining the two control groups into one table
@@ -1249,40 +1317,51 @@ match <- function(db_path, ids, gender, authors_arrow) {
     
     out2018 <- matchit(treatment~lenght2017+pubs_total+ws_pubs+interdisc_proportion+grants2017+gender, method="nearest", data=final_data2018, distance = "mahalanobis", ratio = 1, exact = "disc_ford", replace = TRUE)
     
-    matched_data2018 <- match.data(out2018) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
+    matched_data2018 <- get_matches(out2018) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
     # table(matched_data2018$disc_ford, by = matched_data2018$treatment)
     
     # summary(out2018)
     
     
-    m <- out2018[["match.matrix"]]%>% 
-        as.data.frame() %>% 
-        tibble::rownames_to_column("treatment_number") %>% 
-        as_tibble()
-    
-    names(m)[2] <- "control_number"
-    
-    m_final <- final_data2018 %>% 
-        tibble::rownames_to_column("case_number") 
-    # mutate(treatment_year2 = ifelse(vedidk %in% treatment_refined2018$vedidk, treatment_refined2018$treatment_year, NA)) 
-    
-    
-    m_semi_final <- left_join(m, m_final, by = c("treatment_number" = "case_number")) %>% 
-        dplyr::select(treatment_number, vedidk, control_number) 
-    m_semi_final <- dplyr::rename(m_semi_final, vedidk_treatment = vedidk)
-    m_semi_final2 <- left_join(m, m_final, by = c("control_number" = "case_number")) %>% 
-        dplyr::select(treatment_number, vedidk, control_number)  
-    # dplyr::select(vedidk) %>% 
-    # distinct()
-    
-    m_semi_final <- left_join(m_semi_final, m_semi_final2, by = "treatment_number") %>% 
-        dplyr::select(vedidk, vedidk_treatment)
-    
-    matched_data2018 <- full_join(matched_data2018, m_semi_final, by = "vedidk")
-    
-    plyr::count(matched_data2018$treatment)
-    table(matched_data2018$disc_ford, by = matched_data2018$treatment)
+    # m <- out2018[["match.matrix"]]%>% 
+    #     as.data.frame() %>% 
+    #     tibble::rownames_to_column("treatment_number") %>% 
+    #     as_tibble()
+    # 
+    # names(m)[2:3] <- paste0("control_number", 1:2)
+    # 
+    # m_final <- final_data2018 %>% 
+    #     tibble::rownames_to_column("case_number") 
+    # # mutate(treatment_year2 = ifelse(vedidk %in% treatment_refined2018$vedidk, treatment_refined2018$treatment_year, NA)) 
+    # 
+    # m_long <- m %>%
+    #     tidyr::pivot_longer(
+    #         cols = starts_with("control_number"),
+    #         names_to = "control_group",
+    #         values_to = "control_number"
+    #     ) %>%
+    #     dplyr::select(-control_group) %>% 
+    #     mutate(id = row_number())
+    # 
+    # # Join the treatment group to the match matrix by treatment_number and select the necessary columns
+    # m_semi_final <- left_join(m_long, m_final, by = c("treatment_number" = "case_number")) %>%
+    #     dplyr::select(treatment_number, vedidk = vedidk, control_number, id)
+    # m_semi_final <- rename(m_semi_final, vedidk_treatment = vedidk) 
+    # 
+    # # Join the control group to the match matrix by control_number and select the necessary columns
+    # m_semi_final2 <- left_join(m_long, m_final, by = c("control_number" = "case_number")) %>%
+    #     dplyr::select(control_number, vedidk, id)
+    # m_semi_final2 <- rename(m_semi_final2, vedidk_control = vedidk)
+    # 
+    # m_semi_final <- left_join(m_semi_final, m_semi_final2, by = c("control_number" = "control_number", "id" = "id")) %>%
+    #     dplyr::select(vedidk_control, vedidk_treatment)
+    # 
+    # 
+    # matched_data2018 <- full_join(matched_data2018, m_semi_final, by = c("vedidk" = "vedidk_control"))
+    # 
+    # plyr::count(matched_data2018$treatment)
+    # table(matched_data2018$disc_ford, by = matched_data2018$treatment)
     
     
     
@@ -1291,40 +1370,51 @@ match <- function(db_path, ids, gender, authors_arrow) {
     
     out_funded2018 <- matchit(treatment~lenght2017+pubs_total+ws_pubs+interdisc_proportion+grants2017+first_grant+gender, method="nearest", data=final_data_funded2018, distance = "mahalanobis", ratio = 1, exact = "disc_ford", replace = TRUE)
     
-    matched_data_funded2018 <- match.data(out_funded2018) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
+    matched_data_funded2018 <- get_matches(out_funded2018) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
     # table(matched_data_funded2018$disc_ford, by = matched_data_funded2018$treatment)
     
     # summary(out_funded2018)
     
     
-    m <- out_funded2018[["match.matrix"]]%>% 
-        as.data.frame() %>% 
-        tibble::rownames_to_column("treatment_number") %>% 
-        as_tibble()
-    
-    names(m)[2] <- "control_number"
-    
-    m_final <- final_data_funded2018 %>% 
-        tibble::rownames_to_column("case_number") 
-    # mutate(treatment_year2 = ifelse(vedidk %in% treatment_refined2018$vedidk, treatment_refined2018$treatment_year, NA)) 
-    
-    
-    m_semi_final <- left_join(m, m_final, by = c("treatment_number" = "case_number")) %>% 
-        dplyr::select(treatment_number, vedidk, control_number) 
-    m_semi_final <- dplyr::rename(m_semi_final, vedidk_treatment = vedidk)
-    m_semi_final2 <- left_join(m, m_final, by = c("control_number" = "case_number")) %>% 
-        dplyr::select(treatment_number, vedidk, control_number)  
-    # dplyr::select(vedidk) %>% 
-    # distinct()
-    
-    m_semi_final <- left_join(m_semi_final, m_semi_final2, by = "treatment_number") %>% 
-        dplyr::select(vedidk, vedidk_treatment)
-    
-    matched_data_funded2018 <- full_join(matched_data_funded2018, m_semi_final, by = "vedidk")
-    
-    plyr::count(matched_data_funded2018$treatment)
-    table(matched_data_funded2018$disc_ford, by = matched_data_funded2018$treatment)
+    # m <- out_funded2018[["match.matrix"]]%>% 
+    #     as.data.frame() %>% 
+    #     tibble::rownames_to_column("treatment_number") %>% 
+    #     as_tibble()
+    # 
+    # names(m)[2:3] <- paste0("control_number", 1:2)
+    # 
+    # m_final <- final_data_funded2018 %>% 
+    #     tibble::rownames_to_column("case_number") 
+    # # mutate(treatment_year2 = ifelse(vedidk %in% treatment_refined_funded2018$vedidk, treatment_refined_funded2018$treatment_year, NA)) 
+    # 
+    # m_long <- m %>%
+    #     tidyr::pivot_longer(
+    #         cols = starts_with("control_number"),
+    #         names_to = "control_group",
+    #         values_to = "control_number"
+    #     ) %>%
+    #     dplyr::select(-control_group) %>% 
+    #     mutate(id = row_number())
+    # 
+    # # Join the treatment group to the match matrix by treatment_number and select the necessary columns
+    # m_semi_final <- left_join(m_long, m_final, by = c("treatment_number" = "case_number")) %>%
+    #     dplyr::select(treatment_number, vedidk = vedidk, control_number, id)
+    # m_semi_final <- rename(m_semi_final, vedidk_treatment = vedidk) 
+    # 
+    # # Join the control group to the match matrix by control_number and select the necessary columns
+    # m_semi_final2 <- left_join(m_long, m_final, by = c("control_number" = "case_number")) %>%
+    #     dplyr::select(control_number, vedidk, id)
+    # m_semi_final2 <- rename(m_semi_final2, vedidk_control = vedidk)
+    # 
+    # m_semi_final <- left_join(m_semi_final, m_semi_final2, by = c("control_number" = "control_number", "id" = "id")) %>%
+    #     dplyr::select(vedidk_control, vedidk_treatment)
+    # 
+    # 
+    # matched_data_funded2018 <- full_join(matched_data_funded2018, m_semi_final, by = c("vedidk" = "vedidk_control"))
+    # 
+    # plyr::count(matched_data_funded2018$treatment)
+    # table(matched_data_funded2018$disc_ford, by = matched_data_funded2018$treatment)
     
     
     ## joining the two control groups into one table
@@ -1520,40 +1610,51 @@ match <- function(db_path, ids, gender, authors_arrow) {
     
     out2019 <- matchit(treatment~lenght2018+pubs_total+ws_pubs+interdisc_proportion+grants2018+gender, method="nearest", data=final_data2019, distance = "mahalanobis", ratio = 1, exact = "disc_ford", replace = TRUE)
     
-    matched_data2019 <- match.data(out2019) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
+    matched_data2019 <- get_matches(out2019) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
     # table(matched_data2019$disc_ford, by = matched_data2019$treatment)
     
     # summary(out2019)
     
     
-    m <- out2019[["match.matrix"]]%>% 
-        as.data.frame() %>% 
-        tibble::rownames_to_column("treatment_number") %>% 
-        as_tibble()
-    
-    names(m)[2] <- "control_number"
-    
-    m_final <- final_data2019 %>% 
-        tibble::rownames_to_column("case_number") 
-    # mutate(treatment_year2 = ifelse(vedidk %in% treatment_refined2019$vedidk, treatment_refined2019$treatment_year, NA)) 
-    
-    
-    m_semi_final <- left_join(m, m_final, by = c("treatment_number" = "case_number")) %>% 
-        dplyr::select(treatment_number, vedidk, control_number) 
-    m_semi_final <- dplyr::rename(m_semi_final, vedidk_treatment = vedidk)
-    m_semi_final2 <- left_join(m, m_final, by = c("control_number" = "case_number")) %>% 
-        dplyr::select(treatment_number, vedidk, control_number)  
-    # dplyr::select(vedidk) %>% 
-    # distinct()
-    
-    m_semi_final <- left_join(m_semi_final, m_semi_final2, by = "treatment_number") %>% 
-        dplyr::select(vedidk, vedidk_treatment)
-    
-    matched_data2019 <- full_join(matched_data2019, m_semi_final, by = "vedidk")
-    
-    plyr::count(matched_data2019$treatment)
-    table(matched_data2019$disc_ford, by = matched_data2019$treatment)
+    # m <- out2019[["match.matrix"]]%>% 
+    #     as.data.frame() %>% 
+    #     tibble::rownames_to_column("treatment_number") %>% 
+    #     as_tibble()
+    # 
+    # names(m)[2:3] <- paste0("control_number", 1:2)
+    # 
+    # m_final <- final_data2019 %>% 
+    #     tibble::rownames_to_column("case_number") 
+    # # mutate(treatment_year2 = ifelse(vedidk %in% treatment_refined2019$vedidk, treatment_refined2019$treatment_year, NA)) 
+    # 
+    # m_long <- m %>%
+    #     tidyr::pivot_longer(
+    #         cols = starts_with("control_number"),
+    #         names_to = "control_group",
+    #         values_to = "control_number"
+    #     ) %>%
+    #     dplyr::select(-control_group) %>% 
+    #     mutate(id = row_number())
+    # 
+    # # Join the treatment group to the match matrix by treatment_number and select the necessary columns
+    # m_semi_final <- left_join(m_long, m_final, by = c("treatment_number" = "case_number")) %>%
+    #     dplyr::select(treatment_number, vedidk = vedidk, control_number, id)
+    # m_semi_final <- rename(m_semi_final, vedidk_treatment = vedidk) 
+    # 
+    # # Join the control group to the match matrix by control_number and select the necessary columns
+    # m_semi_final2 <- left_join(m_long, m_final, by = c("control_number" = "case_number")) %>%
+    #     dplyr::select(control_number, vedidk, id)
+    # m_semi_final2 <- rename(m_semi_final2, vedidk_control = vedidk)
+    # 
+    # m_semi_final <- left_join(m_semi_final, m_semi_final2, by = c("control_number" = "control_number", "id" = "id")) %>%
+    #     dplyr::select(vedidk_control, vedidk_treatment)
+    # 
+    # 
+    # matched_data2019 <- full_join(matched_data2019, m_semi_final, by = c("vedidk" = "vedidk_control"))
+    # 
+    # plyr::count(matched_data2019$treatment)
+    # table(matched_data2019$disc_ford, by = matched_data2019$treatment)
     
     
     
@@ -1562,40 +1663,51 @@ match <- function(db_path, ids, gender, authors_arrow) {
     
     out_funded2019 <- matchit(treatment~lenght2018+pubs_total+ws_pubs+interdisc_proportion+grants2018+first_grant+gender, method="nearest", data=final_data_funded2019, distance = "mahalanobis", ratio = 1, exact = "disc_ford", replace = TRUE)
     
-    matched_data_funded2019 <- match.data(out_funded2019) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
+    matched_data_funded2019 <- get_matches(out_funded2019) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
     # table(matched_data_funded2019$disc_ford, by = matched_data_funded2019$treatment)
     
     # summary(out_funded2019)
     
     
-    m <- out_funded2019[["match.matrix"]]%>% 
-        as.data.frame() %>% 
-        tibble::rownames_to_column("treatment_number") %>% 
-        as_tibble()
-    
-    names(m)[2] <- "control_number"
-    
-    m_final <- final_data_funded2019 %>% 
-        tibble::rownames_to_column("case_number") 
-    # mutate(treatment_year2 = ifelse(vedidk %in% treatment_refined2019$vedidk, treatment_refined2019$treatment_year, NA)) 
-    
-    
-    m_semi_final <- left_join(m, m_final, by = c("treatment_number" = "case_number")) %>% 
-        dplyr::select(treatment_number, vedidk, control_number) 
-    m_semi_final <- dplyr::rename(m_semi_final, vedidk_treatment = vedidk)
-    m_semi_final2 <- left_join(m, m_final, by = c("control_number" = "case_number")) %>% 
-        dplyr::select(treatment_number, vedidk, control_number)  
-    # dplyr::select(vedidk) %>% 
-    # distinct()
-    
-    m_semi_final <- left_join(m_semi_final, m_semi_final2, by = "treatment_number") %>% 
-        dplyr::select(vedidk, vedidk_treatment)
-    
-    matched_data_funded2019 <- full_join(matched_data_funded2019, m_semi_final, by = "vedidk")
-    
-    plyr::count(matched_data_funded2019$treatment)
-    table(matched_data_funded2019$disc_ford, by = matched_data_funded2019$treatment)
+    # m <- out_funded2019[["match.matrix"]]%>% 
+    #     as.data.frame() %>% 
+    #     tibble::rownames_to_column("treatment_number") %>% 
+    #     as_tibble()
+    # 
+    # names(m)[2:3] <- paste0("control_number", 1:2)
+    # 
+    # m_final <- final_data_funded2019 %>% 
+    #     tibble::rownames_to_column("case_number") 
+    # # mutate(treatment_year2 = ifelse(vedidk %in% treatment_refined_funded2019$vedidk, treatment_refined_funded2019$treatment_year, NA)) 
+    # 
+    # m_long <- m %>%
+    #     tidyr::pivot_longer(
+    #         cols = starts_with("control_number"),
+    #         names_to = "control_group",
+    #         values_to = "control_number"
+    #     ) %>%
+    #     dplyr::select(-control_group) %>% 
+    #     mutate(id = row_number())
+    # 
+    # # Join the treatment group to the match matrix by treatment_number and select the necessary columns
+    # m_semi_final <- left_join(m_long, m_final, by = c("treatment_number" = "case_number")) %>%
+    #     dplyr::select(treatment_number, vedidk = vedidk, control_number, id)
+    # m_semi_final <- rename(m_semi_final, vedidk_treatment = vedidk) 
+    # 
+    # # Join the control group to the match matrix by control_number and select the necessary columns
+    # m_semi_final2 <- left_join(m_long, m_final, by = c("control_number" = "case_number")) %>%
+    #     dplyr::select(control_number, vedidk, id)
+    # m_semi_final2 <- rename(m_semi_final2, vedidk_control = vedidk)
+    # 
+    # m_semi_final <- left_join(m_semi_final, m_semi_final2, by = c("control_number" = "control_number", "id" = "id")) %>%
+    #     dplyr::select(vedidk_control, vedidk_treatment)
+    # 
+    # 
+    # matched_data_funded2019 <- full_join(matched_data_funded2019, m_semi_final, by = c("vedidk" = "vedidk_control"))
+    # 
+    # plyr::count(matched_data_funded2019$treatment)
+    # table(matched_data_funded2019$disc_ford, by = matched_data_funded2019$treatment)
     
     
     ## joining the two control groups into one table
@@ -1792,41 +1904,52 @@ match <- function(db_path, ids, gender, authors_arrow) {
     
     out2020 <- matchit(treatment~lenght2019+pubs_total+ws_pubs+interdisc_proportion+grants2019+gender, method="nearest", data=final_data2020, distance = "mahalanobis", ratio = 1, exact = "disc_ford", replace = TRUE)
     
-    matched_data2020 <- match.data(out2020) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
+    matched_data2020 <- get_matches(out2020) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
     # table(matched_data2020$disc_ford, by = matched_data2020$treatment)
     
     # summary(out2020)
     
     
-    m <- out2020[["match.matrix"]]%>% 
-        as.data.frame() %>% 
-        tibble::rownames_to_column("treatment_number") %>% 
-        as_tibble()
-    
-    names(m)[2] <- "control_number"
-    
-    m_final <- final_data2020 %>% 
-        tibble::rownames_to_column("case_number") 
-    # mutate(treatment_year2 = ifelse(vedidk %in% treatment_refined2020$vedidk, treatment_refined2020$treatment_year, NA)) 
-    
-    
-    m_semi_final <- left_join(m, m_final, by = c("treatment_number" = "case_number")) %>% 
-        dplyr::select(treatment_number, vedidk, control_number) 
-    m_semi_final <- dplyr::rename(m_semi_final, vedidk_treatment = vedidk)
-    m_semi_final2 <- left_join(m, m_final, by = c("control_number" = "case_number")) %>% 
-        dplyr::select(treatment_number, vedidk, control_number)  
-    # dplyr::select(vedidk) %>% 
-    # distinct()
-    
-    m_semi_final <- left_join(m_semi_final, m_semi_final2, by = "treatment_number") %>% 
-        dplyr::select(vedidk, vedidk_treatment)
-    
-    matched_data2020 <- full_join(matched_data2020, m_semi_final, by = "vedidk")
-    
-    plyr::count(matched_data2020$treatment)
-    table(matched_data2020$disc_ford, by = matched_data2020$treatment)
-    
+    # m <- out2020[["match.matrix"]]%>% 
+    #     as.data.frame() %>% 
+    #     tibble::rownames_to_column("treatment_number") %>% 
+    #     as_tibble()
+    # 
+    # names(m)[2:3] <- paste0("control_number", 1:2)
+    # 
+    # m_final <- final_data2020 %>% 
+    #     tibble::rownames_to_column("case_number") 
+    # # mutate(treatment_year2 = ifelse(vedidk %in% treatment_refined2020$vedidk, treatment_refined2020$treatment_year, NA)) 
+    # 
+    # m_long <- m %>%
+    #     tidyr::pivot_longer(
+    #         cols = starts_with("control_number"),
+    #         names_to = "control_group",
+    #         values_to = "control_number"
+    #     ) %>%
+    #     dplyr::select(-control_group) %>% 
+    #     mutate(id = row_number())
+    # 
+    # # Join the treatment group to the match matrix by treatment_number and select the necessary columns
+    # m_semi_final <- left_join(m_long, m_final, by = c("treatment_number" = "case_number")) %>%
+    #     dplyr::select(treatment_number, vedidk = vedidk, control_number, id)
+    # m_semi_final <- rename(m_semi_final, vedidk_treatment = vedidk) 
+    # 
+    # # Join the control group to the match matrix by control_number and select the necessary columns
+    # m_semi_final2 <- left_join(m_long, m_final, by = c("control_number" = "case_number")) %>%
+    #     dplyr::select(control_number, vedidk, id)
+    # m_semi_final2 <- rename(m_semi_final2, vedidk_control = vedidk)
+    # 
+    # m_semi_final <- left_join(m_semi_final, m_semi_final2, by = c("control_number" = "control_number", "id" = "id")) %>%
+    #     dplyr::select(vedidk_control, vedidk_treatment)
+    # 
+    # 
+    # matched_data2020 <- full_join(matched_data2020, m_semi_final, by = c("vedidk" = "vedidk_control"))
+    # 
+    # plyr::count(matched_data2020$treatment)
+    # table(matched_data2020$disc_ford, by = matched_data2020$treatment)
+    # 
     
     
     #matching 2020 - only funded 
@@ -1834,40 +1957,51 @@ match <- function(db_path, ids, gender, authors_arrow) {
     
     out_funded2020 <- matchit(treatment~lenght2019+pubs_total+ws_pubs+interdisc_proportion+grants2019+first_grant+gender, method="nearest", data=final_data_funded2020, distance = "mahalanobis", ratio = 1, exact = "disc_ford", replace = TRUE)
     
-    matched_data_funded2020 <- match.data(out_funded2020) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
+    matched_data_funded2020 <- get_matches(out_funded2020) # this actually spits out exactly the list of treated nad mtached untreated people in a way that I can easily use it!
     
     # table(matched_data_funded2020$disc_ford, by = matched_data_funded2020$treatment)
     
     # summary(out_funded2020)
     
     
-    m <- out_funded2020[["match.matrix"]]%>% 
-        as.data.frame() %>% 
-        tibble::rownames_to_column("treatment_number") %>% 
-        as_tibble()
-    
-    names(m)[2] <- "control_number"
-    
-    m_final <- final_data_funded2020 %>% 
-        tibble::rownames_to_column("case_number") 
-    # mutate(treatment_year2 = ifelse(vedidk %in% treatment_refined2020$vedidk, treatment_refined2020$treatment_year, NA)) 
-    
-    
-    m_semi_final <- left_join(m, m_final, by = c("treatment_number" = "case_number")) %>% 
-        dplyr::select(treatment_number, vedidk, control_number) 
-    m_semi_final <- dplyr::rename(m_semi_final, vedidk_treatment = vedidk)
-    m_semi_final2 <- left_join(m, m_final, by = c("control_number" = "case_number")) %>% 
-        dplyr::select(treatment_number, vedidk, control_number)  
-    # dplyr::select(vedidk) %>% 
-    # distinct()
-    
-    m_semi_final <- left_join(m_semi_final, m_semi_final2, by = "treatment_number") %>% 
-        dplyr::select(vedidk, vedidk_treatment)
-    
-    matched_data_funded2020 <- full_join(matched_data_funded2020, m_semi_final, by = "vedidk")
-    
-    plyr::count(matched_data_funded2020$treatment)
-    table(matched_data_funded2020$disc_ford, by = matched_data_funded2020$treatment)
+    # m <- out_funded2020[["match.matrix"]]%>% 
+    #     as.data.frame() %>% 
+    #     tibble::rownames_to_column("treatment_number") %>% 
+    #     as_tibble()
+    # 
+    # names(m)[2:3] <- paste0("control_number", 1:2)
+    # 
+    # m_final <- final_data_funded2020 %>% 
+    #     tibble::rownames_to_column("case_number") 
+    # # mutate(treatment_year2 = ifelse(vedidk %in% treatment_refined_funded2020$vedidk, treatment_refined_funded2020$treatment_year, NA)) 
+    # 
+    # m_long <- m %>%
+    #     tidyr::pivot_longer(
+    #         cols = starts_with("control_number"),
+    #         names_to = "control_group",
+    #         values_to = "control_number"
+    #     ) %>%
+    #     dplyr::select(-control_group) %>% 
+    #     mutate(id = row_number())
+    # 
+    # # Join the treatment group to the match matrix by treatment_number and select the necessary columns
+    # m_semi_final <- left_join(m_long, m_final, by = c("treatment_number" = "case_number")) %>%
+    #     dplyr::select(treatment_number, vedidk = vedidk, control_number, id)
+    # m_semi_final <- rename(m_semi_final, vedidk_treatment = vedidk) 
+    # 
+    # # Join the control group to the match matrix by control_number and select the necessary columns
+    # m_semi_final2 <- left_join(m_long, m_final, by = c("control_number" = "case_number")) %>%
+    #     dplyr::select(control_number, vedidk, id)
+    # m_semi_final2 <- rename(m_semi_final2, vedidk_control = vedidk)
+    # 
+    # m_semi_final <- left_join(m_semi_final, m_semi_final2, by = c("control_number" = "control_number", "id" = "id")) %>%
+    #     dplyr::select(vedidk_control, vedidk_treatment)
+    # 
+    # 
+    # matched_data_funded2020 <- full_join(matched_data_funded2020, m_semi_final, by = c("vedidk" = "vedidk_control"))
+    # 
+    # plyr::count(matched_data_funded2020$treatment)
+    # table(matched_data_funded2020$disc_ford, by = matched_data_funded2020$treatment)
     
     
     ## joining the two control groups into one table
