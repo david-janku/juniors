@@ -1143,39 +1143,6 @@
       ],
       "Hash": "ba0240784ad50a62165058a27459304a"
     },
-<<<<<<< HEAD
-    "htmlwidgets": {
-      "Package": "htmlwidgets",
-      "Version": "1.6.2",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "grDevices",
-        "htmltools",
-        "jsonlite",
-        "knitr",
-        "rmarkdown",
-        "yaml"
-      ],
-      "Hash": "a865aa85bcb2697f47505bfd70422471"
-    },
-    "httpuv": {
-      "Package": "httpuv",
-      "Version": "1.6.6",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "R6",
-        "Rcpp",
-        "later",
-        "promises",
-        "utils"
-      ],
-      "Hash": "fd090e236ae2dc0f0cdf33a9ec83afb6"
-    },
-=======
->>>>>>> a58b81d95d6ba0b064743e9a31d4c8f4205d7a2d
     "httr": {
       "Package": "httr",
       "Version": "1.4.4",
@@ -1221,11 +1188,7 @@
         "stats",
         "utils"
       ],
-<<<<<<< HEAD
-      "Hash": "132b06d7060f11ba8b4c7e7f385e9b7a"
-=======
       "Hash": "08352b502db2eae1e46364de6e6421f4"
->>>>>>> a58b81d95d6ba0b064743e9a31d4c8f4205d7a2d
     },
     "isoband": {
       "Package": "isoband",
@@ -2120,74 +2083,6 @@
       ],
       "Hash": "3838071b66e0c566d55cc26bd6e27bf4"
     },
-<<<<<<< HEAD
-    "shiny": {
-      "Package": "shiny",
-      "Version": "1.7.3",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "R6",
-        "bslib",
-        "cachem",
-        "commonmark",
-        "crayon",
-        "ellipsis",
-        "fastmap",
-        "fontawesome",
-        "glue",
-        "grDevices",
-        "htmltools",
-        "httpuv",
-        "jsonlite",
-        "later",
-        "lifecycle",
-        "methods",
-        "mime",
-        "promises",
-        "rlang",
-        "sourcetools",
-        "tools",
-        "utils",
-        "withr",
-        "xtable"
-      ],
-      "Hash": "fe12df67fdb3b1142325cc54f100cc06"
-    },
-    "shinyWidgets": {
-      "Package": "shinyWidgets",
-      "Version": "0.7.4",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "anytime",
-        "bslib",
-        "grDevices",
-        "htmltools",
-        "jsonlite",
-        "rlang",
-        "sass",
-        "shiny"
-      ],
-      "Hash": "bf4f8beed5bdb53095ccefb4209b5889"
-    },
-    "shinybusy": {
-      "Package": "shinybusy",
-      "Version": "0.3.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "htmltools",
-        "htmlwidgets",
-        "jsonlite",
-        "shiny"
-      ],
-      "Hash": "cf0b9330f677599316a4b36682081e8b"
-    },
-=======
->>>>>>> a58b81d95d6ba0b064743e9a31d4c8f4205d7a2d
     "sodium": {
       "Package": "sodium",
       "Version": "1.2.0",
