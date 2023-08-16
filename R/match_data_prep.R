@@ -8,22 +8,12 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigators_arrow, cep_details_arrow, riv_details_arrow, riv_authors_arrow) {
+match_data_prep <- function(db_path, ids, gender, sup_control) {
 
-    authors_arrow <- as.data.frame(authors_arrow)
-    cep_investigators_arrow <- as.data.frame(cep_investigators_arrow)
-    cep_details_arrow <- as.data.frame(cep_details_arrow)
-    riv_details_arrow <- as.data.frame(riv_details_arrow)
-    riv_authors_arrow <- as.data.frame(riv_authors_arrow)
+    
     con <-  DBI::dbConnect(RSQLite::SQLite(), db_path)
-    dbWriteTable(con, "authors_by_pubs", authors_arrow, overwrite = TRUE)
-    dbWriteTable(con, "cep_investigators", cep_investigators_arrow, overwrite = TRUE)
-    dbWriteTable(con, "cep_details", cep_details_arrow, overwrite = TRUE)
-    dbWriteTable(con, "riv_disc", riv_details_arrow, overwrite = TRUE)
-    dbWriteTable(con, "riv_authors", riv_authors_arrow, overwrite = TRUE)
     on.exit(DBI::dbDisconnect(con))
     
-    DBI::dbListTables(con)
     
     # setting up the set of all authors
     
@@ -260,7 +250,7 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
     
     
     disciplines2014 <- discipline_data %>% 
-        dplyr::select(disc_ford, vedidk, year) %>% 
+        dplyr::select(disc_ford, field, vedidk, year) %>% 
         filter(!is.na(disc_ford)) %>% 
         filter(year < 2014) %>% 
         group_by(vedidk) %>% 
@@ -389,7 +379,7 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
     treatment_group <- left_join(treatment_group, nationality)
     
     ids_with_sup <- as_tibble(ids) %>% 
-        filter(!is.na(sup_vedidk)) %>%
+        filter(!is.na(sup_name_first)) %>%
         filter(!is.na(vedidk_core_researcher))
     
     treatment_refined <- treatment_group %>% 
@@ -457,12 +447,12 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
     final_data2015 <- dplyr::rename(final_data2015, pubs_total = freq)
     final_data2015$treatment_year <- as.numeric(final_data2015$treatment_year)
     final_data2015 <-  final_data2015 %>% 
-        dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2014, disc_ford, pubs_total, ws_pubs, interdisc_proportion, grants2014, gender, total_coauthor_count)
+        dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2014, disc_ford, field, pubs_total, ws_pubs, interdisc_proportion, grants2014, gender, total_coauthor_count)
     
     
-    #excluding rows with missing values
-    final_data2015 <- as_tibble(na.omit(final_data2015)) #when I am using "gender" as a variable, it will delete 1100 vedidks -> maybe I dont want that? 
-    sum(is.na(final_data2015))
+    # #excluding rows with missing values
+    # final_data2015 <- as_tibble(na.omit(final_data2015)) #when I am using "gender" as a variable, it will delete 1100 vedidks -> maybe I dont want that? 
+    # sum(is.na(final_data2015))
     
 
     
@@ -545,7 +535,7 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
     #discipline
     
     disciplines2015 <- discipline_data %>% 
-        dplyr::select(disc_ford, vedidk, year) %>% 
+        dplyr::select(disc_ford, field, vedidk, year) %>% 
         filter(!is.na(disc_ford)) %>% 
         filter(year < 2015) %>% 
         group_by(vedidk) %>% 
@@ -633,12 +623,12 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
     final_data2016 <- dplyr::rename(final_data2016, pubs_total = freq)
     final_data2016$treatment_year <- as.numeric(final_data2016$treatment_year)
     final_data2016 <-  final_data2016 %>% 
-        dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2015, disc_ford, pubs_total, ws_pubs, interdisc_proportion, grants2015, gender, total_coauthor_count)
+        dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2015, disc_ford, field, pubs_total, ws_pubs, interdisc_proportion, grants2015, gender, total_coauthor_count)
     
     
-    #excluding rows with missing values
-    final_data2016 <- as_tibble(na.omit(final_data2016)) #when I am using "gender" as a variable, it will delete 1100 vedidks -> maybe I dont want that? 
-    sum(is.na(final_data2016))
+    # #excluding rows with missing values
+    # final_data2016 <- as_tibble(na.omit(final_data2016)) #when I am using "gender" as a variable, it will delete 1100 vedidks -> maybe I dont want that? 
+    # sum(is.na(final_data2016))
     
    
     
@@ -721,7 +711,7 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
     #discipline
     
     disciplines2016 <- discipline_data %>% 
-        dplyr::select(disc_ford, vedidk, year) %>% 
+        dplyr::select(disc_ford, field, vedidk, year) %>% 
         filter(!is.na(disc_ford)) %>% 
         filter(year < 2016) %>% 
         group_by(vedidk) %>% 
@@ -809,12 +799,12 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
     final_data2017 <- dplyr::rename(final_data2017, pubs_total = freq)
     final_data2017$treatment_year <- as.numeric(final_data2017$treatment_year)
     final_data2017 <-  final_data2017 %>% 
-        dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2016, disc_ford, pubs_total, ws_pubs, interdisc_proportion, grants2016, gender, total_coauthor_count)
+        dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2016, disc_ford, field, pubs_total, ws_pubs, interdisc_proportion, grants2016, gender, total_coauthor_count)
     
     
-    #excluding rows with missing values
-    final_data2017 <- as_tibble(na.omit(final_data2017)) #when I am using "gender" as a variable, it will delete 1100 vedidks -> maybe I dont want that? 
-    sum(is.na(final_data2017))
+    # #excluding rows with missing values
+    # final_data2017 <- as_tibble(na.omit(final_data2017)) #when I am using "gender" as a variable, it will delete 1100 vedidks -> maybe I dont want that? 
+    # sum(is.na(final_data2017))
     
     
     
@@ -894,7 +884,7 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
     #discipline
     
     disciplines2017 <- discipline_data %>% 
-        dplyr::select(disc_ford, vedidk, year) %>% 
+        dplyr::select(disc_ford, field, vedidk, year) %>% 
         filter(!is.na(disc_ford)) %>% 
         filter(year < 2017) %>% 
         group_by(vedidk) %>% 
@@ -982,12 +972,12 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
     final_data2018 <- dplyr::rename(final_data2018, pubs_total = freq)
     final_data2018$treatment_year <- as.numeric(final_data2018$treatment_year)
     final_data2018 <-  final_data2018 %>% 
-        dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2017, disc_ford, pubs_total, ws_pubs, interdisc_proportion, grants2017, gender, total_coauthor_count)
+        dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2017, disc_ford, field, pubs_total, ws_pubs, interdisc_proportion, grants2017, gender, total_coauthor_count)
     
     
-    #excluding rows with missing values
-    final_data2018 <- as_tibble(na.omit(final_data2018)) #when I am using "gender" as a variable, it will delete 1100 vedidks -> maybe I dont want that? 
-    sum(is.na(final_data2018))
+    # #excluding rows with missing values
+    # final_data2018 <- as_tibble(na.omit(final_data2018)) #when I am using "gender" as a variable, it will delete 1100 vedidks -> maybe I dont want that? 
+    # sum(is.na(final_data2018))
     
     
 
@@ -1076,7 +1066,7 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
     #discipline
     
     disciplines2018 <- discipline_data %>% 
-        dplyr::select(disc_ford, vedidk, year) %>% 
+        dplyr::select(disc_ford, field, vedidk, year) %>% 
         filter(!is.na(disc_ford)) %>% 
         filter(year < 2018) %>% 
         group_by(vedidk) %>% 
@@ -1164,12 +1154,12 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
     final_data2019 <- dplyr::rename(final_data2019, pubs_total = freq)
     final_data2019$treatment_year <- as.numeric(final_data2019$treatment_year)
     final_data2019 <-  final_data2019 %>% 
-        dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2018, disc_ford, pubs_total, ws_pubs, interdisc_proportion, grants2018, gender, total_coauthor_count)
+        dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2018, disc_ford, field, pubs_total, ws_pubs, interdisc_proportion, grants2018, gender, total_coauthor_count)
     
     
-    #excluding rows with missing values
-    final_data2019 <- as_tibble(na.omit(final_data2019)) #when I am using "gender" as a variable, it will delete 1100 vedidks -> maybe I dont want that? 
-    sum(is.na(final_data2019))
+    # #excluding rows with missing values
+    # final_data2019 <- as_tibble(na.omit(final_data2019)) #when I am using "gender" as a variable, it will delete 1100 vedidks -> maybe I dont want that? 
+    # sum(is.na(final_data2019))
     
 
     
@@ -1247,7 +1237,7 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
     #discipline
     
     disciplines2019 <- discipline_data %>% 
-        dplyr::select(disc_ford, vedidk, year) %>% 
+        dplyr::select(disc_ford, field, vedidk, year) %>% 
         filter(!is.na(disc_ford)) %>% 
         filter(year < 2019) %>% 
         group_by(vedidk) %>% 
@@ -1335,12 +1325,12 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
     final_data2020 <- dplyr::rename(final_data2020, pubs_total = freq)
     final_data2020$treatment_year <- as.numeric(final_data2020$treatment_year)
     final_data2020 <-  final_data2020 %>% 
-        dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2019, disc_ford, pubs_total, ws_pubs, interdisc_proportion, grants2019, gender, total_coauthor_count)
+        dplyr::select(vedidk, treatment, treatment_year, career_start_year, lenght2019, disc_ford, field, pubs_total, ws_pubs, interdisc_proportion, grants2019, gender, total_coauthor_count)
     
     
-    #excluding rows with missing values
-    final_data2020 <- as_tibble(na.omit(final_data2020)) #when I am using "gender" as a variable, it will delete 1100 vedidks -> maybe I dont want that? 
-    sum(is.na(final_data2020))
+    # #excluding rows with missing values
+    # final_data2020 <- as_tibble(na.omit(final_data2020)) #when I am using "gender" as a variable, it will delete 1100 vedidks -> maybe I dont want that? 
+    # sum(is.na(final_data2020))
     
     
     
@@ -1373,6 +1363,20 @@ match_data_prep <- function(db_path, ids, gender, authors_arrow, cep_investigato
     final_data <- rbind2(final_data, final_data2018)
     final_data <- rbind2(final_data, final_data2019)
     final_data <- rbind2(final_data, final_data2020)
+    
+    
+    final_data$gender[final_data$vedidk == "3120899"] <- "male"
+    final_data$gender[final_data$vedidk == "3972305"] <- "female"
+    
+    
+    sup_out <- sup_control %>% filter(is.na(sup_name_first))
+    
+    final_data <- final_data %>% filter(!vedidk %in% sup_out$vedidk)
+    
+    #excluding rows with missing values
+    final_data <- as_tibble(na.omit(final_data)) #when I am using "gender" as a variable, it will delete 1100 vedidks -> maybe I dont want that?
+    sum(is.na(final_data))
+    
     
     final_data
     

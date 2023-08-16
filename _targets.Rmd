@@ -97,25 +97,35 @@ list(
       paths = here::here("data", "raw", "riv_authors.arrow"),
        mode = "wb"),
    tarchetypes::tar_download(sup_path,
-      urls = Sys.getenv("link_to_supervisors_control"),
-      paths = here::here("data", "raw", "supervisors_control_final.csv")),
+      urls = Sys.getenv("link_to_manual_sup_search"),
+      paths = here::here("data", "raw", "manual_sup_search.csv")),
+  tarchetypes::tar_download(sup_path_second,
+      urls = Sys.getenv("link_to_manual_sup_search_second"),
+      paths = here::here("data", "raw", "manual_sup_search_second.csv")),
 
   
-     # tar_target(ids_path, here::here("data", "raw", "supervisors.csv"), format = "file"),
+     # tar_target(ids_path, here::here("data", "raw", "supervisors_updated.csv"), format = "file"),
      tar_target(ids, read.csv2(ids_path)),
      # tar_target(gender_path, here::here("data", "raw", "names4api_tagged.tsv"), format = "file"),
      tar_target(gender, read.delim(gender_path)),
-     tar_target(db_path, here::here("data", "raw", "czech_sci_db.sqlite")),
-     # tar_target(authors_arrow_path, here::here("data", "raw", "authors_by_pubs.arrow")),
      tar_target(authors_arrow, arrow::read_feather(authors_arrow_path)),
-     # tar_target(text_arrow_path, here::here("data", "raw", "riv_text.arrow")),
      tar_target(text_arrow, arrow::read_feather(text_arrow_path)),
      tar_target(cep_investigators_arrow, arrow::read_feather(cep_investigators_path)),
      tar_target(cep_details_arrow, arrow::read_feather(cep_details_path)),
      tar_target(riv_details_arrow, arrow::read_feather(riv_details_path)),
      tar_target(riv_authors_arrow, arrow::read_feather(riv_authors_path)),
-     tar_target(ids_complete, create_ids_complete(ids, db_path)),
-     tar_target(ids_complete_vector, make_ids_complete_vector(ids_complete))
+     tar_target(name = db_path, 
+                command = transcribe_database(path = here::here("data",
+                                                                "raw",
+                                                                "czech_sci_db.sqlite"),
+                                              authors_arrow, 
+                                              cep_investigators_arrow,   
+                                              cep_details_arrow, 
+                                              riv_details_arrow, 
+                                              riv_authors_arrow,
+                                              text_arrow),
+                format = "file"
+                )
    
 
 )
@@ -126,26 +136,31 @@ list(
 ```{r, engine="targets", matching_preparation}
 list(
     
-      tar_target(matching_data, match_data_prep(db_path, ids, gender, authors_arrow, cep_investigators_arrow, cep_details_arrow, riv_details_arrow, riv_authors_arrow)),
-      tar_target(matched_obj_unfunded, match_obj_unfunded(matching_data)), 
-      tar_target(matched_obj_funded, match_obj_funded(db_path, authors_arrow, matching_data)),
-      tar_target(matching, match_data(matched_obj_unfunded, matched_obj_funded)),
-      # tar_target(sup_path, here::here("data", "raw", "supervisors_control_final.csv"), format = "file"),
+     # tar_target(sup_path, here::here("data", "raw", "manual_sup_search.csv"), format = "file"),
       tar_target(sup_control, read.csv2(sup_path)),
-              
-     # tar_target(sup_control, read.csv2(here::here("data", "raw", "supervisors_control.csv")),
-     #          format = "qs"),
-      tar_target(final_data, refine_data(matching, db_path, ids_complete, sup_control, authors_arrow)),
+     
+      tar_target(matching_data, match_data_prep(db_path, ids, gender, sup_control)),
+      tar_target(matched_obj_unfunded, match_obj_unfunded(matching_data)), 
+      tar_target(matched_obj_funded, match_obj_funded(db_path, matching_data)),
+      tar_target(matching, match_data(matched_obj_unfunded, matched_obj_funded)),
+     
+       # tar_target(sup_path_second, here::here("data", "raw", "manual_sup_search_second.csv"), format = "file"),
+      tar_target(sup_control_second, read.csv2(sup_path_second)),
+      tar_target(sup_complete, create_sup_complete(sup_control, sup_control_second, db_path, matching_data)),
+     tar_target(ids_complete, create_ids_complete(ids, db_path, matching_data)),
+     tar_target(ids_complete_vector, make_ids_complete_vector(ids_complete)),
+     
+      tar_target(final_data, connect_data(matching, db_path, ids_complete, sup_complete)),
                
      #at this point, I will need to manually search for the supervisors of the control group researchers and upload their vedidks into new ids file
      tar_target(ids_full_vector,
                make_ids_full_vector(matching)),
      tar_target(all_pubs,
-           get_all_pubs(db_path, final_data, authors_arrow, text_arrow)),
+           get_all_pubs(db_path, final_data)),
     tar_target(all_authors,
-           read_all_authors(db_path, ids_complete_vector, ids_complete, final_data, ids_full_vector, authors_arrow)),
+           read_all_authors(db_path, ids_complete_vector, ids_complete, final_data, ids_full_vector)),
      tar_target(random_pubs,
-           get_random_pubs(db_path, authors_arrow, text_arrow))
+           get_random_pubs(db_path))
 )
 ```
 
@@ -235,7 +250,7 @@ list(
 list(
     
     tar_target(independent_topics,
-                comp_ind_topics(independent_pubs, topic_model, db_path, authors_arrow))
+                comp_ind_topics(independent_pubs, topic_model, db_path))
 )
 
 ```

@@ -2,7 +2,9 @@
 title: "Funding programmes for early career researchers do/not influence their independence"
 author: "David Janků"
 date: "`r Sys.Date()`"
-output: html_document
+output:
+  html_document: default
+  word_document: default
 bibliography: researcher_independence.bib
 csl: apa.csl
 ---
@@ -100,13 +102,14 @@ We calculated the career age of each researcher when they received their first g
 
 *Gender*
 
-We used Genderize.io API to estimate the probability of perceived gender based on the first names of researchers. Where available, information about the nationality of researchers was included in the API call to improve accuracy.
+We used Genderize.io API to estimate the probability of perceived gender based on the first names of researchers. Where available, information about the nationality of researchers was included in the API call to improve accuracy. 
+We have also manually specified gender for 2 obrsevtation from the treatment group for which the gender was not calculated automatically. 
 
 ## Analysis
 
 We analysed the data in the R version 4.2.3. using R studio and [this code](https://github.com/david-janku/juniors). For the construction of the independence indicator, we used network modelling (maybe more specific?) and text-based topic modelling (maybe more specific??).
 
-For the construction of the control group, we implemented propensity matching using the package MatchIt (citation?) and matching exactly by the discipline (42 sub-categories of OECD classification), and approximately by number of publications in total, number of publications in WoS/Scopus, career age, interdisciplinary proportion, number of grants received prior to Junior Grant, career age when receiving the first grant and gender. All of these variables were calculated at the intervention year (i.e. year when the given researcher from experimental group received the Junior Grant). The distance was set to "mahalanobis". The matching was done in 1:1 ratio and with replacement.  
+For the construction of the control group, we implemented propensity matching using the package MatchIt (citation?) and matching exactly by the discipline (42 sub-categories of OECD classification) and treatment year, and approximately by number of publications in total, number of publications in WoS/Scopus, career age, interdisciplinary proportion, number of grants received prior to Junior Grant, career age when receiving the first grant and gender. All of these variables were calculated at the intervention year (i.e. year when the given researcher from experimental group received the Junior Grant). The distance was set to "mahalanobis". The matching was done in 1:3 ratio and with replacement. Manual search for supervisors of the matched control group observations was done by ranking the control group observation by distance from the treatment group observation and first searching for the supervisor of the closest control group observation, and if it was not possible to find it, then repeat the same for the second closest, etc... In the end each treatment observation was matched with exactly one control group observation which was closest but at the same time for which it was possible to identify their supervisor.       
 
 We have created 2 control groups: one using the matching above and one similar but specifically containing only researchers who received their first grant (other than Junior Grant) around the same career age as researchers in our intervention group. That allowed us to better track the impact of any grant funding vs specifically Junior Grants funding on researchers’ independence.
 
@@ -290,8 +293,42 @@ kable(table_before_2, digits = 3, caption = "Descriptive statistics for funded c
 
 ## Matching
 
-After matching, all standardized mean differences for the covariates were below 0.1 and all standardized mean differences for squares and two-way interactions between covariates were below .15, indicating adequate balance. __This removed XXXX cases from the experimental group, leaving us with YYY matched observations__.
+```{r echo=FALSE}
+
+removed_treatment_unfunded <- (tar_read(ids_complete) %>% distinct(vedidk) %>% nrow())-(tar_read(matching) %>% group_by(subclass) %>% filter(!any(treatment == 2)) %>%
+  ungroup() %>% filter(treatment == "1") %>% distinct(vedidk) %>% nrow()) 
+
+removed_treatment_funded <- (tar_read(ids_complete) %>% distinct(vedidk) %>% nrow())-(tar_read(matching) %>% group_by(subclass) %>% filter(!any(treatment == 0)) %>%
+  ungroup() %>% filter(treatment == "1") %>% distinct(vedidk) %>% nrow()) 
+
+unique_treatment_unfunded <- d %>% group_by(subclass) %>% filter(!any(treatment == 2)) %>% ungroup() %>% filter(treatment == "1") %>% distinct(vedidk) %>% nrow()
+
+unique_treatment_funded <- d %>% group_by(subclass) %>% filter(!any(treatment == 0)) %>%
+  ungroup() %>% filter(treatment == "1") %>% distinct(vedidk) %>% nrow()
+
+unique_control_unfunded <- d %>% filter(treatment == 0) %>% distinct(vedidk) %>% nrow()
+    
+unique_control_funded <- d %>% filter(treatment == 2) %>% distinct(vedidk) %>% nrow()
+    
+
+replaced_control_unfunded <- unique_treatment_unfunded-unique_control_unfunded 
+
+replaced_control_funded <- unique_treatment_funded-unique_control_funded 
+
+
+overlap_control <- unique_control_unfunded+unique_control_funded-(d %>% filter(treatment != 1) %>% distinct(vedidk) %>% nrow())
+
+
+```
+
+
+After matching, all standardized mean differences for the covariates were below 0.1 and all standardized mean differences for squares and two-way interactions between covariates were below .15, indicating adequate balance. 
+
+Matching process removed `r removed_treatment_unfunded` treatment observations from matching with unfunded control group and `r removed_treatment_funded` treatment observations from matching with funded control group. This observation was removed because the researchers had no publications prior to the year of application for the grant, which would make it not possible to calculate the independence score for them anyway.
+
+The resulting sample had `r unique_treatment_unfunded` unique treatment group observations paired with `r unique_control_unfunded` unique unfunded control group observations suggesting that `r replaced_control_unfunded` observations from unfunded control group were matched to multiple treatment group observations. Similarly, there were `r unique_treatment_funded` unique treatment group observations paired with `r unique_control_funded` unique funded control group observations, suggesting that `r replaced_control_funded` funded control group observations were matched to multiple treatment group observations.
  
+BTW: there is an overlap between control group observations - `r overlap_control` observations from the unfunded control group also appears in the funded control group
  
 
 ```{r echo=FALSE}
@@ -363,15 +400,15 @@ The estimated effect was XXXX (SE = XXXX, p = XXXX), indicating that the average
 
 ```{r echo=FALSE}
 
-# Run regression model with interaction term
-did_model <- plm(researcher_independence ~ independence_timing * treatment + factor(subclass), 
-                 data = tar_read(full_indicator), 
-                 index = c("subclass", "independence_timing"),
-                 model = "within")
-
-# Calculate clustered standard errors
-clustered_se <- coeftest(did_model, vcov = function(x) vcovHC(x, type = "HC1", cluster = "group"))
-print(clustered_se)
+# # Run regression model with interaction term
+# did_model <- plm(researcher_independence ~ independence_timing * treatment + factor(subclass), 
+#                  data = tar_read(full_indicator), 
+#                  index = c("subclass", "independence_timing"),
+#                  model = "within")
+# 
+# # Calculate clustered standard errors
+# clustered_se <- coeftest(did_model, vcov = function(x) vcovHC(x, type = "HC1", cluster = "group"))
+# print(clustered_se)
 
 
 ```

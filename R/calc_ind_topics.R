@@ -7,11 +7,10 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-calc_ind_topics <- function(topic_model, db_path, authors_arrow, one_author, sup_vedidk) {
+calc_ind_topics <- function(topic_model, db_path, one_author, sup_vedidk) {
 
-    authors_arrow <- as.data.frame(authors_arrow)
+    
     con <-  DBI::dbConnect(RSQLite::SQLite(), db_path)
-    dbWriteTable(con, "authors_by_pubs", authors_arrow, overwrite = TRUE)
     on.exit(DBI::dbDisconnect(con))
     
     

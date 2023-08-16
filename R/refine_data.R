@@ -10,7 +10,7 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-refine_data <- function(matching, db_path, ids_complete, sup_control, authors_arrow) {
+refine_data <- function(matching, db_path, ids_complete, sup_control) {
 
    #  ids_refined <- ids %>%
    #      select(vedoucí.vedidk, vedidk_core_researcher) %>%
@@ -71,7 +71,7 @@ refine_data <- function(matching, db_path, ids_complete, sup_control, authors_ar
         distinct() %>% 
         mutate(sup_details = furrr::future_pmap(.l = list(vedidk),
                                        .f = function(first){
-                                           read_sup(db_path, authors_arrow, 
+                                           read_sup(db_path, 
                                                     ids_full_vector = first)
                                        } ))
     

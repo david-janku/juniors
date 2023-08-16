@@ -8,14 +8,12 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-match_obj_funded <- function(db_path, authors_arrow, matching_data) {
+match_obj_funded <- function(db_path, matching_data) {
 
-    authors_arrow <- as.data.frame(authors_arrow)
+
     con <-  DBI::dbConnect(RSQLite::SQLite(), db_path)
-    dbWriteTable(con, "authors_by_pubs", authors_arrow, overwrite = TRUE)
     on.exit(DBI::dbDisconnect(con))
     
-    DBI::dbListTables(con)
     
     # setting up the set of all authors
     
@@ -121,7 +119,7 @@ match_obj_funded <- function(db_path, authors_arrow, matching_data) {
     
     
     
-    out_funded <- matchit(treatment~length+pubs_total+ws_pubs+interdisc_proportion+grants+first_grant+gender+total_coauthor_count, method="nearest", data=final_data_funded, distance = "mahalanobis", ratio = 1, exact = c("disc_ford", "treatment_year"), replace = TRUE)
+    matched_obj_funded <- matchit(treatment~length+pubs_total+ws_pubs+interdisc_proportion+grants+first_grant+gender+total_coauthor_count, method="nearest", data=final_data_funded, distance = "mahalanobis", ratio = 1, exact = c("disc_ford", "treatment_year"), replace = TRUE)
     
    
    
