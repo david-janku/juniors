@@ -8,16 +8,12 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-get_all_pubs <- function(db_path, final_data, authors_arrow, text_arrow) {
+get_all_pubs <- function(db_path, final_data) {
 
-    authors_arrow <- as.data.frame(authors_arrow)
-    text_arrow <- as.data.frame(text_arrow)
     con <-  DBI::dbConnect(RSQLite::SQLite(), db_path)
-    dbWriteTable(con, "authors_by_pubs", authors_arrow, overwrite = TRUE)
-    dbWriteTable(con, "riv_text", text_arrow, overwrite = TRUE)
     on.exit(DBI::dbDisconnect(con))
     
-    DBI::dbListTables(con)
+  
     
     final_data <- final_data %>%
     filter(!is.na(vedidk)) %>%

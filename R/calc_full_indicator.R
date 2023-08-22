@@ -56,27 +56,28 @@ calc_full_indicator <- function(independent_topics, final_data) {
     d$treatment <- as_factor(d$treatment)
     d$independence_timing <- as_factor(d$independence_timing)
     
+    d
     
     
     #some further refinements and analyses
     ##how many final RII scores is missing?
     
-    sum(is.na(d$RII))
-    
-    sum(is.na(d$RII))/nrow(d) # this suggest about 38,5 % of all RII scores are missing 
+    # sum(is.na(d$RII))
+    # 
+    # sum(is.na(d$RII))/nrow(d) # this suggest about 38,5 % of all RII scores are missing 
     
     
     ##how many of that is because given researchers didnt have any publications?
     
     
-    d <- d %>%
-        mutate(pub_table_empty = purrr::map_lgl(pub_table, function(df) {
-            if (is.data.frame(df)) {
-                return(all(is.na(df)) || nrow(df) == 0)
-            } else {
-                return(TRUE)
-            }
-        }))
+    # d <- d %>%
+    #     mutate(pub_table_empty = purrr::map_lgl(pub_table, function(df) {
+    #         if (is.data.frame(df)) {
+    #             return(all(is.na(df)) || nrow(df) == 0)
+    #         } else {
+    #             return(TRUE)
+    #         }
+    #     }))
     
     # table(d$pub_table_empty, by = d$independence_timing)
     # table(d$pub_table_empty, by = d$treatment_year)

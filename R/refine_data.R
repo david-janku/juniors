@@ -10,7 +10,7 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-refine_data <- function(matching, db_path, ids_complete, sup_control, authors_arrow) {
+refine_data <- function(matching, db_path, ids_complete, sup_control) {
 
    #  ids_refined <- ids %>%
    #      select(vedoucí.vedidk, vedidk_core_researcher) %>%
@@ -65,13 +65,13 @@ refine_data <- function(matching, db_path, ids_complete, sup_control, authors_ar
    #  # # table(d$treatment, by =d$independence_timing)
    #  
     
-    new2 <- matching[1,] %>% 
+    new2 <- matching %>% 
         filter(treatment != 1) %>% 
         dplyr::select(vedidk) %>% 
         distinct() %>% 
-        mutate(sup_details = purrr::pmap(.l = list(vedidk),
+        mutate(sup_details = furrr::future_pmap(.l = list(vedidk),
                                        .f = function(first){
-                                           read_sup(db_path, authors_arrow, 
+                                           read_sup(db_path, 
                                                     ids_full_vector = first)
                                        } ))
     
@@ -81,12 +81,16 @@ refine_data <- function(matching, db_path, ids_complete, sup_control, authors_ar
     
     ids_complete_sup <- ids_complete %>% dplyr::select(vedidk, sup_name, sup_vedidk)
     
-    new_unnested <- rbind(new_unnested, ids_complete_sup)
+    new_unnested <- bind_rows(new_unnested, ids_complete_sup)
     
     a_final_data <- left_join(matching, new_unnested, by = "vedidk") %>% 
         filter(!is.na(sup_name))
     
-    b <- a_final_data %>% filter(!vedidk %in% vedidk_treatment) %>% filter(treatment == 1)
+    b <- a_final_data %>% 
+        group_by(subclass) %>%
+        filter(n() == 1) %>%
+        ungroup() %>%
+        filter(treatment == 1)
     d <- anti_join(a_final_data, b, by = "vedidk")
     # table(d$treatment, by =d$independence_timing)
     
@@ -94,6 +98,6 @@ refine_data <- function(matching, db_path, ids_complete, sup_control, authors_ar
     aa <- anti_join(matching, d, by = "vedidk")
     bb <- left_join(aa, d)
 
-    cc <- rbind(d, bb)
+    cc <- bind_rows(d, bb)
     
 }

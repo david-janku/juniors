@@ -1,7 +1,12 @@
 ---
 title: "Funding programmes for early career researchers do/not influence their independence"
 author: "David Janků"
-output: html_document
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  word_document: default
+bibliography: researcher_independence.bib
+csl: apa.csl
 ---
 
 ```{r setup, include=FALSE}
@@ -30,7 +35,7 @@ There is also some preliminary evidence that higher indepedence modestly correla
 In recent decades, there has been a worry that researchers’ indepedence is decreasing, illustrated by increase in age at which US (biomedical) researchers received their first grant (NAS, 2005; Daniels, 2015), as well as direct measures of new reserchers becoming more depedent on their PhD advisors across almost all disciplines in Slovenia (Rojko & Lužar, 2022, table 6 on p.9). Perhaps to tackle this trend, many grant agencies decided to start awarding grants for early career researchers, usually up to 8 years after finishing their PhD. Such programmes have often explicitly stated goals of helping researchers become more indepedent, set up their own research group and open up new lines of research. The examples of such programmes could be Starting Grants by European Research Council (2022), Junior project and Junior Star by Czech Science Foundation (2020), Walter N. Benjamin Programme by DFG (2022), Innovation Research Incentives Scheme by Netherlands Organization of Scientific Research (NWO) (2021)... something from the US would be also good)
 
 
-Although researcher independence seems to be important feature that is acknowledged by many actors in the research systems and that research funders try to stimulate, there hasn’t been much effort focused on quantifying this phenomenon. Some studies try to measure independence in a simple way, as a ratio of publications the given researcher produced without their supervisor divided by the total number of publications of the given researchers (e.g. Rojko & Lužar, 2022). However, such indicator could be misleading in the world of team science, and also only focuses on collaborations, not tracking whether given researcher become independent in their thinking and research topics. Van den Besselaar & Sandström (2019) therefore proposed more complex indicator for measuring researcher independence on the individual level, based on co-authorship network and topical overlaps. Their measure uses only information about publications’ characteristics (authorship and reference list) regardless of it’s impacts, unlike other alternative measures that focus solely on the impact of the independent work in terms of received citations (Dey, et al., 2021).
+Although researcher independence seems to be important feature that is acknowledged by many actors in the research systems and that research funders try to stimulate, there hasn’t been much effort focused on quantifying this phenomenon. Some studies try to measure independence in a simple way, as a ratio of publications the given researcher produced without their supervisor divided by the total number of publications of the given researchers (e.g. Rojko & Lužar, 2022). However, such indicator could be misleading in the world of team science, and also only focuses on collaborations, not tracking whether given researcher become independent in their thinking and research topics. [@vandenbesselaarMeasuringResearcherIndependence2019] therefore proposed more complex indicator for measuring researcher independence on the individual level, based on co-authorship network and topical overlaps. Their measure uses only information about publications’ characteristics (authorship and reference list) regardless of it’s impacts, unlike other alternative measures that focus solely on the impact of the independent work in terms of received citations (Dey, et al., 2021).
 
 Since the explicit goal of many funding instruments that are being used by research funders all over the world is to help early career researchers become independent, we would like to use the newly created indicators to assess the extent, to which such programmes influence researchers independence.    
 
@@ -58,7 +63,10 @@ These researchers and their PhD advisors with their full publication history (li
 We decided to use the recently created independence indicator by Van den Besselaar & Sandström (2019), since it is based on scientific production (rather than impact) and captures the phenomena in the most complete manner. The indicator has 4 parts: I1: The eigenvector centrality of the supervisor in the researcher’s co-author network; I2: The clustering coefficient of the supervisor in the researcher’s co-author network; I3: The share of own papers of the researcher Pns/Pall where Pns is the number of publications of the researcher, not coauthored with the former supervisor(s) and Pall is the total number of publications of the researcher; and I4: The share of own research topics of the researcher Tns/Tall where Tns is the number of research topics of the researcher in which the former supervisor(s) is not active, and Tall is the total number of topics of the researcher.
 
 
-However, we have made some changes to the indicator. After consulting with its authors, we have changed the aggregation formula to RII = ((1- I1) + I2 + I3 + I4) / 4, since the previous formula had a small error (it weighted I4 double,, i.e. 2*I4). For calculating the share of own research topics of the researcher (I4), we have also not used bibliographic coupling as originally suggested, but text-based topic modelling using publication titles and abstracts. Finally, the original indicator, while tracking not only collaboration independence but also topical independence, is still skewed significantly towards collaboration independence (three-quarters of the indicator measure collaboration, while only one-quarter measures topics). Since we consider cognitive/topical independence an important asset of this indicator, we have decided to adjust the formula a bit further and drop the I3 part, to give more weight to the cognitive/topical independence in the whole indicator. Throughout this paper, we will thus refer to the original indicator as RIIo, our adjusted version as RIIa and the part of the indicator measuring only the cognitive independence RIIc.
+However, we have made some changes to the indicator. After consulting with its authors, we have changed the aggregation formula to 
+$$RII = ((1- I1) + I2 + I3 + I4) / 4$$, since the previous formula had a small error (it weighted I4 double,, i.e. 2*I4). For calculating the share of own research topics of the researcher (I4), we have also not used bibliographic coupling as originally suggested, but text-based topic modelling using publication titles and abstracts. Finally, the original indicator, while tracking not only collaboration independence but also topical independence, is still skewed significantly towards collaboration independence (three-quarters of the indicator measure collaboration, while only one-quarter measures topics). Since we consider cognitive/topical independence an important asset of this indicator, we have decided to adjust the formula a bit further and drop the I3 part, to give more weight to the cognitive/topical independence in the whole indicator. Throughout this paper, we will thus refer to the original indicator as RIIo, our adjusted version as RIIa and the part of the indicator measuring only the cognitive independence RIIc.
+
+---> popsat víc jak počítám topic model??
 
 *Career age*
 
@@ -94,13 +102,14 @@ We calculated the career age of each researcher when they received their first g
 
 *Gender*
 
-We used ??? table ??? to estimate the gender of each researcher.
+We used Genderize.io API to estimate the probability of perceived gender based on the first names of researchers. Where available, information about the nationality of researchers was included in the API call to improve accuracy. 
+We have also manually specified gender for 2 obrsevtation from the treatment group for which the gender was not calculated automatically. 
 
 ## Analysis
 
 We analysed the data in the R version 4.2.3. using R studio and [this code](https://github.com/david-janku/juniors). For the construction of the independence indicator, we used network modelling (maybe more specific?) and text-based topic modelling (maybe more specific??).
 
-For the construction of the control group, we implemented propensity matching using the package MatchIt (citation?) and matching exactly by the discipline (42 sub-categories of OECD classification), and approximately by number of publications in total, number of publications in WoS/Scopus, career age, interdisciplinary proportion, number of grants received prior to Junior Grant, career age when receiving the first grant and gender. All of these variables were calculated at the intervention year (i.e. year when the given researcher from experimental group received the Junior Grant). We set caliper to 0.2 standard deviations of the logit of the propensity score by recommendation of Rosenbaum and Rubin (1985b) and Austin (2011) to remove the cases where the distance between experimental and control group observation was too large. __This removed XXXX cases from the experimental group, leaving us with YYY matched observations__. The matching was done in 1:1 ratio and with replacement.  
+For the construction of the control group, we implemented propensity matching using the package MatchIt (citation?) and matching exactly by the discipline (42 sub-categories of OECD classification) and treatment year, and approximately by number of publications in total, number of publications in WoS/Scopus, career age, interdisciplinary proportion, number of grants received prior to Junior Grant, career age when receiving the first grant and gender. All of these variables were calculated at the intervention year (i.e. year when the given researcher from experimental group received the Junior Grant). The distance was set to "mahalanobis". The matching was done in 1:3 ratio and with replacement. Manual search for supervisors of the matched control group observations was done by ranking the control group observation by distance from the treatment group observation and first searching for the supervisor of the closest control group observation, and if it was not possible to find it, then repeat the same for the second closest, etc... In the end each treatment observation was matched with exactly one control group observation which was closest but at the same time for which it was possible to identify their supervisor.       
 
 We have created 2 control groups: one using the matching above and one similar but specifically containing only researchers who received their first grant (other than Junior Grant) around the same career age as researchers in our intervention group. That allowed us to better track the impact of any grant funding vs specifically Junior Grants funding on researchers’ independence.
 
@@ -284,40 +293,125 @@ kable(table_before_2, digits = 3, caption = "Descriptive statistics for funded c
 
 ## Matching
 
+```{r echo=FALSE}
+
+removed_treatment_unfunded <- (tar_read(ids_complete) %>% distinct(vedidk) %>% nrow())-(tar_read(matching) %>% group_by(subclass) %>% filter(!any(treatment == 2)) %>%
+  ungroup() %>% filter(treatment == "1") %>% distinct(vedidk) %>% nrow()) 
+
+removed_treatment_funded <- (tar_read(ids_complete) %>% distinct(vedidk) %>% nrow())-(tar_read(matching) %>% group_by(subclass) %>% filter(!any(treatment == 0)) %>%
+  ungroup() %>% filter(treatment == "1") %>% distinct(vedidk) %>% nrow()) 
+
+unique_treatment_unfunded <- d %>% group_by(subclass) %>% filter(!any(treatment == 2)) %>% ungroup() %>% filter(treatment == "1") %>% distinct(vedidk) %>% nrow()
+
+unique_treatment_funded <- d %>% group_by(subclass) %>% filter(!any(treatment == 0)) %>%
+  ungroup() %>% filter(treatment == "1") %>% distinct(vedidk) %>% nrow()
+
+unique_control_unfunded <- d %>% filter(treatment == 0) %>% distinct(vedidk) %>% nrow()
+    
+unique_control_funded <- d %>% filter(treatment == 2) %>% distinct(vedidk) %>% nrow()
+    
+
+replaced_control_unfunded <- unique_treatment_unfunded-unique_control_unfunded 
+
+replaced_control_funded <- unique_treatment_funded-unique_control_funded 
+
+
+overlap_control <- unique_control_unfunded+unique_control_funded-(d %>% filter(treatment != 1) %>% distinct(vedidk) %>% nrow())
+
+
+```
+
+
+After matching, all standardized mean differences for the covariates were below 0.1 and all standardized mean differences for squares and two-way interactions between covariates were below .15, indicating adequate balance. 
+
+Matching process removed `r removed_treatment_unfunded` treatment observations from matching with unfunded control group and `r removed_treatment_funded` treatment observations from matching with funded control group. This observation was removed because the researchers had no publications prior to the year of application for the grant, which would make it not possible to calculate the independence score for them anyway.
+
+The resulting sample had `r unique_treatment_unfunded` unique treatment group observations paired with `r unique_control_unfunded` unique unfunded control group observations suggesting that `r replaced_control_unfunded` observations from unfunded control group were matched to multiple treatment group observations. Similarly, there were `r unique_treatment_funded` unique treatment group observations paired with `r unique_control_funded` unique funded control group observations, suggesting that `r replaced_control_funded` funded control group observations were matched to multiple treatment group observations.
+ 
+BTW: there is an overlap between control group observations - `r overlap_control` observations from the unfunded control group also appears in the funded control group
+ 
 
 ```{r echo=FALSE}
-# Create a subset for treatment group and control group 1
-subset_1 <- (tar_read(matching)) %>% filter(treatment != 2)
-subset_2 <- (tar_read(matching)) %>% filter(treatment != 0)
+# # Create a subset for treatment group and control group 1
+# subset_1 <- (tar_read(matching)) %>% filter(treatment != 2)
+# subset_2 <- (tar_read(matching)) %>% filter(treatment != 0)
+# 
+# # Generate balance table for treatment vs control group 1
+# balance_results_1 <- bal.tab(treatment ~ career_lenght + pubs_total + ws_pubs + interdisc_proportion + grants + gender, data = subset_1, disp = c("mean", "std"))
+# balance_results_2 <- bal.tab(treatment ~ career_lenght + pubs_total + ws_pubs + interdisc_proportion + grants + gender, data = subset_2, disp = c("mean", "std"))
+# 
+# # Define a function to manually extract balance statistics from bal.tab object
+# extract_balance_stats <- function(bal_results) {
+#   covariates <- rownames(bal_results$Balance)
+#   means_treat <- bal_results$Balance$`M.1.Un`
+#   means_ctrl <- bal_results$Balance$`M.0.Un`
+#   diff <- bal_results$Balance$`Diff.Un`
+#   
+#   data.frame(Covariate = covariates, 
+#              Mean_Treatment = means_treat, 
+#              Mean_Control = means_ctrl, 
+#              Diff = diff)
+# }
+# 
+# # Extract balance stats for subset_1 and subset_2
+# balance_stats_1 <- extract_balance_stats(balance_results_1)
+# balance_stats_2 <- extract_balance_stats(balance_results_2)
+# 
+# # Print tables in R Markdown
+# knitr::kable(balance_stats_1, caption = "Balance Statistics: Treatment vs Control Group 1") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+# knitr::kable(balance_stats_2, caption = "Balance Statistics: Treatment vs Control Group 2") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
-# Generate balance table for treatment vs control group 1
-balance_results_1 <- bal.tab(treatment ~ career_lenght + pubs_total + ws_pubs + interdisc_proportion + grants + gender, data = subset_1, disp = c("mean", "std"))
-balance_results_2 <- bal.tab(treatment ~ career_lenght + pubs_total + ws_pubs + interdisc_proportion + grants + gender, data = subset_2, disp = c("mean", "std"))
 
-# Define a function to manually extract balance statistics from bal.tab object
-extract_balance_stats <- function(bal_results) {
-  covariates <- rownames(bal_results$Balance)
-  means_treat <- bal_results$Balance$`M.1.Un`
-  means_ctrl <- bal_results$Balance$`M.0.Un`
-  diff <- bal_results$Balance$`Diff.Un`
-  
-  data.frame(Covariate = covariates, 
-             Mean_Treatment = means_treat, 
-             Mean_Control = means_ctrl, 
-             Diff = diff)
-}
 
-# Extract balance stats for subset_1 and subset_2
-balance_stats_1 <- extract_balance_stats(balance_results_1)
-balance_stats_2 <- extract_balance_stats(balance_results_2)
 
-# Print tables in R Markdown
-knitr::kable(balance_stats_1, caption = "Balance Statistics: Treatment vs Control Group 1") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
-knitr::kable(balance_stats_2, caption = "Balance Statistics: Treatment vs Control Group 2") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+unf_sum <- summary(tar_read(matched_obj_unfunded), un = TRUE)
+
+summary(tar_read(matched_obj_unfunded))
+    
+plot(unf_sum, var.order = "unmatched")
+
+
+cobalt::bal.tab(tar_read(matched_obj_unfunded), un = FALSE, stats = c("m", "v", "ks"), binary = "std")
+
+cobalt::love.plot(tar_read(matched_obj_unfunded), binary = "std", var.order = "adjusted")
+
+
+
+
+
+fun_sum <- summary(tar_read(matched_obj_funded), un = TRUE)
+
+summary(tar_read(matched_obj_funded))
+    
+plot(fun_sum, var.order = "unmatched")
+
+
+
+
 
 ```
 
 ## Main results
+
+
+To estimate the treatment effect and its standard error, we fit a linear regression model with 1978 earnings as the outcome and the treatment, covariates, and their interaction as predictors and included the full matching weights in the estimation. The lm() function was used to fit the outcome, and the comparisons() function in the marginaleffects package was used to perform g-computation in the matched sample to estimate the ATT. A cluster-robust variance was used to estimate its standard error with matching stratum membership as the clustering variable.
+
+The estimated effect was XXXX (SE = XXXX, p = XXXX), indicating that the average effect of the treatment for those who received it is to increase earnings.
+
+```{r echo=FALSE}
+
+# # Run regression model with interaction term
+# did_model <- plm(researcher_independence ~ independence_timing * treatment + factor(subclass), 
+#                  data = tar_read(full_indicator), 
+#                  index = c("subclass", "independence_timing"),
+#                  model = "within")
+# 
+# # Calculate clustered standard errors
+# clustered_se <- coeftest(did_model, vcov = function(x) vcovHC(x, type = "HC1", cluster = "group"))
+# print(clustered_se)
+
+
+```
 
 
 ### Before intervention
@@ -531,4 +625,8 @@ In the treatment group of `r nrow(tar_read(ids_complete))`researchers,  118 (49 
 In the control groups, we have manually found supervisors for `r nrow(tar_read(sup_control) %>% filter(!is.na(sup_vedidk)) %>% distinct(name_first, name_last))` researchers, and when we compared them to the supervisors suggested by the most frequent coauthor algorithm, we found that 41 (29 %) had their most frequent co-author the same as their supervisor, 80 (57 %) had someone other than their supervisor as their most frequent co-author in their first 5 publications, and 20 (14 %) had no co-author in their first 5 publications.
 
 Further, we have conducted analysis on an independent sample of researchers from Slovenia (citace Luzar??), and found that  when we filter out all researchers who have not had any publication 4 years prior to their PhD defense (1135, approx 9,5% of the sample), we see that from the remaining researchers, about 50,3 % had their supervisor as the most frequent coauthor in the 4 years prior to their PhD defense.
+
+
+
+# References
 
