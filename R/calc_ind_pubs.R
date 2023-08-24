@@ -43,7 +43,7 @@ calc_ind_pubs <- function(one_author, sup_name) {
         filter(id_helper == c) %>% 
         select(id_unique)
     
-    ind_pubs <- anti_join(all_pubs_author, sup_pubs)
+    ind_pubs <- anti_join(all_pubs_author, sup_pubs, by = "id_unique")
        
     rpubs = nrow(ind_pubs)/nrow(all_pubs_author)
     

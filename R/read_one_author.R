@@ -77,7 +77,8 @@ read_one_author <- function(db_path, ids_complete_vector, ids_complete, matching
       mutate(vedidk = one_vedidk_filtered_pubs$vedidk[1]) %>% 
       # mutate(vedouci = sup_name) %>% 
       #mutate(discipline = discipline)
-      as_tibble()
+      as_tibble() %>% 
+      distinct()
   
   if(nrow(one_vedidk_coauthors)==0){tibble(id_unique = NA, id_helper = NA, year = NA, vedidk = NA, treatment_year = NA, independence_timing = NA)}else(one_vedidk_coauthors)
   

@@ -122,16 +122,15 @@ The difference between groups was tested using paired t-test and subsequent diff
 ### Missing data
 ```{r echo=FALSE}
 d <- tar_read(full_indicator)
-d$disc_ford <- substring(d$disc_ford, 0, 1)
 d$disc_ford <- as.factor(d$disc_ford)
 
 na_counts <- sum(is.na(d$RII))
 na_percentage <- round((na_counts / nrow(d))*100, 1)
 
 na_sup <- round((sum(is.na(d$sup_name))/na_counts)*100, 1)
-na_pubs <- round((nrow(d %>% filter(!is.na(sup_name)) %>% filter(pub_table_empty == TRUE))/na_counts)*100, 1)
+na_pubs <- round((nrow(d %>% filter(!is.na(sup_name)) %>% filter(is.na(pubs_number)))/na_counts)*100, 1)
 
-na_pubs_after <- round((nrow(d %>% filter(!is.na(sup_name)) %>% filter(pub_table_empty == TRUE) %>% filter(independence_timing == "after_intervention"))/nrow(d %>% filter(!is.na(sup_name)) %>% filter(pub_table_empty == TRUE)))*100, 1)
+na_pubs_after <- round((nrow(d %>% filter(!is.na(sup_name)) %>% filter(is.na(pubs_number)) %>% filter(independence_timing == "after_intervention"))/nrow(d %>% filter(!is.na(sup_name)) %>% filter(is.na(pubs_number))))*100, 1)
 
 na_treatment <- nrow(d %>% filter(is.na(RII)) %>% filter(treatment == 1))
 na_control1 <- nrow(d %>% filter(is.na(RII)) %>% filter(treatment == 0))

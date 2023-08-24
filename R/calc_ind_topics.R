@@ -35,7 +35,16 @@ calc_ind_topics <- function(topic_model, db_path, one_author, sup_vedidk) {
     
     all_pubs_author$id_unique <- as.character(all_pubs_author$id_unique)
     
-    author_pubs_topics <- as_tibble(cbind(id_unique = names(topic_model), t(topic_model))) 
+    # author_pubs_topics <- as_tibble(cbind(id_unique = names(topic_model), t(topic_model))) 
+    
+    author_pubs_topics <- 
+        tibble::enframe(names(topic_model), name = NULL, value = "id_unique") |> 
+        bind_cols(
+            as_tibble(
+                t(topic_model),
+                .name_repair = function(x) paste0("topic_", seq_along(x))
+            )
+        )
        
     author_pubs_tp <- semi_join(author_pubs_topics, all_pubs_author, by = "id_unique") 
 
@@ -62,9 +71,7 @@ calc_ind_topics <- function(topic_model, db_path, one_author, sup_vedidk) {
             
     sup_vedidk <- sup_vedidk
     
-    con <-  DBI::dbConnect(RSQLite::SQLite(), db_path)
-    on.exit(DBI::dbDisconnect(con))
-    
+   
     sup_pubids <- dplyr::tbl(con, "authors_by_pubs") %>% #colnames()
         filter(vedidk == sup_vedidk) %>% 
         select(id_unique) %>% 
@@ -97,9 +104,14 @@ calc_ind_topics <- function(topic_model, db_path, one_author, sup_vedidk) {
     topic_model$sup_topic <- tidyr::replace_na(topic_model$sup_topic, 0)
     topic_model$author_topic <- tidyr::replace_na(topic_model$author_topic, 0)
     
+    
+    DBI::dbDisconnect(con)
+    
     topic_independence_categories = sum(ifelse(topic_model$author_topic>topic_model$sup_topic, 1, 0))/(sum(topic_model$author_topic))
     
     # table <- tibble(vedidk = vedidk_researcher, ind_topics = topic_independence_categories)
+    
+    
     
     
     # #alternativni zpusob vypoctu

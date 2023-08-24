@@ -137,7 +137,7 @@ list(
 list(
     
      # tar_target(sup_path, here::here("data", "raw", "manual_sup_search.csv"), format = "file"),
-      tar_target(sup_control, read.csv2(sup_path)),
+      tar_target(sup_control, read.csv(sup_path)),
      
       tar_target(matching_data, match_data_prep(db_path, ids, gender, sup_control)),
       tar_target(matched_obj_unfunded, match_obj_unfunded(matching_data)), 
@@ -145,7 +145,7 @@ list(
       tar_target(matching, match_data(matched_obj_unfunded, matched_obj_funded)),
      
        # tar_target(sup_path_second, here::here("data", "raw", "manual_sup_search_second.csv"), format = "file"),
-      tar_target(sup_control_second, read.csv2(sup_path_second)),
+      tar_target(sup_control_second, read.csv(sup_path_second)),
       tar_target(sup_complete, create_sup_complete(sup_control, sup_control_second, db_path, matching_data)),
      tar_target(ids_complete, create_ids_complete(ids, db_path, matching_data)),
      tar_target(ids_complete_vector, make_ids_complete_vector(ids_complete)),

@@ -57,12 +57,12 @@ manual_sup_search <- manual_sup_search %>%
 
 
 
-sup_control <- read.csv2(here::here("data", "raw", "supervisors_control_final.csv")) 
-sup_control <- sup_control %>% filter(!is.na(sup_vedidk)) %>% dplyr::select(vedidk, sup_name_first, sup_name_last, sup_vedidk, sec_sup_name_first, sec_sup_name_last, sec_sup_vedidk)
-sup_control$vedidk <- as.character(sup_control$vedidk)
+sup_control2 <- read.csv2(here::here("data", "raw", "supervisors_control_final.csv")) 
+sup_control2 <- sup_control2 %>% filter(!is.na(sup_vedidk)) %>% dplyr::select(vedidk, sup_name_first, sup_name_last, sup_vedidk, sec_sup_name_first, sec_sup_name_last, sec_sup_vedidk)
+sup_control2$vedidk <- as.character(sup_control2$vedidk)
 
 
-manual_sup_search <- left_join(manual_sup_search, sup_control, by = "vedidk")
+manual_sup_search <- left_join(manual_sup_search, sup_control2, by = "vedidk")
 
 
 extra_search_sup <- anti_join(manual_sup_search, sup_control, by = "vedidk")
@@ -103,103 +103,87 @@ extra_search_sup_second <- anti_join(extra_search_sup, sup_complete, by = "vedid
 
 
 
+## extra ids search
 
-# kteří superrvisors neměli se svými studenty ani jednu publikaci? -- na ty se podívát více do hloubky
+ids_complete <- ids_complete %>% filter(!is.na(sup_name)) %>%  dplyr::select(vedidk)
 
-sup_vedidk <- dplyr::tbl(con, "authors_by_pubs") %>% 
-    dplyr::select(name_first, name_last, id_helper, vedidk) %>% 
+ids <- ids %>% mutate(across(everything(), ~replace(., . == "", NA))) %>% filter(!is.na(vedidk_core_researcher))
+
+ids$vedidk_core_researcher <- as.character(ids$vedidk_core_researcher)
+
+ids_in <- anti_join(ids, ids_complete, by = c("vedidk_core_researcher" = "vedidk")) %>% filter(statni.prislusnost == "CZ") %>% dplyr::select(vedidk_core_researcher) %>% rename(vedidk = vedidk_core_researcher) %>% distinct()
+
+con <-  DBI::dbConnect(RSQLite::SQLite(), db_path)
+on.exit(DBI::dbDisconnect(con))
+
+
+all_auth <- dplyr::tbl(con, "authors_by_pubs") %>% #colnames()
+    dplyr::select(vedidk, id_unique, name_first, name_last, org_name) %>% 
     distinct() %>% 
-    collect()
+    dplyr::collect() %>% 
+    as_tibble()
 
-sup_vedidk <- left_join(sup_complete, sup_vedidk, by = c("sup_name_first" = "name_first", "sup_name_last" = "name_last"))
+discipline_pubs <- DBI::dbReadTable(con, "riv_disc") %>%  #colnames()
+    dplyr::select(id_unique, pub_type, ford, field, year) %>%
+    filter(pub_type %in% c("J","B","C","D")) %>%
+    # tidyr::unite(disc_ford, c(disc, ford), na.rm = TRUE) %>%
+    as_tibble()
 
+discipline_pubs <- dplyr::rename(discipline_pubs, disc_ford = ford)
 
-# Assuming you've loaded the authors_by_pubs into a regular dataframe
-authors_by_pubs_df <- dplyr::tbl(con, "authors_by_pubs") %>%
-    dplyr::select(id_unique, name_first, name_last, vedidk, id_helper) %>% 
-        collect()
+discipline_data <- left_join(discipline_pubs, all_auth, by = "id_unique") %>% 
+    distinct() 
 
-# Check for common id_unique for each row of non_unique_rows
-has_common_id_unique <- apply(sup_vedidk, 1, function(row) {
-    id_unique_for_vedidk_x <- authors_by_pubs_df$id_unique[authors_by_pubs_df$vedidk == row["vedidk.x"]]
-    id_unique_for_vedidk_y <- authors_by_pubs_df$id_unique[authors_by_pubs_df$vedidk == row["vedidk.y"]]
-
-    length(intersect(id_unique_for_vedidk_x, id_unique_for_vedidk_y)) > 0
-})
-
-# Filter rows based on the result
-coauth <- sup_vedidk[has_common_id_unique, ]
+discipline_data$disc_ford <- as.character(discipline_data$disc_ford)
 
 
-
-no_coauth <- anti_join(sup_vedidk, coauth, by = "vedidk.x")
-# ---> we need to disambiguate these further -> perhaps based on sup discipline and sup institution?
-
-no_coauth <- left_join(no_coauth, matching_data %>% dplyr::select(vedidk, disc_ford), by = c("vedidk.y" = "vedidk")) %>% 
-    distinct()
+plyr::count(discipline_data$disc_ford) 
 
 
-
-non_unique_rows2 <- coauth %>%
-    group_by(vedidk.x) %>%
-    filter(n() > 1) %>%
-    ungroup()   #this table tells us that there are 2 cases in which the researchers has published with more than 1 person who has the same name as the supervisor
-
-
-
-# supervisors matching
-
-sup_unique_rows <- sup_vedidk %>%
-    group_by(vedidk.x) %>%
-    filter(n() == 1) %>%
-    ungroup()
-
-sup_non_unique_rows <- sup_vedidk %>%
-    group_by(vedidk.x) %>%
-    filter(n() > 1) %>%
-    ungroup()
+disciplines <- discipline_data %>% 
+    dplyr::select(disc_ford, field, vedidk, year, org_name) %>% 
+    filter(!is.na(disc_ford)) %>% 
+    group_by(vedidk) %>% 
+    slice(which.max(table(disc_ford))) %>% 
+    ungroup() 
 
 
-# Check for common id_unique for each row of non_unique_rows
-has_common_id_unique <- apply(sup_non_unique_rows, 1, function(row) {
-    id_unique_for_vedidk_x <- authors_by_pubs_df$id_unique[authors_by_pubs_df$vedidk == row["vedidk.x"]]
-    id_unique_for_vedidk_y <- authors_by_pubs_df$id_unique[authors_by_pubs_df$vedidk == row["vedidk.y"]]
-    
-    length(intersect(id_unique_for_vedidk_x, id_unique_for_vedidk_y)) > 0
-})
+ids_in <- left_join(ids_in, disciplines %>% dplyr::select(vedidk, disc_ford) %>% distinct(), by = "vedidk")
 
-# Filter rows based on the result
-sup_coauth_rest <- sup_non_unique_rows[has_common_id_unique, ]
-
-sup_total <- rbind(sup_unique_rows, sup_coauth_rest) #this show we were able to match 223 out of 247 supervisors vedidks
+inspect <- ids_in %>% filter(is.na(disc_ford)) #these are vedidks that didnt have any discipline in RIV, suggesting they didnt have any publication in RIV --> incorrect vedidks in CEP
 
 
+career_start <- discipline_data %>% 
+    group_by(vedidk) %>% 
+    slice(which.min(year)) %>% 
+    ungroup() 
+
+ids_sup_search <- left_join(ids_in, career_start %>% dplyr::select(vedidk, name_first, name_last, org_name), by = "vedidk")
+
+ids_sup_search <- ids_sup_search %>% 
+    mutate(theses =
+               paste0("https://theses.cz/vyhledavani/?search=",
+                      name_first, "+", name_last, "+disertační+práce"))
 
 
-# non_unique_rows$vedidk.y <- as.character(non_unique_rows$vedidk.y)
-# non_unique_rows$vedidk.x <- as.character(non_unique_rows$vedidk.x)
+ids_sup_search <- ids_sup_search %>% 
+    mutate(dspace_cuni =
+               paste0("https://dspace.cuni.cz/discover?filtertype_1=author&filter_relational_operator_1=contains&filter_1=",
+                      name_last, "%2C+", name_first))
 
 
+ids_sup_search <- ids_sup_search %>% 
+    mutate(google =
+               paste0("https://www.google.com/search?q=",
+                      name_first, "+", name_last, "+disertační+práce"))
 
 
+ids_sup_search$sup_name_first <- NA
+ids_sup_search$sup_name_last <- NA
+ids_sup_search$dis_link <- NA
+ids_sup_search$sec_sup_name_first <- NA
+ids_sup_search$sec_sup_name_last <- NA
 
-
-
-# control_id <-  sup_control$sup_vedidk
-# sup_names <- dplyr::tbl(con, "authors_by_pubs") %>% # colnames()
-#     dplyr::select(id_helper, vedidk) %>% 
-#     filter(vedidk %in% control_id) %>% 
-#     dplyr::rename(sup_name = id_helper) %>%
-#     dplyr::rename(sup_vedidk = vedidk) %>%
-#     dplyr::collect() %>% 
-#     distinct() #tady ideálně ještě přidat část kódu která říká "pokud je tam nějaký vedidk více než jednou, vyber jeho nejčastější sup_name -> v našem vzorku ale není žádný vedidk více než jednou, takže ok
-# 
-# sup_control <- left_join(sup_control, sup_names, by = "sup_vedidk")
-
-sup_control$vedidk <- as.character(sup_control$vedidk)
-
-sup_control
-
-
+# write.csv2(ids_sup_search, file = here::here("data", "derived", "ids_sup_search.csv"))
 
 }

@@ -379,6 +379,7 @@ match_data_prep <- function(db_path, ids, gender, sup_control) {
     treatment_group <- left_join(treatment_group, nationality)
     
     ids_with_sup <- as_tibble(ids) %>% 
+        mutate(across(everything(), ~replace(., . == "", NA))) %>% 
         filter(!is.na(sup_name_first)) %>%
         filter(!is.na(vedidk_core_researcher))
     
