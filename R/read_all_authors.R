@@ -11,8 +11,7 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-read_all_authors <- function(db_path, ids_complete_vector, ids_complete,
-                             final_data, ids_full_vector) {
+read_all_authors <- function(db_path, ids_complete, final_data) {
 
 final_data <- final_data %>% 
      filter(!is.na(sup_name))
@@ -26,7 +25,7 @@ new <-  matching %>%
         distinct() %>% 
         mutate(pub_table = furrr::future_pmap(.l = list(vedidk, treatment_year, independence_timing),
                                        .f = function(first, second, third){
-                                           read_one_author(db_path, ids_complete_vector, ids_complete, matching,
+                                           read_one_author(db_path, ids_complete, matching,
                                                                  ids_full_vector = first, intervention_year = second, timing = third)
                                        } ))
 

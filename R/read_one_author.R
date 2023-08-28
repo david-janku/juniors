@@ -8,7 +8,7 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-read_one_author <- function(db_path, ids_complete_vector, ids_complete, matching, ids_full_vector, intervention_year, timing) {
+read_one_author <- function(db_path, ids_complete, matching, ids_full_vector, intervention_year, timing) {
 
     con <-  DBI::dbConnect(RSQLite::SQLite(), db_path)
     on.exit(DBI::dbDisconnect(con))

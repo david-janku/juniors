@@ -62,6 +62,8 @@ lapply(list.files(here::here("R"), full.names = TRUE), source)
 
 # Data import
 
+Here we import all the data we work with. Data are stored on a cloud from where we download it. 
+
 ```{r, engine="targets", data_import}
 list(
     
@@ -125,46 +127,61 @@ list(
                                               riv_authors_arrow,
                                               text_arrow),
                 format = "file"
-                )
+                ),
+     tar_target(sup_control, read.csv(sup_path)),
+     tar_target(sup_control_second, read.csv(sup_path_second))
    
 
 )
 ```
 
-# Matching and data preparation 
+# Matching
 
-```{r, engine="targets", matching_preparation}
+Here we perform construction of control groups via mahalanobis distance matching. There are 2 control groups: funded, and unfunded, which have separate matching procedures, but later are combined into one dataset (target "matching") so it is easier to work with.  
+
+
+```{r, engine="targets", matching}
 list(
-    
-     # tar_target(sup_path, here::here("data", "raw", "manual_sup_search.csv"), format = "file"),
-      tar_target(sup_control, read.csv(sup_path)),
      
       tar_target(matching_data, match_data_prep(db_path, ids, gender, sup_control)),
       tar_target(matched_obj_unfunded, match_obj_unfunded(matching_data)), 
       tar_target(matched_obj_funded, match_obj_funded(db_path, matching_data)),
-      tar_target(matching, match_data(matched_obj_unfunded, matched_obj_funded)),
+      tar_target(matching, match_data(matched_obj_unfunded, matched_obj_funded))
      
-       # tar_target(sup_path_second, here::here("data", "raw", "manual_sup_search_second.csv"), format = "file"),
-      tar_target(sup_control_second, read.csv(sup_path_second)),
-      tar_target(sup_complete, create_sup_complete(sup_control, sup_control_second, db_path, matching_data)),
+     
+)
+```
+
+# Data preparation
+
+Here we perform author disambiguation of the manually collected names of supervisors ("sup_complete", "ids_complete") and combine these into final dataset including list of publications for each observation (in the target "all_authors").
+
+Further, we prepare the data for the construction of topic models in the targets "all_pubs" and "random_pubs".
+
+
+```{r, engine="targets", data_prep}
+list(
+
+ tar_target(sup_complete, create_sup_complete(sup_control, sup_control_second, db_path, matching_data)),
      tar_target(ids_complete, create_ids_complete(ids, db_path, matching_data)),
-     tar_target(ids_complete_vector, make_ids_complete_vector(ids_complete)),
-     
       tar_target(final_data, connect_data(matching, db_path, ids_complete, sup_complete)),
                
-     #at this point, I will need to manually search for the supervisors of the control group researchers and upload their vedidks into new ids file
-     tar_target(ids_full_vector,
-               make_ids_full_vector(matching)),
+      tar_target(all_authors,
+           read_all_authors(db_path, ids_complete, final_data)),
+     
+ 
      tar_target(all_pubs,
            get_all_pubs(db_path, final_data)),
-    tar_target(all_authors,
-           read_all_authors(db_path, ids_complete_vector, ids_complete, final_data, ids_full_vector)),
      tar_target(random_pubs,
            get_random_pubs(db_path))
+
 )
 ```
 
 # Topic model
+
+Here we construct a smaller topic model based on the randomly selected 1200 publications ("topic_model_original") from the full database of all Czech publications. Then we take all publications of the researchers in our sample (both treatment group and control groups, target "topic_model_input_addition") and match it onto the existing topic model ("topic_model"). This way we limit the endogeneity of the topic model, compared to if we calculated the topic model based only on the publications of our sample researchers.
+
 
 ```{r, engine="targets", topic_model}
 list(
@@ -189,6 +206,8 @@ list(
 
 # Coauthorship network
 
+Here we construct coauthorship network for each observation in our sample, which is a precursor from which 2 parts of the independence indicator are calculated.   
+
 ```{r, engine="targets", network}
 
 list(
@@ -206,6 +225,8 @@ list(
 
 # Researcher independence indicator (RII) part 1 - eigenvector centrality
 
+Here we calculate first part of the independence indicator: eigenvector centrality of the PhD supervisors in the author's network.
+
 ```{r, engine="targets", RII1}
 
 list(
@@ -218,6 +239,8 @@ list(
 ```
 
 # Researcher independence indicator (RII) part 2 - clustering coefficient
+
+Here we calculate second part of the independence indicator: clustering coefficient of the PhD supervisors in the author's network.
 
 ```{r, engine="targets", RII2}
 
@@ -233,6 +256,8 @@ list(
 
 # Researcher independence indicator (RII) part 3 - independent publications
 
+Here we calculate third part of the independence indicator: ratio of publications without coauthorship with the author's PhD supervisor.
+
 ```{r, engine="targets", RII3}
 
 list(
@@ -245,6 +270,9 @@ list(
 
 # Researcher independence indicator (RII) part 4 - independent topics
 
+Here we calculate fourth part of the independence indicator: ratio of topics that the author publishes on that their PhD supervisor does not publish on.
+
+
 ```{r, engine="targets", RII4}
 
 list(
@@ -255,21 +283,10 @@ list(
 
 ```
 
-# Researcher independence indicator (RII) part 4 - independent topics: alternative way via cosine similarity
-
-```{r, engine="targets", RII4_2}
-
-list(
-    
-    # tar_target(ind_topics_cs,
-    #            calc_cos_sim(topic_model, two_authors), 
-    #            format = "qs")
-    # 
-)
-
-```
 
 # Final indicator
+
+Here we construct the final independence indicator using the parts calculated above.  
 
 ```{r, engine="targets", final}
 
@@ -287,7 +304,10 @@ list(
 
 
 ```
+
 # Article
+
+Here is the paper presenting results. It also contains code for figures, hypothesis testing, etc.. 
 
 ```{targets article}
 list(
@@ -305,4 +325,3 @@ list(
 
 ```
 
-etc... rinse and repeat
