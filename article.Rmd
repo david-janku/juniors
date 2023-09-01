@@ -19,6 +19,12 @@ library(knitr)
 library(psych)
 library(kableExtra)
 library(ggplot2)
+library(lme4)
+library(lmerTest)
+library(MuMIn)
+library(ez)
+library(plm)
+
 ```
 
 # Intro
@@ -136,25 +142,25 @@ na_treatment <- nrow(d %>% filter(is.na(RII)) %>% filter(treatment == 1))
 na_control1 <- nrow(d %>% filter(is.na(RII)) %>% filter(treatment == 0))
 na_control2 <- nrow(d %>% filter(is.na(RII)) %>% filter(treatment == 2))
 
-s <- d %>% filter(is.na(RII))
-                  
-f_after <- d %>% filter(!is.na(RII)) %>% filter(independence_timing == "after_intervention") 
-f_before <- d %>% filter(!is.na(RII)) %>% filter(independence_timing == "before_intervention") 
-
-
-v_after <- c(f_after$vedidk[f_after$treatment == 1 ], NA)
-v_before <- c(f_before$vedidk[f_before$treatment == 1 ], NA)
-
-r_after <- f_after %>% filter(vedidk_treatment %in% v_after)
-r_before <- f_before %>% filter(vedidk_treatment %in% v_before)
-
-
-
-v_after_control <- c(r_after$vedidk[r_after$treatment != 1 ], r_after$vedidk_treatment)
-v_before_control <- c(r_before$vedidk[r_before$treatment != 1 ], r_before$vedidk_treatment)
-
-r_after_final <- r_after %>% filter(vedidk %in% v_after_control)
-r_before_final <- r_before %>% filter(vedidk %in% v_before_control)
+# s <- d %>% filter(is.na(RII))
+#                   
+# f_after <- d %>% filter(!is.na(RII)) %>% filter(independence_timing == "after_intervention") 
+# f_before <- d %>% filter(!is.na(RII)) %>% filter(independence_timing == "before_intervention") 
+# 
+# 
+# v_after <- c(f_after$vedidk[f_after$treatment == 1 ], NA)
+# v_before <- c(f_before$vedidk[f_before$treatment == 1 ], NA)
+# 
+# r_after <- f_after %>% filter(vedidk_treatment %in% v_after)
+# r_before <- f_before %>% filter(vedidk_treatment %in% v_before)
+# 
+# 
+# 
+# v_after_control <- c(r_after$vedidk[r_after$treatment != 1 ], r_after$vedidk_treatment)
+# v_before_control <- c(r_before$vedidk[r_before$treatment != 1 ], r_before$vedidk_treatment)
+# 
+# r_after_final <- r_after %>% filter(vedidk %in% v_after_control)
+# r_before_final <- r_before %>% filter(vedidk %in% v_before_control)
 
 
 # r_test <- r_after %>% filter(treatment != 2)
@@ -162,21 +168,39 @@ r_before_final <- r_before %>% filter(vedidk %in% v_before_control)
 # r_test_final <- r_test %>% filter(vedidk %in% v_after_test)
 
 
-final_before_control1 <- nrow(r_before_final %>% filter(treatment == 0)) 
-final_before_control2 <- nrow(r_before_final %>% filter(treatment == 2))
+# final_before_control1 <- nrow(r_before_final %>% filter(treatment == 0)) 
+# final_before_control2 <- nrow(r_before_final %>% filter(treatment == 2))
+# 
+# 
+# final_after_control1 <- nrow(r_after_final %>% filter(treatment == 0)) 
+# final_after_control2 <- nrow(r_after_final %>% filter(treatment == 2))
 
 
-final_after_control1 <- nrow(r_after_final %>% filter(treatment == 0)) 
-final_after_control2 <- nrow(r_after_final %>% filter(treatment == 2))
+# a <- intersect(
+#     r_after_final$vedidk,
+#     r_before_final$vedidk
+# )
+# 
+# 
+# all <- rbind(r_before_final, r_after_final) %>% filter(vedidk %in% a)
 
 
-a <- intersect(
-    r_after_final$vedidk,
-    r_before_final$vedidk
-)
+filtered_by_subclass <- d %>%
+     group_by(subclass, independence_timing) %>%
+     filter(!any(is.na(RII))) %>%
+     ungroup()
+
+filtered_subclass <- nrow(filtered_by_subclass %>% distinct(subclass))
+subclass_all <- nrow(d %>% distinct(subclass))
+filtered_subclass_perc <- round((filtered_subclass/subclass_all)*100, 1)
 
 
-all <- rbind(r_before_final, r_after_final) %>% filter(vedidk %in% a)
+final_before_control1 <- nrow(filtered_by_subclass %>% filter(independence_timing == "before_intervention") %>% filter(treatment == 0))
+final_before_control2 <- nrow(filtered_by_subclass %>% filter(independence_timing == "before_intervention") %>% filter(treatment == 2))
+
+final_after_control1 <- nrow(filtered_by_subclass %>% filter(independence_timing == "after_intervention") %>% filter(treatment == 0))
+final_after_control2 <- nrow(filtered_by_subclass %>% filter(independence_timing == "after_intervention") %>% filter(treatment == 2))
+
 
 ```
 
@@ -184,9 +208,9 @@ all <- rbind(r_before_final, r_after_final) %>% filter(vedidk %in% a)
 The independence indicator was not possible to calculate for `r na_counts` (`r na_percentage` % of observations). This is in `r na_sup` % caused by missing data about supervisors, and in `r na_pubs` % due to given researcher not having any publications in the given period (`r na_pubs_after` % of these cases are in the period after the intervention, which sometimes mean in the past few years).
 
 There are `r na_treatment` missing observations in the treatment group, `r na_control1` in the unfunded control group and  `r na_control2` in the funded control group.
-If we only keep observation that have match with non-missing values, we are left with a sample of `r final_before_control1` matched observations in unfunded control group and `r final_before_control2` matched observations in funded control group before intervention and a sample of `r final_after_control1` matched observations in unfunded control group and `r final_after_control2` matched observations in funded control group after intervention.
+If we only keep observations that have a match with non-missing values, we are left with a sample of `r final_before_control1` matched observations in unfunded control group and `r final_before_control2` matched observations in funded control group before intervention and a sample of `r final_after_control1` matched observations in unfunded control group and `r final_after_control2` matched observations in funded control group after intervention.
 
-When Looking at disciplines, we see that there are slightly more missing data in the discipline group 1 (Natural Sciences).
+When Looking at disciplines, we see that there are slightly more missing data in Agricultural and veterinary scieces and the Humanities and the Arts.
 
 ```{r echo=FALSE}
 
@@ -195,21 +219,24 @@ dt$missing <- ifelse(is.na(dt$RII), "Missing", "Complete")
 
 # Calculate counts and proportions
 df_summary <- dt %>%
-  group_by(disc_ford, missing) %>%
+  group_by(field, missing) %>%
   summarise(count = n(), .groups = "drop") %>%
   mutate(Proportion = count / sum(count)) %>%
   pivot_wider(names_from = missing, values_from = c(count, Proportion))
+
+# If there are any NA values in the 'count_Missing' column, replace them with 0
+df_summary$count_Missing[is.na(df_summary$count_Missing)] <- 0
 
 # Calculate Missing / (Missing + Complete) in percentages for each disc_ford
 df_summary <- df_summary %>%
   mutate(Proportion = ifelse(!is.na(`count_Missing`) & !is.na(`count_Complete`), `count_Missing` / (`count_Missing` + `count_Complete`) * 100, NA))
 
 # If there are any NA values in the 'Proportion' column, replace them with 0
-df_summary[is.na(df_summary$Proportion)] <- 0
+df_summary$Proportion[is.na(df_summary$Proportion)] <- 0
 
 # Remove unnecessary columns and rename the others
 df_summary <- df_summary %>%
-  select(disc_ford, count_Complete, count_Missing, Proportion) %>%
+  select(field, count_Complete, count_Missing, Proportion) %>%
   rename(
     Complete = count_Complete,
     Missing = count_Missing,
@@ -225,13 +252,14 @@ kable(df_summary, digits = 3, caption = "Counts and Proportions of Missing data 
 ```
 
 
-
 ### Before intervention
+
+POZN: here we show data 
 
 ```{r echo=FALSE}
 
 # assuming df is your dataframe
-df <- r_before_final
+df <- filtered_by_subclass %>% filter(independence_timing == "before_intervention")
 
 # list of numeric columns. Exclude treatment column
 numeric_vars <- df %>% select(where(is.numeric)) %>% select(-weights, -funded_control, -id, -treatment_year, -career_start_year) %>% names()
@@ -263,7 +291,7 @@ kable(table_before_2, digits = 3, caption = "Descriptive statistics for funded c
 ```{r echo=FALSE}
 
 # assuming df is your dataframe
-df <- r_after_final
+df <- filtered_by_subclass %>% filter(independence_timing == "after_intervention")
 
 # list of numeric columns. Exclude treatment column
 numeric_vars <- df %>% select(where(is.numeric)) %>% select(-weights, -funded_control, -id, -treatment_year, -career_start_year) %>% names()
@@ -392,25 +420,209 @@ plot(fun_sum, var.order = "unmatched")
 
 ## Main results
 
+To ascertain the differences in independence scores before and after intervention, while accounting for the treatment type, academic disciplines, and paired nature of the data, we used repeated measures ANOVA. This allowed us to measure the main effect of change in independence across time, across disciplines, and the main treatment effect was the interaction between treatment type and time.
 
+
+POZN: only for comparison:
 To estimate the treatment effect and its standard error, we fit a linear regression model with 1978 earnings as the outcome and the treatment, covariates, and their interaction as predictors and included the full matching weights in the estimation. The lm() function was used to fit the outcome, and the comparisons() function in the marginaleffects package was used to perform g-computation in the matched sample to estimate the ATT. A cluster-robust variance was used to estimate its standard error with matching stratum membership as the clustering variable.
 
 The estimated effect was XXXX (SE = XXXX, p = XXXX), indicating that the average effect of the treatment for those who received it is to increase earnings.
 
 ```{r echo=FALSE}
 
+pp <- d %>%
+     group_by(subclass) %>%
+     filter(!any(is.na(RII))) %>%
+     ungroup()
+
+filtered_by_subclass_1 <- pp %>% 
+    group_by(subclass) %>% 
+    filter(!any(treatment == 2)) %>% 
+    ungroup()
+
+filtered_by_subclass_1$subclass <- as.factor(filtered_by_subclass_1$subclass)
+filtered_by_subclass_1$treatment <- as.factor(filtered_by_subclass_1$treatment)
+filtered_by_subclass_1$independence_timing <- as.factor(filtered_by_subclass_1$independence_timing)
+filtered_by_subclass_1$field <- as.factor(filtered_by_subclass_1$field)
+
+# this DiD model unfortunately doesnt work for some reason that I cannot resolve, but it is possible to calculate the same using repeated measures anova or mixes effects model, so it should be fine
+
 # # Run regression model with interaction term
-# did_model <- plm(researcher_independence ~ independence_timing * treatment + factor(subclass), 
-#                  data = tar_read(full_indicator), 
-#                  index = c("subclass", "independence_timing"),
+# did_model <- plm::plm(RII ~ independence_timing * treatment + factor(subclass),
+#                  data = filtered_by_subclass_1,
+#                  index = c("subclass"),
 #                  model = "within")
 # 
 # # Calculate clustered standard errors
-# clustered_se <- coeftest(did_model, vcov = function(x) vcovHC(x, type = "HC1", cluster = "group"))
-# print(clustered_se)
+# clustered_se <- coeftest(did_model, vcov = function(x) vcovHC(x, type = "HC1", cluster = "subclass"))
+
+
+
+
+## here should be some assumptions tests that I will run to see whtehr it is correct, but later I will comment it so that it doesnt show in the final paper
+
+
+model <- lmer(RII ~ treatment * independence_timing + (1 | subclass), data = filtered_by_subclass_1)
+summary(model)
+r.squaredGLMM(model)
+
+
+result <- ezANOVA(data = filtered_by_subclass_1,
+                 dv = RII,
+                 wid = subclass,
+                 within = .(independence_timing),
+                 between = treatment)
+print(result)
+
+
+
+## adding disciplines:
+
+
+result_disc <- ezANOVA(data = filtered_by_subclass_1,
+                 dv = RII,
+                 wid = subclass,
+                 within = .(independence_timing),
+                 between = .(treatment, field))
+print(result_disc)
+
+
+
+
+
+
+
+
+
+### visualisations
+     
+     
+means <- aggregate(RII ~ treatment + independence_timing, data = filtered_by_subclass_1, FUN = mean)
+
+ ggplot(data = filtered_by_subclass_1, aes(x = treatment, y = RII, fill = independence_timing)) +
+         geom_violin(scale = "width") +
+         scale_fill_discrete(name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
+         xlab("Treatment Group") +
+         ylab("RII Score") +
+         ggtitle("Violin Plot of RII Scores by Treatment and Time") +
+         theme_bw()
 
 
 ```
+
+
+
+
+In the first analysis, we examined the effects of treatment, independence_timing, and their interaction on the dependent variable, researcher independence (RII) for the treatment group and unfunded control group. There was a significant main effect of independence_timing on RII, F(1, 188) = 158.29, p < .001, indicating a significant change in the independence from before to after the intervention. The effect size (GES) for this effect was 0.075, suggesting a moderate effect.
+Importantly, there was a significant interaction effect between treatment and independence_timing on independence, F(1, 188) = 11.00, p = .001. This interaction suggests that the effect of the intervention on independence differed based on the treatment group. The effect size (GES) for this interaction was 0.006, indicating a small effect.
+
+In the subsequent analysis, we further incorporated the factor of discipline (field) to explore if there were differences across disciplines in the observed effects. There was a significant main effect of field on independence, F(5, 178) = 2.88, p = .016, indicating that there were significant differences in RII across the six discipline groups. (WHICH ARE LOW AND HIGH?) The effect size (GES) for this was 0.068, suggesting a moderate effect. The interaction between treatment and field was not statistically significant, F(5, 178) = 0.29, p = .920, suggesting that the effect of treatment on independence was consistent across disciplines. The three-way interaction among treatment, independence_timing, and field was not statistically significant, F(5, 178) = 0.51, p = .765. This implies that the interaction effect of treatment and independence_timing on independence remained consistent across different disciplines.
+
+
+
+POZN ON MODEL CHOICE:
+
+In Conclusion:
+
+Both the mixed-effects model and the RM-ANOVA suggest a significant interaction between the treatment and the timing of the intervention. This means that the effect of the intervention differed between the treatment and control groups.
+
+Both methods also indicate that the timing of the intervention (i.e., whether it's before or after) has a significant effect on the outcome RII.
+
+The models are in agreement with their primary findings, which is a good sign. It suggests that the treatment has a distinct effect on RII after the intervention, different from that of the control group.
+
+However, it's worth noting that while the methods reach similar conclusions, they approach the problem from different angles. The mixed-effects model incorporates the correlation within each subclass through its random effect, while the RM-ANOVA primarily focuses on the repeated measures nature of the data. Both models provide valuable insights, but the mixed-effects model might be a more robust choice for this particular dataset, given its explicit modeling of the subclass structure.
+
+
+My take:
+
+
+I understand the results of ANOVa, but dont understand the results of the mixed effects model very much. I also like that ANOVa actually provides p statistic and effect size statistic
+
+
+```{r echo=FALSE}
+
+
+filtered_by_subclass_2 <- pp %>% 
+    group_by(subclass) %>% 
+    filter(!any(treatment == 0)) %>% 
+    ungroup()
+
+filtered_by_subclass_2$subclass <- as.factor(filtered_by_subclass_2$subclass)
+filtered_by_subclass_2$treatment <- as.factor(filtered_by_subclass_2$treatment)
+filtered_by_subclass_2$independence_timing <- as.factor(filtered_by_subclass_2$independence_timing)
+filtered_by_subclass_2$field <- as.factor(filtered_by_subclass_2$field)
+
+# this DiD model unfortunately doesnt work for some reason that I cannot resolve, but it is possible to calculate the same using repeated measures anova or mixes effects model, so it should be fine
+#---> maybe if I edit the dataset so that there is only one row for each observation and it has columns RII_before and RII_after? ------or alternatively I can also just calculate the difference directly RII_diff = after-before and then test only this difference? Not sure how much of a difference this would make -> I should perhaps ask chatGPT
+
+
+# # Run regression model with interaction term
+# did_model <- plm::plm(RII ~ independence_timing * treatment + factor(subclass),
+#                  data = filtered_by_subclass_1,
+#                  index = c("subclass"),
+#                  model = "within")
+# 
+# # Calculate clustered standard errors
+# clustered_se <- coeftest(did_model, vcov = function(x) vcovHC(x, type = "HC1", cluster = "subclass"))
+
+
+model2 <- lmer(RII ~ treatment * independence_timing + (1 | subclass), data = filtered_by_subclass_2)
+summary(model2)
+r.squaredGLMM(model2)
+
+
+result <- ezANOVA(data = filtered_by_subclass_2,
+                 dv = RII,
+                 wid = subclass,
+                 within = .(independence_timing),
+                 between = treatment)
+print(result)
+
+
+
+## adding disciplines:
+
+
+result_disc2 <- ezANOVA(data = filtered_by_subclass_2,
+                 dv = RII,
+                 wid = subclass,
+                 within = .(independence_timing),
+                 between = .(treatment, field))
+print(result_disc2)
+
+
+
+
+
+
+### visualisations
+     
+     
+means2 <- aggregate(RII ~ treatment + independence_timing, data = filtered_by_subclass_2, FUN = mean)
+
+ ggplot(data = filtered_by_subclass_2, aes(x = treatment, y = RII, fill = independence_timing)) +
+         geom_violin(scale = "width") +
+         scale_fill_discrete(name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
+         xlab("Treatment Group") +
+         ylab("RII Score") +
+         ggtitle("Violin Plot of RII Scores by Treatment and Time") +
+         theme_bw()
+
+
+```
+
+
+In the second analysis, we examined the effects of treatment, independence_timing, and their interaction on the researcher independence (RII) for the treatment group and funded control group. Again, there was a significant main effect of time on independence (F(1, 224) = 177.37, p < 0.001), with moderate effect size (GES = 0.0938371139).
+Importantly, this time the interaction effect between treatment and time  was not significant (F(1, 224) = 0.968, p = 0.326), suggesting that funding has the same effects, regardless of its type or source.
+
+When adding disciplines into the analysis, we again found that there is a variation in independence across disciplines (WHICH ARE LOW AND HIGH?) (F(5, 214) = 3.218, p = 0.008), with a moderate effect size (GES = 0.0613437626). Anyway, these differences were again stable across time and treatment conditions as the interaction were not significant.
+
+
+
+
+
+
+
 
 
 ### Before intervention
@@ -606,11 +818,17 @@ means <- aggregate(RII ~ treatment + independence_timing, data = d, FUN = mean)
 
 # Discussion
 
+The results of this study provide important insights into the effects of funding interventions on researcher independence. The strongest effect we found across all control group comparison was the effect of time - over time, researchers become more independent, regardless of their access to funding or their discipline. The effect size for this difference is moderate (GES = 0.075) when comparing funded and unfunded groups, and moderate (GES = 0.075) when comparing the funded treatment and funded control groups.
+
+Additionally, the observed variation in independence across different disciplines underscores the importance of considering disciplinary differences, suggested by a moderate effect size (GES = 0.068). A moderate effect size (GES = 0.068) for the field effect emphasizes that certain disciplines might inherently have variations in RII, perhaps due to differences in practices, methodologies, or norms specific to each discipline. Anyway, these differences remain constant across time and funding interventions, suggesting that funding has a uniform effect on the independence across disciplines.
+
+Finally, the significant interaction between treatment and time when comparing treamtnet vs unfunded group suggests the funding has positive effect on stimulating researchers' independence. However, the effect size is only modest (GES = 0.006), indicating relatively small practical relevance. Further the insignificant interaction when comparing the treatment vs funded control group suggests that funding in this career stage has the same effect, regardless of its type or source.
+
+
 
 
 ## Limitations
 
---> the identification of supervisors in the control group (only 50% correct)
 --> only talks about the Czech environment and considers researchers growing up and most of their careers in the Czech republic
 
 # Attachments

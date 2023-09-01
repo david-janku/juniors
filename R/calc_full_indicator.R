@@ -50,7 +50,7 @@ calc_full_indicator <- function(independent_topics, final_data) {
     # independent_topics$id <- seq_along(independent_topics$vedidk)
     
     
-    d <- left_join(final_data, independent_topics, by = c("vedidk" = "vedidk", "treatment_year" = "treatment_year" , "independence_timing" = "independence_timing"))
+    d <- left_join(final_data, independent_topics, by = c("vedidk" = "vedidk", "treatment_year" = "treatment_year" , "independence_timing" = "independence_timing", "sup_name" = "sup_name", "sup_vedidk" = "sup_vedidk"))
     
     
     d$treatment <- as_factor(d$treatment)
