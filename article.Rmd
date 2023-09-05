@@ -467,6 +467,67 @@ summary(model)
 r.squaredGLMM(model)
 
 
+
+##checking assumptiosn fro repeated measures ANOVA
+
+# Normality: You can check the normality of the residuals using a Q-Q plot and the Shapiro-Wilk test.
+
+model_lm <- lm(RII ~ treatment + subclass + subclass:independence_timing, data = filtered_by_subclass_1)
+
+# Check residuals from lm
+plot(resid(model_lm))
+
+#Linearity and Homoscedasticity (Equal Variances) of Residuals: If the assumptions hold, you should not see any obvious patterns or funnel shapes in the plot.
+
+plot(model_lm$fitted.values, resid(model_lm), 
+     xlab = "Fitted values", ylab = "Residuals", 
+     main = "Residuals vs. Fitted Values")
+abline(h = 0, col = "red")
+
+# Normality of Residuals: 
+qqnorm(resid(model_lm))
+qqline(resid(model_lm))
+
+shapiro.test(resid(model_lm)) 
+
+
+# Independence of Residuals: If your data has a time sequence (e.g., repeated measurements over time), then you would be concerned about the independence of residuals. For this, you can use the Durbin-Watson test from the car package. The Durbin-Watson test statistic ranges from 0 to 4. A value around 2 suggests no autocorrelation, while values below 1 and above 3 are cause for concern.
+
+library(car)
+durbinWatsonTest(model_lm)
+
+
+# Multicollinearity: Check the variance inflation factor (VIF) for each predictor. Typically, a VIF above 5-10 indicates multicollinearity.
+
+vif(model_lm)
+
+# Outliers and Influence Points: Leverage vs. studentized residuals plot can be used to identify influential points.
+
+plot(hatvalues(model_lm), rstudent(model_lm),
+     xlab = "Leverage", ylab = "Studentized Residuals",
+     main = "Residuals vs. Leverage")
+abline(h = c(-2,2), col = "red", lty = 2)
+
+
+
+# Sphericity: Use the mauchly.test function on your model. If the test is significant, then the assumption of sphericity has been violated.
+
+# mauchly.test(model_aov)
+
+# Homogeneity of Variance: Use Levene's Test. The car package offers leveneTest.
+
+library(car)
+leveneTest(RII ~ treatment, data = filtered_by_subclass_1)
+
+# Outliers:You can inspect boxplots or use Mahalanobis distance.
+
+boxplot(RII ~ treatment, data = filtered_by_subclass_1)
+
+
+
+##conducting repeated measures ANOVA
+
+
 result <- ezANOVA(data = filtered_by_subclass_1,
                  dv = RII,
                  wid = subclass,
@@ -508,15 +569,42 @@ means <- aggregate(RII ~ treatment + independence_timing, data = filtered_by_sub
          theme_bw()
 
 
+means_disc <- aggregate(RII ~ field, data = filtered_by_subclass_1, FUN = mean)
+     
+num_disc <- filtered_by_subclass_1 %>%
+  group_by(field) %>%
+  summarise(count = n(), .groups = "drop")
+
+means_disc <- left_join(means_disc, num_disc, by = "field") 
+
+# Step 1: Reorder the levels of 'field'
+means_disc$field <- with(means_disc, factor(field, levels=unique(field[order(RII)])))
+
+# Step 2: Optionally, sort the dataframe based on the reordered levels
+means_disc <- means_disc %>% arrange(field)
+
+    
+ggplot(data = means_disc, aes(x = reorder(c(1:6), RII), y = RII, fill = field)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  
+  # Add the number of observations on top of the bars
+  geom_text(aes(label=count), position=position_dodge(width=0.9), vjust=-0.5) +
+
+  labs(x = "Field", y = "Mean RII") +
+  scale_fill_discrete(name = "Field") +
+  theme_bw()
+
+ 
+ 
 ```
 
 
 
 
-In the first analysis, we examined the effects of treatment, independence_timing, and their interaction on the dependent variable, researcher independence (RII) for the treatment group and unfunded control group. There was a significant main effect of independence_timing on RII, F(1, 188) = 158.29, p < .001, indicating a significant change in the independence from before to after the intervention. The effect size (GES) for this effect was 0.075, suggesting a moderate effect.
-Importantly, there was a significant interaction effect between treatment and independence_timing on independence, F(1, 188) = 11.00, p = .001. This interaction suggests that the effect of the intervention on independence differed based on the treatment group. The effect size (GES) for this interaction was 0.006, indicating a small effect.
+In the first analysis, we examined the effects of treatment, independence_timing, and their interaction on the dependent variable, researcher independence (RII) for the treatment group and unfunded control group. There was a significant main effect of independence_timing on RII, F(`r result$ANOVA[2, 2]`, `r result$ANOVA[2, 3]`) = `r result$ANOVA[2, 4]`, p = `r result$ANOVA[2, 5]` indicating a significant change in the independence from before to after the intervention. The effect size (GES) for this effect was `r result$ANOVA[2, 7]`, suggesting a moderate effect.
+Importantly, there was a significant interaction effect between treatment and independence_timing on independence, F(`r result$ANOVA[3, 2]`, `r result$ANOVA[3, 3]`) = `r result$ANOVA[3, 4]`, p = `r result$ANOVA[3, 5]`. This interaction suggests that the effect of the intervention on independence differed based on the treatment group. The effect size (GES) for this interaction was `r result$ANOVA[3, 7]`, indicating a small effect.
 
-In the subsequent analysis, we further incorporated the factor of discipline (field) to explore if there were differences across disciplines in the observed effects. There was a significant main effect of field on independence, F(5, 178) = 2.88, p = .016, indicating that there were significant differences in RII across the six discipline groups. (WHICH ARE LOW AND HIGH?) The effect size (GES) for this was 0.068, suggesting a moderate effect. The interaction between treatment and field was not statistically significant, F(5, 178) = 0.29, p = .920, suggesting that the effect of treatment on independence was consistent across disciplines. The three-way interaction among treatment, independence_timing, and field was not statistically significant, F(5, 178) = 0.51, p = .765. This implies that the interaction effect of treatment and independence_timing on independence remained consistent across different disciplines.
+In the subsequent analysis, we further incorporated the factor of discipline (field) to explore if there were differences across disciplines in the observed effects. There was a significant main effect of field on independence, F(`r result_disc$ANOVA[2, 2]`, `r result_disc$ANOVA[2, 3]`) = `r result_disc$ANOVA[2, 4]`, p = `r result_disc$ANOVA[2, 5]`, indicating that there were significant differences in RII across the six discipline groups. On average, Agricultural and veterinary sciences showed lowest independence, while Social Sciences and Humanities showed almost twice as large independence, (though it is important to note that small sample might provide unstable estimates (----> i SHOULD REMOVE THEM FROM THE ANALYSIS SINCE THESE SEEM TO BE TOO FEW OBSERVATIONS --> MAYBE I SHOULD ALSO DO A SEPARATE ANOVA ONLY TAKING INTO ACCOUNT ALL DISC BEFORE INTEVENTION AND AFTER INTERVENTION SEPARATELY BUT FOR BOTH CONTROL GROUPS). The effect size (GES) for this was `r result_disc$ANOVA[2, 7]`, suggesting a moderate effect. The interaction between treatment and field was not statistically significant, F(`r result_disc$ANOVA[4, 2]`, `r result_disc$ANOVA[4, 3]`) = `r result_disc$ANOVA[4, 4]`, p = `r result_disc$ANOVA[4, 5]`, suggesting that the effect of treatment on independence was consistent across disciplines. The three-way interaction among treatment, independence_timing, and field was not statistically significant, F(`r result_disc$ANOVA[6, 2]`, `r result_disc$ANOVA[6, 3]`) = `r result_disc$ANOVA[6, 4]`, p = `r result_disc$ANOVA[6, 5]`. This implies that the interaction effect of treatment and independence_timing on independence remained consistent across different disciplines.
 
 
 
@@ -571,7 +659,7 @@ summary(model2)
 r.squaredGLMM(model2)
 
 
-result <- ezANOVA(data = filtered_by_subclass_2,
+result2 <- ezANOVA(data = filtered_by_subclass_2,
                  dv = RII,
                  wid = subclass,
                  within = .(independence_timing),
@@ -609,220 +697,52 @@ means2 <- aggregate(RII ~ treatment + independence_timing, data = filtered_by_su
          theme_bw()
 
 
-```
-
-
-In the second analysis, we examined the effects of treatment, independence_timing, and their interaction on the researcher independence (RII) for the treatment group and funded control group. Again, there was a significant main effect of time on independence (F(1, 224) = 177.37, p < 0.001), with moderate effect size (GES = 0.0938371139).
-Importantly, this time the interaction effect between treatment and time  was not significant (F(1, 224) = 0.968, p = 0.326), suggesting that funding has the same effects, regardless of its type or source.
-
-When adding disciplines into the analysis, we again found that there is a variation in independence across disciplines (WHICH ARE LOW AND HIGH?) (F(5, 214) = 3.218, p = 0.008), with a moderate effect size (GES = 0.0613437626). Anyway, these differences were again stable across time and treatment conditions as the interaction were not significant.
-
-
-
-
-
-
-
-
-
-### Before intervention
-
-Was there a difference between the treatment groups in their level of independence before the intervention?
-
-The analysis of variance (ANOVA) was used to compare the means of the three treatment groups. The results of the ANOVA showed that the effect of treatment was not statistically significant (F(2, 630) = 0.256, p = 0.613). The mean square (MS) within groups was 0.05775, which indicates that the variability within each group is relatively small. The MS between groups was 0.01476, which is smaller than the MS within groups, suggesting that the differences between the means of the treatment groups are small. The model explained only a small proportion of the total variance in the data (R-squared = 0.01). Sixty-five observations were deleted due to missing data. In conclusion, there is no evidence to suggest that the treatment has a significant effect on the outcome variable. However, the small effect size and the missing data should be taken into consideration when interpreting the results. Post-hoc test power was 0.9997622 as calculated by GPower (Faul, Erdfelder, Lang & Buchner, 2007).
-
-
-```{r echo=FALSE}
-set.seed(123)
-
-d_before <- r_before_final
-     
-before_treatment <- aov(RII ~ treatment, data = d_before)
-summary(before_treatment)
-
-means_before_treatment <- aggregate(RII ~ treatment, data = d_before, FUN = mean)
-     
-     
-ggplot(data = means_before_treatment, aes(x = treatment, y = RII, fill = treatment)) +
-         geom_bar(stat = "identity", position = "dodge") +
-         labs(x = "Treatment", y = "Mean RII") +
-         scale_fill_discrete(name = "treatment") +
-         theme_bw()
-
-
-```
-
-Further, were there any differences in independence across disciplines?
-
-```{r echo=FALSE}
-set.seed(123)
-
-d_before$disc_ford <- substring(d_before$disc_ford, 0, 1)
-d_before$disc_ford <- as.factor(d_before$disc_ford)
-     
-d_before$treatment <- as.factor(d_before$treatment)
-     
-table(d_before$disc_ford, by = d_before$treatment)
-
-disc_before <- aov(RII ~ disc_ford, data = d_before)
-summary(disc_before)
-     
-means_before_disc <- aggregate(RII ~ disc_ford, data = d_before, FUN = mean)
-     
-     
-ggplot(data = means_before_disc, aes(x = disc_ford, y = RII, fill = disc_ford)) +
-         geom_bar(stat = "identity", position = "dodge") +
-         labs(x = "disc_ford", y = "Mean RII") +
-         scale_fill_discrete(name = "disc_ford") +
-         theme_bw()
-
-```
-
-
-Was there any interaction between the treatment group and discipline?
-
-```{r echo=FALSE}
-set.seed(123)
-
-before_disc_interaction <- aov(RII ~ treatment*disc_ford, data = d_before)
-summary(before_disc_interaction)
-     
-     
- means_before_disc_interaction <- aggregate(RII ~ treatment + disc_ford, data = d_before, FUN = mean)
-     
-     # Plot grouped bar plot
-     ggplot(data = means_before_disc_interaction, aes(x = treatment, y = RII, fill = disc_ford)) +
-         geom_bar(stat = "identity", position = "dodge") +
-         labs(x = "Treatment", y = "Mean RII") +
-         scale_fill_discrete(name = "disc_ford") +
-         theme_bw()
-
-```
-
-
-
-### After intervention
-
-Was there a difference between the treatment groups in their level of independence after the intervention?
-
-The analysis of variance (ANOVA) was used to compare the means of the three treatment groups. The results of the ANOVA showed that the effect of treatment was not statistically significant (F(2, 630) = 0.256, p = 0.613). The mean square (MS) within groups was 0.05775, which indicates that the variability within each group is relatively small. The MS between groups was 0.01476, which is smaller than the MS within groups, suggesting that the differences between the means of the treatment groups are small. The model explained only a small proportion of the total variance in the data (R-squared = 0.01). Sixty-five observations were deleted due to missing data. In conclusion, there is no evidence to suggest that the treatment has a significant effect on the outcome variable. However, the small effect size and the missing data should be taken into consideration when interpreting the results. Post-hoc test power was 0.9997622 as calculated by GPower (Faul, Erdfelder, Lang & Buchner, 2007).
-
-
-```{r echo=FALSE}
-set.seed(123)
-
-d_before <- r_after_final
-     
-before_treatment <- aov(RII ~ treatment, data = d_before)
-summary(before_treatment)
-
-means_before_treatment <- aggregate(RII ~ treatment, data = d_before, FUN = mean)
-     
-     
-ggplot(data = means_before_treatment, aes(x = treatment, y = RII, fill = treatment)) +
-         geom_bar(stat = "identity", position = "dodge") +
-         labs(x = "Treatment", y = "Mean RII") +
-         scale_fill_discrete(name = "treatment") +
-         theme_bw()
-
-
-```
-
-Further, were there any differences in independence across disciplines?
-
-```{r echo=FALSE}
-set.seed(123)
-
-d_before$disc_ford <- substring(d_before$disc_ford, 0, 1)
-d_before$disc_ford <- as.factor(d_before$disc_ford)
-     
-d_before$treatment <- as.factor(d_before$treatment)
-     
-table(d_before$disc_ford, by = d_before$treatment)
-
-disc_before <- aov(RII ~ disc_ford, data = d_before)
-summary(disc_before)
-     
-means_before_disc <- aggregate(RII ~ disc_ford, data = d_before, FUN = mean)
-     
-     
-ggplot(data = means_before_disc, aes(x = disc_ford, y = RII, fill = disc_ford)) +
-         geom_bar(stat = "identity", position = "dodge") +
-         labs(x = "disc_ford", y = "Mean RII") +
-         scale_fill_discrete(name = "disc_ford") +
-         theme_bw()
-
-```
-
-
-Was there any interaction between the treatment group and discipline?
-
-```{r echo=FALSE}
-set.seed(123)
-
-before_disc_interaction <- aov(RII ~ treatment*disc_ford, data = d_before)
-summary(before_disc_interaction)
-     
-     
- means_before_disc_interaction <- aggregate(RII ~ treatment + disc_ford, data = d_before, FUN = mean)
-     
-     # Plot grouped bar plot
-     ggplot(data = means_before_disc_interaction, aes(x = treatment, y = RII, fill = disc_ford)) +
-         geom_bar(stat = "identity", position = "dodge") +
-         labs(x = "Treatment", y = "Mean RII") +
-         scale_fill_discrete(name = "disc_ford") +
-         theme_bw()
-
-```
-
-
-
-### Intervention effect
-
-
-```{r echo=FALSE}
-
-d <- all 
-d$treatment <- as.factor(d$treatment)
-d$independence_timing <- as.factor(d$independence_timing)
-     
-interaction <- aov(RII ~ treatment * independence_timing, data = d)
-summary(interaction)
-heplots::etasq(interaction, anova = TRUE)
-
- ###calculating r-squared - generated by chatGPT, so not sure this is correct
-     
-     n <- nrow(d)
-     p <- length(coef(interaction))
-     SSresid <- sum(resid(interaction)^2)
-     SStotal <- sum((na.omit(d$RII) - mean(d$RII, na.rm = TRUE))^2)
-     R2 <- 1 - (SSresid / SStotal)
-     adjR2 <- 1 - ((1 - R2) * (n - 1) / (n - p - 1))
-
- ### visualisations
-     
-     
-means <- aggregate(RII ~ treatment + independence_timing, data = d, FUN = mean)
-
- ggplot(data = interaction, aes(x = treatment, y = RII, fill = independence_timing)) +
-         geom_violin(scale = "width") +
-         scale_fill_discrete(name = "Independence Timing", labels = c("After intervention", "Before intervention")) +
-         xlab("Treatment Group") +
-         ylab("RII Score") +
-         ggtitle("Violin Plot of RII Scores by Treatment and Time") +
-         theme_bw()
  
+means_disc2 <- aggregate(RII ~ field, data = filtered_by_subclass_2, FUN = mean)
+     
+num_disc2 <- filtered_by_subclass_2 %>%
+  group_by(field) %>%
+  summarise(count = n(), .groups = "drop")
+
+means_disc2 <- left_join(means_disc2, num_disc2, by = "field") 
+
+# Step 1: Reorder the levels of 'field'
+means_disc2$field <- with(means_disc2, factor(field, levels=unique(field[order(RII)])))
+
+# Step 2: Optionally, sort the dataframe based on the reordered levels
+means_disc2 <- means_disc2 %>% arrange(field)
+
+    
+ggplot(data = means_disc2, aes(x = reorder(c(1:6), RII), y = RII, fill = field)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  
+  # Add the number of observations on top of the bars
+  geom_text(aes(label=count), position=position_dodge(width=0.9), vjust=-0.5) +
+
+  labs(x = "Field", y = "Mean RII") +
+  scale_fill_discrete(name = "Field") +
+  theme_bw()
+
  
 ```
+
+
+In the second analysis, we examined the effects of treatment, independence_timing, and their interaction on the researcher independence (RII) for the treatment group and funded control group. Again, there was a significant main effect of time on independence (F(`r result2$ANOVA[2, 2]`, `r result2$ANOVA[2, 3]`) = `r result2$ANOVA[2, 4]`, p = `r result2$ANOVA[2, 5]`), with moderate effect size (GES = `r result2$ANOVA[2, 7]`).
+Importantly, this time the interaction effect between treatment and time  was not significant (F(`r result2$ANOVA[3, 2]`, `r result2$ANOVA[3, 3]`) = `r result2$ANOVA[3, 4]`, p = `r result2$ANOVA[3, 5]`), suggesting that funding has the same effects, regardless of its type or source.
+
+When adding disciplines into the analysis, we again found that there is a variation in independence across disciplines (F(`r result_disc2$ANOVA[2, 2]`, `r result_disc2$ANOVA[2, 3]`) = `r result_disc2$ANOVA[2, 4]`, p = `r result_disc2$ANOVA[2, 5]`) with Agricultural and veterinary sciences again showing the lowest independence, while Social Sciences and Humanities showing largest (though it is important to note that small sample might provide unstable estimates (----> i SHOULD REMOVE THEM FROM THE ANALYSIS SINCE THESE SEEM TO BE TOO FEW OBSERVATIONS --> MAYBE I SHOULD ALSO DO A SEPARATE ANOVA ONLY TAKING INTO ACCOUNT ALL DISC BEFORE INTEVENTION AND AFTER INTERVENTION SEPARATELY BUT FOR BOTH CONTROL GROUPS), and with a moderate effect size (GES = `r result_disc2$ANOVA[2, 7]`). Anyway, these differences were again stable across time and treatment conditions as the interaction were not significant.
+
+
+
 
 
 # Discussion
 
-The results of this study provide important insights into the effects of funding interventions on researcher independence. The strongest effect we found across all control group comparison was the effect of time - over time, researchers become more independent, regardless of their access to funding or their discipline. The effect size for this difference is moderate (GES = 0.075) when comparing funded and unfunded groups, and moderate (GES = 0.075) when comparing the funded treatment and funded control groups.
+The results of this study provide important insights into the effects of funding interventions on researcher independence. The strongest effect we found across all control group comparison was the effect of time - over time, researchers become more independent, regardless of their access to funding or their discipline. The effect size for this difference is moderate when comparing funded and unfunded groups, and also moderate when comparing the funded treatment and funded control groups.
 
-Additionally, the observed variation in independence across different disciplines underscores the importance of considering disciplinary differences, suggested by a moderate effect size (GES = 0.068). A moderate effect size (GES = 0.068) for the field effect emphasizes that certain disciplines might inherently have variations in RII, perhaps due to differences in practices, methodologies, or norms specific to each discipline. Anyway, these differences remain constant across time and funding interventions, suggesting that funding has a uniform effect on the independence across disciplines.
+Additionally, the observed variation in independence across different disciplines underscores the importance of considering disciplinary differences, suggested by a moderate effect size. A moderate effect size for the field effect emphasizes that certain disciplines might inherently have variations in RII, perhaps due to differences in practices, methodologies, or norms specific to each discipline. Anyway, these differences remain constant across time and funding interventions, suggesting that funding has a uniform effect on the independence across disciplines.
 
-Finally, the significant interaction between treatment and time when comparing treamtnet vs unfunded group suggests the funding has positive effect on stimulating researchers' independence. However, the effect size is only modest (GES = 0.006), indicating relatively small practical relevance. Further the insignificant interaction when comparing the treatment vs funded control group suggests that funding in this career stage has the same effect, regardless of its type or source.
+Finally, the significant interaction between treatment and time when comparing treamtnet vs unfunded group suggests the funding has positive effect on stimulating researchers' independence. However, the effect size is only modest, indicating relatively small practical relevance. Further the insignificant interaction when comparing the treatment vs funded control group suggests that funding in this career stage has the same effect, regardless of its type or source.
 
 
 

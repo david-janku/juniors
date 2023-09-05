@@ -184,6 +184,26 @@ ids_sup_search$dis_link <- NA
 ids_sup_search$sec_sup_name_first <- NA
 ids_sup_search$sec_sup_name_last <- NA
 
-# write.csv2(ids_sup_search, file = here::here("data", "derived", "ids_sup_search.csv"))
+# write.csv2(ids_sup_search, file = here::here("data", "derived", "sup_search_third.csv"))
+
+ids_extra <- read.csv(here::here("data", "raw", "backup", "ids_sup_search.csv")) 
+
+ids_extra$vedidk <- as.character(ids_extra$vedidk)
+
+ids <- left_join(ids, ids_extra %>% dplyr::select(vedidk, sup_name_first, sup_name_last), by = c("vedidk_core_researcher" = "vedidk"))
+
+a <- ids %>% mutate(across(everything(), ~replace(., . == "", NA))) %>% filter(!is.na(sup_name_first))
+                             
+combined <- ids %>%
+  mutate(across(everything(), ~replace(., . == "", NA))) %>% 
+  left_join(ids_extra %>% dplyr::select(vedidk, sup_name_first, sup_name_last), by = c("vedidk_core_researcher" = "vedidk"), suffix = c("", "_extra")) %>%
+  mutate(
+    sup_name_first = ifelse(is.na(sup_name_first), sup_name_first_extra, sup_name_first),
+    sup_name_last = ifelse(is.na(sup_name_last), sup_name_last_extra, sup_name_last)
+  ) %>%
+  select(-sup_name_first_extra, -sup_name_last_extra)
+  
+b <- combined %>% mutate(across(everything(), ~replace(., . == "", NA))) %>% filter(!is.na(sup_name_first))
+
 
 }

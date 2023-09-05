@@ -143,7 +143,7 @@ Here we perform construction of control groups via mahalanobis distance matching
 ```{r, engine="targets", matching}
 list(
      
-      tar_target(matching_data, match_data_prep(db_path, ids, gender, sup_control)),
+      tar_target(matching_data, match_data_prep(db_path, ids, gender, sup_control, sup_control_second)),
       tar_target(matched_obj_unfunded, match_obj_unfunded(matching_data)), 
       tar_target(matched_obj_funded, match_obj_funded(db_path, matching_data)),
       tar_target(matching, match_data(matched_obj_unfunded, matched_obj_funded))
