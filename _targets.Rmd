@@ -148,7 +148,6 @@ list(
       tar_target(matched_obj_funded, match_obj_funded(db_path, matching_data)),
       tar_target(matching, match_data(matched_obj_unfunded, matched_obj_funded))
      
-     
 )
 ```
 

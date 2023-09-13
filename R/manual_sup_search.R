@@ -8,7 +8,7 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-manual_sup_search <- function(db_path, matching) {
+manual_sup_search <- function(db_path, matching, sup_control_second) {
     
     
     con <-  DBI::dbConnect(RSQLite::SQLite(), db_path)
@@ -204,6 +204,58 @@ combined <- ids %>%
   select(-sup_name_first_extra, -sup_name_last_extra)
   
 b <- combined %>% mutate(across(everything(), ~replace(., . == "", NA))) %>% filter(!is.na(sup_name_first))
+
+
+
+
+
+
+sup_control_third <- read.csv(here::here("data", "raw", "backup",  "sup_search_third.csv")) 
+
+a <- bind_rows(sup_control_first %>% dplyr::select(-Column1, -sec_sup_vedidk), sup_control_second %>% dplyr::select(-X))
+a <- bind_rows(a, sup_control_third %>% dplyr::select(-X)) %>% distinct()
+a$vedidk <- as.character(a$vedidk)
+
+final <- left_join(manual_sup_search, a, by = c("vedidk" = "vedidk", "disc_ford" = "disc_ford"))
+
+write.csv(final, file = here::here("data", "raw", "backup", "manual_sup_search_updated.csv"))
+
+
+
+
+
+
+
+sup_control_third <- read.csv2(here::here("data", "raw", "backup", "manual_sup_search_third_cleaned.csv")) 
+sup_control_second <- read.csv2(here::here("data", "raw", "backup", "manual_sup_search_second_cleaned.csv")) 
+sup_control_first <- read.csv2(here::here("data", "raw", "backup", "manual_sup_search_first_cleaned.csv")) 
+
+manual_sup_search2 <- anti_join(manual_sup_search, sup_control, by = c("vedidk" = "vedidk", "disc_ford" = "disc_ford"))
+
+final2 <- left_join(manual_sup_search2, a, by = c("vedidk" = "vedidk", "disc_ford" = "disc_ford"))
+
+write.csv(final2, file = here::here("data", "raw", "backup", "manual_sup_search_second_updated.csv"))
+
+
+
+
+
+write.csv(a, file = here::here("data", "raw", "backup", "all_control_sup.csv"))
+
+sup_add <- read.csv2(here::here("data", "raw", "backup",  "supervisors_control_final.csv")) %>% 
+    mutate(across(everything(), ~replace(., . == "", NA))) %>% 
+    filter(!is.na(sup_name_first))
+
+sup_add$vedidk <- as.character(sup_add$vedidk)
+
+b <- bind_rows(a %>% filter(!is.na(sup_name_first)), sup_add %>% dplyr::select(-uni..obor, -shoda.jmen.)) %>% distinct()
+
+write.csv(b, file = here::here("data", "raw", "backup", "all_control_sup_final.csv"))
+
+
+
+
+
 
 
 }

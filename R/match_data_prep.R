@@ -1372,7 +1372,7 @@ match_data_prep <- function(db_path, ids, gender, sup_control, sup_control_secon
     
     sup_out <- sup_control %>% filter(is.na(sup_name_first))
     sup_out_second <- sup_control_second %>% filter(is.na(sup_name_first))
-    
+    # 
     final_data <- final_data %>% filter(!vedidk %in% sup_out$vedidk)
     final_data <- final_data %>% filter(!vedidk %in% sup_out_second$vedidk)
     
