@@ -24,6 +24,8 @@ library(lmerTest)
 library(MuMIn)
 library(ez)
 library(plm)
+library(effectsize)
+library(nlme)
 
 ```
 
@@ -210,7 +212,7 @@ The independence indicator was not possible to calculate for `r na_counts` (`r n
 There are `r na_treatment` missing observations in the treatment group, `r na_control1` in the unfunded control group and  `r na_control2` in the funded control group.
 If we only keep observations that have a match with non-missing values, we are left with a sample of `r final_before_control1` matched observations in unfunded control group and `r final_before_control2` matched observations in funded control group before intervention and a sample of `r final_after_control1` matched observations in unfunded control group and `r final_after_control2` matched observations in funded control group after intervention.
 
-When Looking at disciplines, we see that there are slightly more missing data in Agricultural and veterinary scieces and the Humanities and the Arts.
+When Looking at disciplines, we see that there are slightly more missing data in Agricultural and veterinary sciences and the Humanities and the Arts.
 
 ```{r echo=FALSE}
 
@@ -258,29 +260,29 @@ POZN: here we show data
 
 ```{r echo=FALSE}
 
-# assuming df is your dataframe
 df <- filtered_by_subclass %>% filter(independence_timing == "before_intervention")
+numeric_vars <- df %>% 
+  select(where(is.numeric)) %>% 
+  select(-weights, -funded_control, -id, -treatment_year, -career_start_year) %>% 
+  names()
 
-# list of numeric columns. Exclude treatment column
-numeric_vars <- df %>% select(where(is.numeric)) %>% select(-weights, -funded_control, -id, -treatment_year, -career_start_year) %>% names()
-
-# descriptive stats for treatment level 1
+# descriptive stats for each treatment level
 table_before_1 <- df %>% filter(treatment == 1) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
-
-# Print table for treatment level 1
-kable(table_before_1, digits = 3, caption = "Descriptive statistics for treatment group") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
-
-# descriptive stats for treatment level 0
 table_before_0 <- df %>% filter(treatment == 0) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
-
-# Print table for treatment level 0
-kable(table_before_0, digits = 3, caption = "Descriptive statistics for unfunded control group") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
-
-# descriptive stats for treatment level 2
 table_before_2 <- df %>% filter(treatment == 2) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
 
-# Print table for treatment level 2
-kable(table_before_2, digits = 3, caption = "Descriptive statistics for funded control group") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+colnames(table_before_0) <- paste0(colnames(table_before_0), "_0")
+colnames(table_before_2) <- paste0(colnames(table_before_2), "_2")
+
+combined_table_before <- cbind(table_before_1, table_before_0[, -1], table_before_2[, -1])
+
+kable(combined_table_before, 
+      digits = 3, align = "c", booktabs = TRUE) %>%
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>%
+  add_header_above(c(" " = 1, "Treatment Group" = 5, "Unfunded Control Group" = 4, "Funded Control Group" = 4))
+
+
+
 
 ```
 
@@ -290,29 +292,27 @@ kable(table_before_2, digits = 3, caption = "Descriptive statistics for funded c
 
 ```{r echo=FALSE}
 
-# assuming df is your dataframe
 df <- filtered_by_subclass %>% filter(independence_timing == "after_intervention")
+numeric_vars <- df %>% 
+  select(where(is.numeric)) %>% 
+  select(-weights, -funded_control, -id, -treatment_year, -career_start_year) %>% 
+  names()
 
-# list of numeric columns. Exclude treatment column
-numeric_vars <- df %>% select(where(is.numeric)) %>% select(-weights, -funded_control, -id, -treatment_year, -career_start_year) %>% names()
+# descriptive stats for each treatment level
+table_after_1 <- df %>% filter(treatment == 1) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
+table_after_0 <- df %>% filter(treatment == 0) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
+table_after_2 <- df %>% filter(treatment == 2) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
 
-# descriptive stats for treatment level 1
-table_before_1 <- df %>% filter(treatment == 1) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
+colnames(table_after_0) <- paste0(colnames(table_after_0), "_0")
+colnames(table_after_2) <- paste0(colnames(table_after_2), "_2")
 
-# Print table for treatment level 1
-kable(table_before_1, digits = 3, caption = "Descriptive statistics for treatment group") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+combined_table_after <- cbind(table_after_1, table_after_0[, -1], table_after_2[, -1])
 
-# descriptive stats for treatment level 0
-table_before_0 <- df %>% filter(treatment == 0) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
+kable(combined_table_after, 
+      digits = 3, align = "c", booktabs = TRUE) %>%
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>%
+  add_header_above(c(" " = 1, "Treatment Group" = 5, "Unfunded Control Group" = 4, "Funded Control Group" = 4))
 
-# Print table for treatment level 0
-kable(table_before_0, digits = 3, caption = "Descriptive statistics for unfunded control group") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
-
-# descriptive stats for treatment level 2
-table_before_2 <- df %>% filter(treatment == 2) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
-
-# Print table for treatment level 2
-kable(table_before_2, digits = 3, caption = "Descriptive statistics for funded control group") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 ```
 
@@ -355,7 +355,7 @@ Matching process removed `r removed_treatment_unfunded` treatment observations f
 
 The resulting sample had `r unique_treatment_unfunded` unique treatment group observations paired with `r unique_control_unfunded` unique unfunded control group observations suggesting that `r replaced_control_unfunded` observations from unfunded control group were matched to multiple treatment group observations. Similarly, there were `r unique_treatment_funded` unique treatment group observations paired with `r unique_control_funded` unique funded control group observations, suggesting that `r replaced_control_funded` funded control group observations were matched to multiple treatment group observations.
  
-BTW: there is an overlap between control group observations - `r overlap_control` observations from the unfunded control group also appears in the funded control group
+BTW: there is an overlap between control group observations: `r overlap_control` observations from the unfunded control group also appears in the funded control group
  
 
 ```{r echo=FALSE}
@@ -389,30 +389,72 @@ BTW: there is an overlap between control group observations - `r overlap_control
 # knitr::kable(balance_stats_2, caption = "Balance Statistics: Treatment vs Control Group 2") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 
+##Unfunded group
 
 
 unf_sum <- summary(tar_read(matched_obj_unfunded), un = TRUE)
 
-summary(tar_read(matched_obj_unfunded))
-    
-plot(unf_sum, var.order = "unmatched")
+# summary(tar_read(matched_obj_unfunded))
+#     
+# plot(unf_sum, var.order = "unmatched")
 
 
-cobalt::bal.tab(tar_read(matched_obj_unfunded), un = FALSE, stats = c("m", "v", "ks"), binary = "std")
+aa <- cobalt::bal.tab(tar_read(matched_obj_unfunded), un = TRUE, stats = c("m", "v", "ks"), binary = "std")
 
-cobalt::love.plot(tar_read(matched_obj_unfunded), binary = "std", var.order = "adjusted")
+# aa <- aa[!grepl("^disc_ford", names(aa))]
+
+# aa <- aa[!grepl("^disc_ford", names(aa$Balance))]
+
+bal_df <- aa$Balance
+
+bal_df <- bal_df[!grepl("^disc_ford", rownames(bal_df)), ]
 
 
+# Display the cleaned-up table with kable
+kable(bal_df, "html", caption = "Balance Statistics For Unfunded Control Group") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+
+aa$Balance <- bal_df
+
+cobalt::love.plot(aa, binary = "std", var.order = "adjusted")
+
+
+
+
+
+##Funded group
 
 
 
 fun_sum <- summary(tar_read(matched_obj_funded), un = TRUE)
 
-summary(tar_read(matched_obj_funded))
-    
-plot(fun_sum, var.order = "unmatched")
+# summary(tar_read(matched_obj_funded))
+#     
+# plot(fun_sum, var.order = "unmatched")
 
 
+bb <- cobalt::bal.tab(tar_read(matched_obj_funded), un = TRUE, stats = c("m", "v", "ks"), binary = "std")
+
+# aa <- aa[!grepl("^disc_ford", names(aa))]
+
+# aa <- aa[!grepl("^disc_ford", names(aa$Balance))]
+
+
+bal_df_funded <- bb$Balance
+
+bal_df_funded <- bal_df_funded[!grepl("^disc_ford", rownames(bal_df_funded)), ]
+
+
+# Display the cleaned-up table with kable
+kable(bal_df_funded, "html", caption = "Balance Statistics For Funded Control Group") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+
+
+bb$Balance <- bal_df_funded 
+
+cobalt::love.plot(bb, binary = "std", var.order = "adjusted")
 
 
 
@@ -423,10 +465,10 @@ plot(fun_sum, var.order = "unmatched")
 To ascertain the differences in independence scores before and after intervention, while accounting for the treatment type, academic disciplines, and paired nature of the data, we used repeated measures ANOVA. This allowed us to measure the main effect of change in independence across time, across disciplines, and the main treatment effect was the interaction between treatment type and time.
 
 
-POZN: only for comparison:
-To estimate the treatment effect and its standard error, we fit a linear regression model with 1978 earnings as the outcome and the treatment, covariates, and their interaction as predictors and included the full matching weights in the estimation. The lm() function was used to fit the outcome, and the comparisons() function in the marginaleffects package was used to perform g-computation in the matched sample to estimate the ATT. A cluster-robust variance was used to estimate its standard error with matching stratum membership as the clustering variable.
+<!-- POZN: only for comparison: -->
+<!-- To estimate the treatment effect and its standard error, we fit a linear regression model with 1978 earnings as the outcome and the treatment, covariates, and their interaction as predictors and included the full matching weights in the estimation. The lm() function was used to fit the outcome, and the comparisons() function in the marginaleffects package was used to perform g-computation in the matched sample to estimate the ATT. A cluster-robust variance was used to estimate its standard error with matching stratum membership as the clustering variable. -->
 
-The estimated effect was XXXX (SE = XXXX, p = XXXX), indicating that the average effect of the treatment for those who received it is to increase earnings.
+<!-- The estimated effect was XXXX (SE = XXXX, p = XXXX), indicating that the average effect of the treatment for those who received it is to increase earnings. -->
 
 ```{r echo=FALSE}
 
@@ -438,7 +480,8 @@ pp <- d %>%
 filtered_by_subclass_1 <- pp %>% 
     group_by(subclass) %>% 
     filter(!any(treatment == 2)) %>% 
-    ungroup()
+    ungroup() %>%
+    mutate(treatment = factor(treatment, levels = c(0, 1)))
 
 filtered_by_subclass_1$subclass <- as.factor(filtered_by_subclass_1$subclass)
 filtered_by_subclass_1$treatment <- as.factor(filtered_by_subclass_1$treatment)
@@ -463,50 +506,68 @@ filtered_by_subclass_1$field <- as.factor(filtered_by_subclass_1$field)
 
 
 model <- lmer(RII ~ treatment * independence_timing + (1 | subclass), data = filtered_by_subclass_1)
-summary(model)
-r.squaredGLMM(model)
+# summary(model)
+# r.squaredGLMM(model)
+
+model_no_interaction <- lmer(RII ~ treatment + independence_timing + (1 | subclass), data = filtered_by_subclass_1)
+
+RSS_no_interaction <- sum(residuals(model_no_interaction)^2)
+RSS_full <- sum(residuals(model)^2)
+delta_RSS <- RSS_no_interaction - RSS_full
+R2_interaction <- delta_RSS / RSS_no_interaction
+# print(R2_interaction)
+
+
+model_disc <- lmer(RII ~ treatment * independence_timing * field + 
+              (1 + independence_timing|subclass), 
+              data = filtered_by_subclass_1)
+
+# summary(model_disc)
+
+
+##checking assumptions fro repeated measures ANOVA
 
 
 
-##checking assumptiosn fro repeated measures ANOVA
+result <- aov(RII ~ treatment * independence_timing + Error(subclass/independence_timing), data=filtered_by_subclass_1)
+# summary(result)
+eta_sq_result <- eta_squared(result)
 
 # Normality: You can check the normality of the residuals using a Q-Q plot and the Shapiro-Wilk test.
 
-model_lm <- lm(RII ~ treatment + subclass + subclass:independence_timing, data = filtered_by_subclass_1)
-
 # Check residuals from lm
-plot(resid(model_lm))
+# plot(resid(result))
 
 #Linearity and Homoscedasticity (Equal Variances) of Residuals: If the assumptions hold, you should not see any obvious patterns or funnel shapes in the plot.
 
-plot(model_lm$fitted.values, resid(model_lm), 
-     xlab = "Fitted values", ylab = "Residuals", 
-     main = "Residuals vs. Fitted Values")
-abline(h = 0, col = "red")
+# plot(result$fitted.values, resid(result), 
+#      xlab = "Fitted values", ylab = "Residuals", 
+#      main = "Residuals vs. Fitted Values")
+# abline(h = 0, col = "red")
 
 # Normality of Residuals: 
-qqnorm(resid(model_lm))
-qqline(resid(model_lm))
-
-shapiro.test(resid(model_lm)) 
+# qqnorm(resid(result))
+# qqline(resid(result))
+# 
+# shapiro.test(resid(result)) 
 
 
 # Independence of Residuals: If your data has a time sequence (e.g., repeated measurements over time), then you would be concerned about the independence of residuals. For this, you can use the Durbin-Watson test from the car package. The Durbin-Watson test statistic ranges from 0 to 4. A value around 2 suggests no autocorrelation, while values below 1 and above 3 are cause for concern.
 
-library(car)
-durbinWatsonTest(model_lm)
+# library(car)
+# durbinWatsonTest(result)
 
 
 # Multicollinearity: Check the variance inflation factor (VIF) for each predictor. Typically, a VIF above 5-10 indicates multicollinearity.
 
-vif(model_lm)
+# vif(result)
 
 # Outliers and Influence Points: Leverage vs. studentized residuals plot can be used to identify influential points.
 
-plot(hatvalues(model_lm), rstudent(model_lm),
-     xlab = "Leverage", ylab = "Studentized Residuals",
-     main = "Residuals vs. Leverage")
-abline(h = c(-2,2), col = "red", lty = 2)
+# plot(hatvalues(result), rstudent(result),
+#      xlab = "Leverage", ylab = "Studentized Residuals",
+#      main = "Residuals vs. Leverage")
+# abline(h = c(-2,2), col = "red", lty = 2)
 
 
 
@@ -516,115 +577,312 @@ abline(h = c(-2,2), col = "red", lty = 2)
 
 # Homogeneity of Variance: Use Levene's Test. The car package offers leveneTest.
 
-library(car)
-leveneTest(RII ~ treatment, data = filtered_by_subclass_1)
+# library(car)
+# leveneTest(RII ~ treatment, data = filtered_by_subclass_1)
 
 # Outliers:You can inspect boxplots or use Mahalanobis distance.
 
-boxplot(RII ~ treatment, data = filtered_by_subclass_1)
+# boxplot(RII ~ treatment, data = filtered_by_subclass_1)
 
 
 
 ##conducting repeated measures ANOVA
 
+# filtered_by_subclass_1 <- filtered_by_subclass_1 %>%
+#      group_by(vedidk, subclass) %>%  # Assuming 'id' is your current unique identifier
+#      mutate(subject_id = cur_group_id()) %>%  # This creates a unique ID for each group
+#      ungroup()
 
-result <- ezANOVA(data = filtered_by_subclass_1,
-                 dv = RII,
-                 wid = subclass,
-                 within = .(independence_timing),
-                 between = treatment)
-print(result)
+# #this is preferable because it takes into account the matched nature of the data, as well as repeated measures nature of the data -> see chatGPT conversation "ANOVA `wid` parameter clarification"
+# result <- aov(RII ~ treatment * independence_timing + Error(subclass/independence_timing), data=filtered_by_subclass_1)
+# # summary(result)
+# eta_sq_result <- eta_squared(result)
+
+#this is less preferable because it takes into account only the repeated measure nature of the data, not the matched nature -> you can see that when you run this tests, there is warning that says "there were non-unique subclass values across the between-subjects variable (treatment). Essentially, ezANOVA detected the problem and internally "fixed" it by making subclass unique across the treatment groups, so it behaves similarly to subject_id you later created." -> this means that it effectively converts the subclass to subject_id anyway
+# result <- ezANOVA(data = filtered_by_subclass_1,
+#                  dv = RII,
+#                  wid = subclass,
+#                  within = .(independence_timing),
+#                  between = treatment)
+# # print(result)
+
+
+
 
 
 
 ## adding disciplines:
 
-
-result_disc <- ezANOVA(data = filtered_by_subclass_1,
-                 dv = RII,
-                 wid = subclass,
-                 within = .(independence_timing),
-                 between = .(treatment, field))
-print(result_disc)
-
-
-
-
-
-
-
-
-
-### visualisations
-     
-     
-means <- aggregate(RII ~ treatment + independence_timing, data = filtered_by_subclass_1, FUN = mean)
-
- ggplot(data = filtered_by_subclass_1, aes(x = treatment, y = RII, fill = independence_timing)) +
-         geom_violin(scale = "width") +
-         scale_fill_discrete(name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
-         xlab("Treatment Group") +
-         ylab("RII Score") +
-         ggtitle("Violin Plot of RII Scores by Treatment and Time") +
-         theme_bw()
-
-
-means_disc <- aggregate(RII ~ field, data = filtered_by_subclass_1, FUN = mean)
-     
-num_disc <- filtered_by_subclass_1 %>%
+filtered_data_disc_1 <- filtered_by_subclass_1 %>%
   group_by(field) %>%
-  summarise(count = n(), .groups = "drop")
+  filter(n() >= 10)
 
-means_disc <- left_join(means_disc, num_disc, by = "field") 
+filtered_data_disc_1 <- filtered_data_disc_1 %>%
+     group_by(vedidk, subclass) %>%  # Assuming 'id' is your current unique identifier
+     mutate(subject_id = cur_group_id()) %>%  # This creates a unique ID for each group
+     ungroup()
 
-# Step 1: Reorder the levels of 'field'
-means_disc$field <- with(means_disc, factor(field, levels=unique(field[order(RII)])))
 
-# Step 2: Optionally, sort the dataframe based on the reordered levels
-means_disc <- means_disc %>% arrange(field)
+# Calculate weights based on group size (you can adjust this based on other criteria if needed)
+group_sizes <- table(filtered_data_disc_1$field)
+max_size <- max(group_sizes)
+filtered_data_disc_1$weights <- max_size / group_sizes[filtered_data_disc_1$field]
 
-    
-ggplot(data = means_disc, aes(x = reorder(c(1:6), RII), y = RII, fill = field)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  
-  # Add the number of observations on top of the bars
-  geom_text(aes(label=count), position=position_dodge(width=0.9), vjust=-0.5) +
+#this model addresses both unequal group sizes (via weights) and heteroscedasticity (via varIdent). Additionally, I've added a first-order autoregressive structure (corAR1) assuming you have repeated measures on the same subjects and to account for their paired nature (indicated by subclass/independence_timing)
+#this model directly tests whether there is a difference in disciplines - anyway it tests each discipline agains each other, so it doesnt produce the neat result of "yes, there are some significant differences between disciplines", but more nuanced version of "there is specifically difference between this and this discipline"
 
-  labs(x = "Field", y = "Mean RII") +
-  scale_fill_discrete(name = "Field") +
-  theme_bw()
+model_gls_weighted <- gls(RII ~ field, data = filtered_data_disc_1, 
+                          weights = varIdent(form = ~ 1 | field),
+                          method = "ML",
+                          correlation = corAR1(form = ~ 1 | subject_id))  
 
- 
+# summary(model_gls_weighted)
+
+#this model below is the same as the above but with added predictors
+
+model_gls_interactions_subclass <- gls(RII ~ field * treatment * independence_timing, 
+                              data = filtered_data_disc_1, 
+                              weights = varIdent(form = ~ 1 | field),
+                              method = "ML",
+                              correlation = corAR1(form = ~ 1 | subclass/independence_timing)) 
+
+# summary(model_gls_interactions_subclass)
+
+
+#one potential strategy to get the neat result of "yes, there are some significant differences between disciplines" is following: create two similar models 
+
+model_without_field <- gls(RII ~ treatment + independence_timing + treatment:independence_timing, 
+                           data = filtered_data_disc_1, 
+                           correlation = corCompSymm(form = ~ 1 | subclass/independence_timing), 
+                           method = "ML")
+
+model_with_field_main_effect <- gls(RII ~ treatment + field + independence_timing + treatment:independence_timing, 
+                                    data = filtered_data_disc_1, 
+                                    correlation = corCompSymm(form = ~ 1 | subclass/independence_timing), 
+                                    method = "ML")
+
+
+anova_result <- anova(model_without_field, model_with_field_main_effect)
+
+
+
+# Your result specifically shows that the model_with_field_main_effect is significantly better at explaining the variance in your response variable compared to the model_without_field. The p-value is extremely small (1e-04), indicating a significant main effect of "field".
+# 
+# In other words, the main effect of "field" significantly improves the model fit, suggesting that the variable "field" has a significant main effect on the response variable RII after accounting for other predictors in the model.
+
+
+
+
+
+#this model does NOT address unequal group sizes (via weights) and heteroscedasticity 
+
+# result_disc <- ezANOVA(data = filtered_data_disc_1,
+#                  dv = RII,
+#                  wid = subclass,
+#                  within = .(independence_timing),
+#                  between = .(treatment, field))
+# # print(result_disc)
+
+
  
 ```
 
 
 
 
-In the first analysis, we examined the effects of treatment, independence_timing, and their interaction on the dependent variable, researcher independence (RII) for the treatment group and unfunded control group. There was a significant main effect of independence_timing on RII, F(`r result$ANOVA[2, 2]`, `r result$ANOVA[2, 3]`) = `r result$ANOVA[2, 4]`, p = `r result$ANOVA[2, 5]` indicating a significant change in the independence from before to after the intervention. The effect size (GES) for this effect was `r result$ANOVA[2, 7]`, suggesting a moderate effect.
-Importantly, there was a significant interaction effect between treatment and independence_timing on independence, F(`r result$ANOVA[3, 2]`, `r result$ANOVA[3, 3]`) = `r result$ANOVA[3, 4]`, p = `r result$ANOVA[3, 5]`. This interaction suggests that the effect of the intervention on independence differed based on the treatment group. The effect size (GES) for this interaction was `r result$ANOVA[3, 7]`, indicating a small effect.
+In the first analysis, we examined the effects of treatment, independence_timing, and their interaction on the dependent variable, researcher independence (RII) for the treatment group and unfunded control group. 
 
-In the subsequent analysis, we further incorporated the factor of discipline (field) to explore if there were differences across disciplines in the observed effects. There was a significant main effect of field on independence, F(`r result_disc$ANOVA[2, 2]`, `r result_disc$ANOVA[2, 3]`) = `r result_disc$ANOVA[2, 4]`, p = `r result_disc$ANOVA[2, 5]`, indicating that there were significant differences in RII across the six discipline groups. On average, Agricultural and veterinary sciences showed lowest independence, while Social Sciences and Humanities showed almost twice as large independence, (though it is important to note that small sample might provide unstable estimates (----> i SHOULD REMOVE THEM FROM THE ANALYSIS SINCE THESE SEEM TO BE TOO FEW OBSERVATIONS --> MAYBE I SHOULD ALSO DO A SEPARATE ANOVA ONLY TAKING INTO ACCOUNT ALL DISC BEFORE INTEVENTION AND AFTER INTERVENTION SEPARATELY BUT FOR BOTH CONTROL GROUPS). The effect size (GES) for this was `r result_disc$ANOVA[2, 7]`, suggesting a moderate effect. The interaction between treatment and field was not statistically significant, F(`r result_disc$ANOVA[4, 2]`, `r result_disc$ANOVA[4, 3]`) = `r result_disc$ANOVA[4, 4]`, p = `r result_disc$ANOVA[4, 5]`, suggesting that the effect of treatment on independence was consistent across disciplines. The three-way interaction among treatment, independence_timing, and field was not statistically significant, F(`r result_disc$ANOVA[6, 2]`, `r result_disc$ANOVA[6, 3]`) = `r result_disc$ANOVA[6, 4]`, p = `r result_disc$ANOVA[6, 5]`. This implies that the interaction effect of treatment and independence_timing on independence remained consistent across different disciplines.
+There was a significant main effect of independence_timing on RII, F(`r summary(result)$"Error: subclass:independence_timing"[[1]]$"Df"[1]`, `r format(summary(result)$"Error: subclass:independence_timing"[[1]]$"Df"[2])`) = `r format(summary(result)$"Error: subclass:independence_timing"[[1]]$"F value"[1], digits=2)`, p = `r format(summary(result)$"Error: subclass:independence_timing"[[1]]$"Pr(>F)"[1], digits=4)`). This effect accounted for approximately `r format(eta_sq_result[eta_sq_result$Parameter == "independence_timing", "Eta2_partial"] * 100, digits=2)`% of the observed variance (partial \(\eta^2 = `r eta_sq_result[eta_sq_result$Parameter == "independence_timing", "Eta2_partial"]`\), 95% CI [`r eta_sq_result[eta_sq_result$Parameter == "independence_timing", "CI_low"]`, `r eta_sq_result[eta_sq_result$Parameter == "independence_timing", "CI_high"]`]).
 
-
-
-POZN ON MODEL CHOICE:
-
-In Conclusion:
-
-Both the mixed-effects model and the RM-ANOVA suggest a significant interaction between the treatment and the timing of the intervention. This means that the effect of the intervention differed between the treatment and control groups.
-
-Both methods also indicate that the timing of the intervention (i.e., whether it's before or after) has a significant effect on the outcome RII.
-
-The models are in agreement with their primary findings, which is a good sign. It suggests that the treatment has a distinct effect on RII after the intervention, different from that of the control group.
-
-However, it's worth noting that while the methods reach similar conclusions, they approach the problem from different angles. The mixed-effects model incorporates the correlation within each subclass through its random effect, while the RM-ANOVA primarily focuses on the repeated measures nature of the data. Both models provide valuable insights, but the mixed-effects model might be a more robust choice for this particular dataset, given its explicit modeling of the subclass structure.
+Importantly, there was a significant interaction effect between treatment and independence_timing on independence, F(`r format(summary(result)$"Error: Within"[[1]]$"Df"[2])`, `r format(summary(result)$"Error: Within"[[1]]$"Df"[3])` = `r format(summary(result)$"Error: Within"[[1]]$"F value"[2], digits=2)`, p = `r format(summary(result)$"Error: Within"[[1]]$"Pr(>F)"[2], digits=2)`. This interaction effect explained about `r format(eta_sq_result[eta_sq_result$Parameter == "treatment:independence_timing", "Eta2_partial"] * 100, digits=2)`% of the variability (partial \(\eta^2 = `r eta_sq_result[eta_sq_result$Parameter == "treatment:independence_timing", "Eta2_partial"]`\), 95% CI [`r eta_sq_result[eta_sq_result$Parameter == "treatment:independence_timing", "CI_low"]`, `r eta_sq_result[eta_sq_result$Parameter == "treatment:independence_timing", "CI_high"]`]).
 
 
-My take:
 
 
-I understand the results of ANOVa, but dont understand the results of the mixed effects model very much. I also like that ANOVa actually provides p statistic and effect size statistic
+
+
+
+<!-- LMM interpretation: -->
+
+
+<!-- In the updated analysis using a linear mixed model, we examined the effects of treatment, independence_timing, and their interaction on the dependent variable, researcher independence (RII) for the treatment group and unfunded control group. -->
+
+<!-- - There was a significant main effect of `independence_timing` on RII, t(`r summary(model)$coefficients[3,3]`) = `r summary(model)$coefficients[3, "t value"]`, p = `r format(summary(model)$coefficients[3,5], scientific = TRUE)`, suggesting that there was a significant change in RII from before to after intervention in the control group. -->
+
+<!-- - There was also a significant main effect of `treatment` on RII, t(`r summary(model)$coefficients[2,3]`) = `r summary(model)$coefficients[2, "t value"]`, p = `r format(summary(model)$coefficients[2,5], scientific = TRUE)`. This effect indicates a difference in RII between the control group and the treatment group before the intervention. -->
+
+<!-- - Importantly, there was a significant interaction effect between `treatment` and `independence_timing` on RII, t(`r summary(model)$coefficients[4,3]`) = `r summary(model)$coefficients[4, "t value"]`, p = `r format(summary(model)$coefficients[4,5], scientific = TRUE)`. This interaction suggests that the effect of the intervention on independence differed based on the timing of the measurement. The effect size for all fixed effects can be approximated using the marginal \( R^2 \) which is `r r.squaredGLMM(model)[1]`, suggesting that about `r round(r.squaredGLMM(model)[1] * 100, 1)`% of the variance in RII can be explained by the main effects in our model. The effect size for the interaction specifically can be computed using \( \Delta R^2 \) due to the interaction, which is `r R2_interaction`, indicating that about `r round(R2_interaction * 100, 1)`% of variance in RII is explained by the interaction between treatment and independence_timing over and above the main effects. -->
+
+
+
+
+
+<!-- POZN ON MODEL CHOICE: -->
+
+<!-- In Conclusion: -->
+
+<!-- Both the mixed-effects model and the RM-ANOVA suggest a significant interaction between the treatment and the timing of the intervention. This means that the effect of the intervention differed between the treatment and control groups. -->
+
+<!-- Both methods also indicate that the timing of the intervention (i.e., whether it's before or after) has a significant effect on the outcome RII. -->
+
+<!-- The models are in agreement with their primary findings, which is a good sign. It suggests that the treatment has a distinct effect on RII after the intervention, different from that of the control group. -->
+
+<!-- However, it's worth noting that while the methods reach similar conclusions, they approach the problem from different angles. The mixed-effects model incorporates the correlation within each subclass through its random effect, while the RM-ANOVA primarily focuses on the repeated measures nature of the data. Both models provide valuable insights, but the mixed-effects model might be a more robust choice for this particular dataset, given its explicit modeling of the subclass structure. -->
+
+
+<!-- My take: -->
+
+<!-- The advantage of ANOVa is that it provides information about the "average" effect of independence timing across the dataset, whereas LMM does not do that (but it could be calculated extra, by default it only shows change in time in the control group, not the treatment group, which makes the interpretation harder). On the other hand  -->
+<!-- None of these models work well with the disciplines by default - I could make some extra edits to make ANOVA work, but I'm unsure what the interpretation would be for LMM -->
+
+
+```{r echo=FALSE}
+
+### visualisations
+     
+     
+means <- aggregate(RII ~ treatment + independence_timing, data = filtered_by_subclass_1, FUN = mean)
+
+ # ggplot(data = filtered_by_subclass_1, aes(x = treatment, y = RII, fill = independence_timing)) +
+ #         geom_violin(scale = "width") +
+ #         scale_fill_discrete(name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
+ #         xlab("Treatment Group") +
+ #         ylab("RII Score") +
+ #         ggtitle("Violin Plot of RII Scores by Treatment and Time") +
+ #         theme_bw()
+
+ 
+ # Calculate means and standard errors for plotting
+plot_data <- filtered_by_subclass_1 %>%
+  group_by(treatment, independence_timing) %>%
+  summarize(
+    mean_RII = mean(RII),
+    se_RII = sd(RII) / sqrt(n())
+  )
+
+# # Plot
+# p <- ggplot(plot_data, aes(x = independence_timing, y = mean_RII, group = treatment, color = factor(treatment))) +
+#   geom_line(aes(linetype = factor(treatment))) + 
+#   geom_point(size = 3) + 
+#   geom_errorbar(aes(ymin = mean_RII - se_RII, ymax = mean_RII + se_RII), width = 0.2) +
+#   labs(
+#     title = "Effect of Intervention on Researcher Independence Index (RII)",
+#     x = "Independence Timing",
+#     y = "Mean RII",
+#     color = "Treatment Group",
+#     linetype = "Treatment Group"
+#   ) +
+#   scale_color_manual(values = c("blue", "red"), labels = c("Control", "Treatment")) +
+#   scale_linetype_manual(values = c("dashed", "solid")) +
+#   theme_minimal()
+
+ 
+ 
+dodge_width <- 0.5
+
+combined_plot <- ggplot() +  
+  
+  geom_violin(data = filtered_by_subclass_1, 
+              aes(x = treatment, y = RII, fill = independence_timing), 
+              scale = "width", 
+              position = position_dodge(dodge_width)) + 
+  
+  geom_point(data = plot_data, 
+             aes(x = treatment, y = mean_RII, color = independence_timing), 
+             position = position_dodge(dodge_width), 
+             size = 3) +
+  
+  geom_errorbar(data = plot_data, 
+                aes(x = treatment, ymin = mean_RII - se_RII, ymax = mean_RII + se_RII, color = independence_timing), 
+                position = position_dodge(dodge_width), 
+                width = 0.2) +
+  
+  scale_fill_discrete(name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
+  scale_color_manual(values = c("black", "red"), name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
+  
+  labs(title = "Violin Plot of RII Scores by Treatment and Time with Mean and CI Overlayed",
+       x = "Treatment Group",
+       y = "RII Score") +
+  theme_bw()
+
+print(combined_plot)
+
+```
+
+
+```{r echo=FALSE}
+
+# means_disc <- aggregate(RII ~ field, data = filtered_by_subclass_1, FUN = mean)
+#      
+# num_disc <- filtered_by_subclass_1 %>%
+#   group_by(field) %>%
+#   summarise(count = n(), .groups = "drop")
+# 
+# means_disc <- left_join(means_disc, num_disc, by = "field") 
+# 
+# # Step 1: Reorder the levels of 'field'
+# means_disc$field <- with(means_disc, factor(field, levels=unique(field[order(RII)])))
+# 
+# # Step 2: Optionally, sort the dataframe based on the reordered levels
+# means_disc <- means_disc %>% arrange(field)
+# 
+#     
+# se_ci_data <- filtered_by_subclass_1 %>%
+#   group_by(field) %>%
+#   summarise(mean_RII = mean(RII),
+#             se_RII = sd(RII) / sqrt(n()),
+#             lower_CI = mean_RII - (1.96 * se_RII),
+#             upper_CI = mean_RII + (1.96 * se_RII), 
+#             .groups = "drop")
+# 
+# means_disc <- merge(means_disc, se_ci_data, by = "field")
+# 
+# 
+# ggplot(data = means_disc, aes(x = field, y = mean_RII, fill = field)) +
+#   geom_bar(stat = "identity", position = "dodge") +
+#   
+#   # Add error bars for confidence intervals
+#   geom_errorbar(aes(ymin = lower_CI, ymax = upper_CI), position = position_dodge(width=0.9), width=0.25) +
+#   
+#   # Add the number of observations in the middle of the bars
+#   geom_text(aes(label=count, y = mean_RII/2), position=position_dodge(width=0.9), vjust=0.5) +
+#   
+#   # Change x-axis labels and add a title
+#   scale_x_discrete(labels = seq_along(unique(means_disc$field))) + # replace with numbers
+#   labs(
+#     x = "Field", 
+#     y = "Mean RII",
+#     title = "Differences in RII across disciplines" # Replace with your desired title
+#   ) +
+#   scale_fill_discrete(name = "Field") +
+#   theme_bw()
+
+
+```
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ```{r echo=FALSE}
@@ -633,7 +891,10 @@ I understand the results of ANOVa, but dont understand the results of the mixed 
 filtered_by_subclass_2 <- pp %>% 
     group_by(subclass) %>% 
     filter(!any(treatment == 0)) %>% 
-    ungroup()
+    ungroup() %>%
+    mutate(treatment = as.numeric(as.character(treatment))) %>%
+    mutate(treatment = if_else(treatment == 2, 0, treatment)) %>%
+    mutate(treatment = factor(treatment, levels = c(0, 1)))
 
 filtered_by_subclass_2$subclass <- as.factor(filtered_by_subclass_2$subclass)
 filtered_by_subclass_2$treatment <- as.factor(filtered_by_subclass_2$treatment)
@@ -654,95 +915,216 @@ filtered_by_subclass_2$field <- as.factor(filtered_by_subclass_2$field)
 # clustered_se <- coeftest(did_model, vcov = function(x) vcovHC(x, type = "HC1", cluster = "subclass"))
 
 
-model2 <- lmer(RII ~ treatment * independence_timing + (1 | subclass), data = filtered_by_subclass_2)
-summary(model2)
-r.squaredGLMM(model2)
+# model2 <- lmer(RII ~ treatment * independence_timing + (1 | subclass), data = filtered_by_subclass_2)
+# summary(model2)
+# r.squaredGLMM(model2)
 
 
-result2 <- ezANOVA(data = filtered_by_subclass_2,
-                 dv = RII,
-                 wid = subclass,
-                 within = .(independence_timing),
-                 between = treatment)
-print(result)
+
+result2 <- aov(RII ~ treatment * independence_timing + Error(subclass/independence_timing), data=filtered_by_subclass_2)
+# summary(result)
+eta_sq_result2 <- eta_squared(result2)
+
+
+# result2 <- ezANOVA(data = filtered_by_subclass_2,
+#                  dv = RII,
+#                  wid = subclass,
+#                  within = .(independence_timing),
+#                  between = treatment)
+# print(result)
 
 
 
 ## adding disciplines:
 
 
-result_disc2 <- ezANOVA(data = filtered_by_subclass_2,
-                 dv = RII,
-                 wid = subclass,
-                 within = .(independence_timing),
-                 between = .(treatment, field))
-print(result_disc2)
+
+
+# result_disc2 <- ezANOVA(data = filtered_by_subclass_2,
+#                  dv = RII,
+#                  wid = subclass,
+#                  within = .(independence_timing),
+#                  between = .(treatment, field))
+# print(result_disc2)
+
+
+
+```
 
 
 
 
+In the second analysis, we examined the effects of treatment, independence_timing, and their interaction on the researcher independence (RII) for the treatment group and funded control group. Again, there was a significant main effect of time on independence, F(`r format(summary(result2)$"Error: subclass:independence_timing"[[1]]$"Df"[1])`, `r format(summary(result2)$"Error: subclass:independence_timing"[[1]]$"Df"[2])`) = `r format(summary(result2)$"Error: subclass:independence_timing"[[1]]$"F value"[1], digits=2)`, p = `r format(summary(result2)$"Error: subclass:independence_timing"[[1]]$"Pr(>F)"[1], digits=4)`). The effect accounted for approximately `r format(eta_sq_result2[eta_sq_result2$Parameter == "independence_timing", "Eta2_partial"] * 100, digits=2)`% of the observed variance (partial \(\eta^2 = `r eta_sq_result2[eta_sq_result2$Parameter == "independence_timing", "Eta2_partial"]`\), 95% CI [`r eta_sq_result2[eta_sq_result2$Parameter == "independence_timing", "CI_low"]`, `r eta_sq_result2[eta_sq_result2$Parameter == "independence_timing", "CI_high"]`]).
+
+Importantly, this time the interaction effect between treatment and time was not significant, F(`r format(summary(result2)$"Error: Within"[[1]]$"Df"[2])`, `r format(summary(result2)$"Error: Within"[[1]]$"Df"[3])`) = `r format(summary(result2)$"Error: Within"[[1]]$"F value"[2], digits=2)`, p = `r format(summary(result2)$"Error: Within"[[1]]$"Pr(>F)"[2], digits=2)`. This interaction effect explained about `r format(eta_sq_result2[eta_sq_result2$Parameter == "treatment:independence_timing", "Eta2_partial"] * 100, digits=2)`% of the variability (partial \(\eta^2 = `r eta_sq_result2[eta_sq_result2$Parameter == "treatment:independence_timing", "Eta2_partial"]`\), 95% CI [`r eta_sq_result2[eta_sq_result2$Parameter == "treatment:independence_timing", "CI_low"]`, `r eta_sq_result2[eta_sq_result2$Parameter == "treatment:independence_timing", "CI_high"]`]), suggesting that funding has the same effects, regardless of its type or source.
+
+
+```{r echo=FALSE}
 
 
 ### visualisations
      
-     
-means2 <- aggregate(RII ~ treatment + independence_timing, data = filtered_by_subclass_2, FUN = mean)
 
- ggplot(data = filtered_by_subclass_2, aes(x = treatment, y = RII, fill = independence_timing)) +
-         geom_violin(scale = "width") +
-         scale_fill_discrete(name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
-         xlab("Treatment Group") +
-         ylab("RII Score") +
-         ggtitle("Violin Plot of RII Scores by Treatment and Time") +
-         theme_bw()
-
+plot_data2 <- filtered_by_subclass_2 %>%
+  group_by(treatment, independence_timing) %>%
+  summarize(
+    mean_RII = mean(RII),
+    se_RII = sd(RII) / sqrt(n())
+  )
 
  
-means_disc2 <- aggregate(RII ~ field, data = filtered_by_subclass_2, FUN = mean)
+dodge_width <- 0.5
+
+combined_plot2 <- ggplot() +  
+  
+  geom_violin(data = filtered_by_subclass_2, 
+              aes(x = treatment, y = RII, fill = independence_timing), 
+              scale = "width", 
+              position = position_dodge(dodge_width)) + 
+  
+  geom_point(data = plot_data2, 
+             aes(x = treatment, y = mean_RII, color = independence_timing), 
+             position = position_dodge(dodge_width), 
+             size = 3) +
+  
+  geom_errorbar(data = plot_data2, 
+                aes(x = treatment, ymin = mean_RII - se_RII, ymax = mean_RII + se_RII, color = independence_timing), 
+                position = position_dodge(dodge_width), 
+                width = 0.2) +
+  
+  scale_fill_discrete(name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
+  scale_color_manual(values = c("black", "red"), name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
+  
+  labs(title = "Violin Plot of RII Scores by Treatment and Time with Mean and CI Overlayed",
+       x = "Treatment Group",
+       y = "RII Score") +
+  theme_bw()
+
+print(combined_plot2)
+
+
+
+# means2 <- aggregate(RII ~ treatment + independence_timing, data = filtered_by_subclass_2, FUN = mean)
+# 
+# 
+# means_disc2 <- aggregate(RII ~ field, data = filtered_by_subclass_2, FUN = mean)
+#      
+# num_disc2 <- filtered_by_subclass_2 %>%
+#   group_by(field) %>%
+#   summarise(count = n(), .groups = "drop")
+# 
+# means_disc2 <- left_join(means_disc2, num_disc2, by = "field") 
+# 
+# # Step 1: Reorder the levels of 'field'
+# means_disc2$field <- with(means_disc2, factor(field, levels=unique(field[order(RII)])))
+# 
+# # Step 2: Optionally, sort the dataframe based on the reordered levels
+# means_disc2 <- means_disc2 %>% arrange(field)
+# 
+# 
+# 
+# se_ci_data2 <- filtered_by_subclass_2 %>%
+#   group_by(field) %>%
+#   summarise(mean_RII = mean(RII),
+#             se_RII = sd(RII) / sqrt(n()),
+#             lower_CI = mean_RII - (1.96 * se_RII),
+#             upper_CI = mean_RII + (1.96 * se_RII), 
+#             .groups = "drop")
+# 
+# means_disc2 <- merge(means_disc2, se_ci_data2, by = "field")
+# 
+# 
+# ggplot(data = means_disc2, aes(x = field, y = mean_RII, fill = field)) +
+#   geom_bar(stat = "identity", position = "dodge") +
+#   
+#   # Add error bars for confidence intervals
+#   geom_errorbar(aes(ymin = lower_CI, ymax = upper_CI), position = position_dodge(width=0.9), width=0.25) +
+#   
+#   # Add the number of observations in the middle of the bars
+#   geom_text(aes(label=count, y = mean_RII/2), position=position_dodge(width=0.9), vjust=0.5) +
+#   
+#   # Change x-axis labels and add a title
+#   scale_x_discrete(labels = seq_along(unique(means_disc2$field))) + # replace with numbers
+#   labs(
+#     x = "Field", 
+#     y = "Mean RII",
+#     title = "Differences in RII across disciplines" # Replace with your desired title
+#   ) +
+#   scale_fill_discrete(name = "Field") +
+#   theme_bw()
+
+
+
+
+disc_data <- d %>%
+     filter(!is.na(RII)) %>% 
+     group_by(vedidk, field, RII) %>%
+     sample_n(1) %>%
+     ungroup()
+
+means_disc_complete <- aggregate(RII ~ field, data = disc_data, FUN = mean)
      
-num_disc2 <- filtered_by_subclass_2 %>%
+num_disc_complete <- disc_data %>%
   group_by(field) %>%
   summarise(count = n(), .groups = "drop")
 
-means_disc2 <- left_join(means_disc2, num_disc2, by = "field") 
+means_disc_complete <- left_join(means_disc_complete, num_disc_complete, by = "field") 
 
 # Step 1: Reorder the levels of 'field'
-means_disc2$field <- with(means_disc2, factor(field, levels=unique(field[order(RII)])))
+means_disc_complete$field <- with(means_disc_complete, factor(field, levels=unique(field[order(RII)])))
 
 # Step 2: Optionally, sort the dataframe based on the reordered levels
-means_disc2 <- means_disc2 %>% arrange(field)
+means_disc_complete <- means_disc_complete %>% arrange(field)
 
-    
-ggplot(data = means_disc2, aes(x = reorder(c(1:6), RII), y = RII, fill = field)) +
+
+
+se_ci_data_complete <- disc_data %>%
+  group_by(field) %>%
+  summarise(mean_RII = mean(RII),
+            se_RII = sd(RII) / sqrt(n()),
+            lower_CI = mean_RII - (1.96 * se_RII),
+            upper_CI = mean_RII + (1.96 * se_RII), 
+            .groups = "drop")
+
+means_disc_complete <- merge(means_disc_complete, se_ci_data_complete, by = "field")
+
+
+ggplot(data = means_disc_complete, aes(x = field, y = mean_RII, fill = field)) +
   geom_bar(stat = "identity", position = "dodge") +
   
-  # Add the number of observations on top of the bars
-  geom_text(aes(label=count), position=position_dodge(width=0.9), vjust=-0.5) +
-
-  labs(x = "Field", y = "Mean RII") +
+  # Add error bars for confidence intervals
+  geom_errorbar(aes(ymin = lower_CI, ymax = upper_CI), position = position_dodge(width=0.9), width=0.25) +
+  
+  # Add the number of observations in the middle of the bars
+  geom_text(aes(label=count, y = mean_RII/2), position=position_dodge(width=0.9), vjust=0.5) +
+  
+  # Change x-axis labels and add a title
+  scale_x_discrete(labels = seq_along(unique(means_disc_complete$field))) + # replace with numbers
+  labs(
+    x = "Field", 
+    y = "Mean RII",
+    title = "Differences in average RII across disciplines"
+  ) +
   scale_fill_discrete(name = "Field") +
   theme_bw()
+
+
 
  
 ```
 
 
-In the second analysis, we examined the effects of treatment, independence_timing, and their interaction on the researcher independence (RII) for the treatment group and funded control group. Again, there was a significant main effect of time on independence (F(`r result2$ANOVA[2, 2]`, `r result2$ANOVA[2, 3]`) = `r result2$ANOVA[2, 4]`, p = `r result2$ANOVA[2, 5]`), with moderate effect size (GES = `r result2$ANOVA[2, 7]`).
-Importantly, this time the interaction effect between treatment and time  was not significant (F(`r result2$ANOVA[3, 2]`, `r result2$ANOVA[3, 3]`) = `r result2$ANOVA[3, 4]`, p = `r result2$ANOVA[3, 5]`), suggesting that funding has the same effects, regardless of its type or source.
-
-When adding disciplines into the analysis, we again found that there is a variation in independence across disciplines (F(`r result_disc2$ANOVA[2, 2]`, `r result_disc2$ANOVA[2, 3]`) = `r result_disc2$ANOVA[2, 4]`, p = `r result_disc2$ANOVA[2, 5]`) with Agricultural and veterinary sciences again showing the lowest independence, while Social Sciences and Humanities showing largest (though it is important to note that small sample might provide unstable estimates (----> i SHOULD REMOVE THEM FROM THE ANALYSIS SINCE THESE SEEM TO BE TOO FEW OBSERVATIONS --> MAYBE I SHOULD ALSO DO A SEPARATE ANOVA ONLY TAKING INTO ACCOUNT ALL DISC BEFORE INTEVENTION AND AFTER INTERVENTION SEPARATELY BUT FOR BOTH CONTROL GROUPS), and with a moderate effect size (GES = `r result_disc2$ANOVA[2, 7]`). Anyway, these differences were again stable across time and treatment conditions as the interaction were not significant.
-
-
-
-
 
 # Discussion
 
-The results of this study provide important insights into the effects of funding interventions on researcher independence. The strongest effect we found across all control group comparison was the effect of time - over time, researchers become more independent, regardless of their access to funding or their discipline. The effect size for this difference is moderate when comparing funded and unfunded groups, and also moderate when comparing the funded treatment and funded control groups.
+The results of this study provide important insights into the effects of funding interventions on researcher independence. The strongest effect we found across all control group comparison was the effect of time - over time, researchers become more independent, regardless of their access to funding or their study discipline. This effect explains around 60% of the variance in independence.
 
 Additionally, the observed variation in independence across different disciplines underscores the importance of considering disciplinary differences, suggested by a moderate effect size. A moderate effect size for the field effect emphasizes that certain disciplines might inherently have variations in RII, perhaps due to differences in practices, methodologies, or norms specific to each discipline. Anyway, these differences remain constant across time and funding interventions, suggesting that funding has a uniform effect on the independence across disciplines.
 
-Finally, the significant interaction between treatment and time when comparing treamtnet vs unfunded group suggests the funding has positive effect on stimulating researchers' independence. However, the effect size is only modest, indicating relatively small practical relevance. Further the insignificant interaction when comparing the treatment vs funded control group suggests that funding in this career stage has the same effect, regardless of its type or source.
+Finally, the significant interaction between treatment and time when comparing treatment vs unfunded group suggests the funding has positive effect on stimulating researchers' independence. However, the effect size is only modest, explaining about 2 % of variance in independence, indicating relatively small practical relevance. Further, the insignificant interaction when comparing the treatment vs funded control group suggests that funding in this career stage has the same effect, regardless of its type or source. Interestingly, in our sample both funded groups (treatment as well as control) started with lower independence compared to unfunded control group. This might suggest that in the early career stages, in order to secure funding, it is needed to be more dependent on one's PhD advisor.
+
+<!-- Anyway, rather than granting funded researchers greater independence compared to the unfunded control group, it seems that the funding programme we examined sampled less independent researchers and then allowed them to catch up with the unfunded control group via providing them funding. -->
+
 
 
 
