@@ -1,10 +1,12 @@
 ---
-title: "Funding programmes for early career researchers do/not influence their independence"
+title: "Funding programmes for early career researchers influence their independence"
 author: "David Janků"
 date: "`r Sys.Date()`"
 output:
-  html_document: default
+  html_document:
+    df_print: paged
   word_document: default
+always_allow_html: yes
 bibliography: researcher_independence.bib
 csl: apa.csl
 ---
@@ -29,21 +31,26 @@ library(nlme)
 
 ```
 
+# Abstract
+
+Independence is important quality constituting one factor of research excellence, often used in assessments for hiring, tenure and promotion in academia [@moherAssessingScientistsHiring2018]. From a bigger picture view, encouraging more independence might also lead to faster exploration of the cognitive map of science and thus lead to faster innovation. Many national research funders have created programmes specifically aimed at increasing independence of early career researchers, yet until recently, there was no quantifiable way to measure changes in independence. We employed recently proposed measure by @vandenbesselaarMeasuringResearcherIndependence2019 to asses whether one such funding programme by Czech Science Foundation is effective at stimulating more independence. We found that funding for early career researchers is effective at stimulating their independence, though the effect is relatively small (2 % of variance) and the source of funding does not matter. The funding also helped selected researchers to catch up with the unfunded group, rather than to outrun them. Additionally, we found differences in levels of independence across disciplines that were stable across time and treatment groups, with Social Sciences and Humanities showing highest independence, while Medical and Heath Sciences and Natural Sciences showing lowest independence.  
+
+
 # Intro
 
-Researchers’ independence from their PhD advisor is one of the criteria often used for assessing researchers for hiring, tenure and promotion (Van Arensbergen, Van der Weijden, Van den Besselaar, 2014; Moher et al, 2018), constituting one factor of research excellence.
-The promise of independence is that researchers will “challenge the existing common views and open up new lines of research” (Van den Besselaar & Sandström, 2019, p.2). 
+Researchers’ independence from their PhD advisor is one of the criteria often used for assessing researchers for hiring, tenure and promotion (@vanarensbergenDifferentViewsScholarly2014; @moherAssessingScientistsHiring2018), constituting one factor of research excellence.
+The promise of independence is that researchers will “challenge the existing common views and open up new lines of research” (@vandenbesselaarMeasuringResearcherIndependence2019, p.2). 
 
-An independent investigator is then defined by the US National Academies of Science (NAS) as “one who enjoys independence of thought—the freedom to define the problem of interest and to choose or develop the best strategies and approaches to address that problem–especially during the earlier career phase” (Van den Besselaar & Sandström, 2019, p.4). Such a definition does not necessarily put independence in relation to other actors (e.g. one’s PhD advisor), but only in relation to one’s own freedom and resources. However other institutions, such as European Research Council via their Starting Grants scheme (Neufeld, Huber & Wegner, 2013) think of independence in a relational manner, in terms of having one (or a few) publications without the former PhD supervisor being co-author; being PI on a grant; or being lab director or research leader. 
+An independent investigator is then defined by the US National Academies of Science (NAS) as “one who enjoys independence of thought—the freedom to define the problem of interest and to choose or develop the best strategies and approaches to address that problem–especially during the earlier career phase” (@vandenbesselaarMeasuringResearcherIndependence2019, p.4). Such a definition does not necessarily put independence in relation to other actors (e.g. one’s PhD advisor), but only in relation to one’s own freedom and resources. However other institutions, such as European Research Council via their Starting Grants scheme (@neufeldPeerReviewbasedSelection2013) think of independence in a relational manner, in terms of having one (or a few) publications without the former PhD supervisor being co-author; being PI on a grant; or being lab director or research leader. 
 
-Based on some early empirical studies (Rojko & Lužar, 2022), it seems that researchers in disciplines such as philosophy, psychology; religion, theology; social sciences; the arts, recreation, entertainment, sport; language, linguistics, literature; and geography, biography, history experience significantly higher levels of indepedence on their PhD advisor than researchers in disciplines such as science and knowledge, organization, computer science, information, documentation, librarianship, institutions, publications; mathematics, natural sciences; and applied sciences, medicine, technology. 
-There is also some preliminary evidence that higher indepedence modestly correlates with number of citations aquired (Rojko & Lužar, 2022), but others argue that even the research systems with very low indepedence can create a lot of scientific impact, and thus the relationships between independence and impact might not be as clear (Gläser et al., 2021)
-
-
-In recent decades, there has been a worry that researchers’ indepedence is decreasing, illustrated by increase in age at which US (biomedical) researchers received their first grant (NAS, 2005; Daniels, 2015), as well as direct measures of new reserchers becoming more depedent on their PhD advisors across almost all disciplines in Slovenia (Rojko & Lužar, 2022, table 6 on p.9). Perhaps to tackle this trend, many grant agencies decided to start awarding grants for early career researchers, usually up to 8 years after finishing their PhD. Such programmes have often explicitly stated goals of helping researchers become more indepedent, set up their own research group and open up new lines of research. The examples of such programmes could be Starting Grants by European Research Council (2022), Junior project and Junior Star by Czech Science Foundation (2020), Walter N. Benjamin Programme by DFG (2022), Innovation Research Incentives Scheme by Netherlands Organization of Scientific Research (NWO) (2021)... something from the US would be also good)
+Based on some early empirical studies @rojkoScientificPerformanceResearch2022, it seems that researchers in disciplines such as philosophy, psychology; religion, theology; social sciences; the arts, recreation, entertainment, sport; language, linguistics, literature; and geography, biography, history experience significantly higher levels of independence on their PhD advisor than researchers in disciplines such as science and knowledge, organization, computer science, information, documentation, librarianship, institutions, publications; mathematics, natural sciences; and applied sciences, medicine, technology. 
+There is also some preliminary evidence that higher independence modestly correlates with number of citations acquired (@rojkoScientificPerformanceResearch2022), but others argue that even the research systems with very low independence can create a lot of scientific impact, and thus the relationships between independence and impact might not be as clear (@glaserIndependenceResearchReview2022)
 
 
-Although researcher independence seems to be important feature that is acknowledged by many actors in the research systems and that research funders try to stimulate, there hasn’t been much effort focused on quantifying this phenomenon. Some studies try to measure independence in a simple way, as a ratio of publications the given researcher produced without their supervisor divided by the total number of publications of the given researchers (e.g. Rojko & Lužar, 2022). However, such indicator could be misleading in the world of team science, and also only focuses on collaborations, not tracking whether given researcher become independent in their thinking and research topics. [@vandenbesselaarMeasuringResearcherIndependence2019] therefore proposed more complex indicator for measuring researcher independence on the individual level, based on co-authorship network and topical overlaps. Their measure uses only information about publications’ characteristics (authorship and reference list) regardless of it’s impacts, unlike other alternative measures that focus solely on the impact of the independent work in terms of received citations (Dey, et al., 2021).
+In recent decades, there has been a worry that researchers’ indepedence is decreasing, illustrated by increase in age at which US (biomedical) researchers received their first grant (NAS, 2005; @danielsGenerationRiskYoung2015), as well as direct measures of new researchers becoming more dependent on their PhD advisors across almost all disciplines in Slovenia (@rojkoScientificPerformanceResearch2022, table 6 on p.9). Perhaps to tackle this trend, many grant agencies decided to start awarding grants for early career researchers, usually up to 8 years after finishing their PhD. Such programmes have often explicitly stated goals of helping researchers become more independent, set up their own research group and open up new lines of research. The examples of such programmes could be Starting Grants by European Research Council (@StartingGrantERC), Junior project and Junior Star by Czech Science Foundation (2020), Walter N. Benjamin Programme by DFG (@WalterBenjaminProgramme), Innovation Research Incentives Scheme by Netherlands Organization of Scientific Research (NWO) (2021)... something from the US would be also good)
+
+
+Although researcher independence seems to be important feature that is acknowledged by many actors in the research systems and that research funders try to stimulate, there hasn’t been much effort focused on quantifying this phenomenon. Some studies try to measure independence in a simple way, as a ratio of publications the given researcher produced without their supervisor divided by the total number of publications of the given researchers (e.g. @rojkoScientificPerformanceResearch2022). However, such indicator could be misleading in the world of team science, and also only focuses on collaborations, not tracking whether given researcher become independent in their thinking and research topics. [@vandenbesselaarMeasuringResearcherIndependence2019] therefore proposed more complex indicator for measuring researcher independence on the individual level, based on co-authorship network and topical overlaps. Their measure uses only information about publications’ characteristics (authorship and reference list) regardless of it’s impacts, unlike other alternative measures that focus solely on the impact of the independent work in terms of received citations (Dey, et al., 2021, @ALISNovelMetric).
 
 Since the explicit goal of many funding instruments that are being used by research funders all over the world is to help early career researchers become independent, we would like to use the newly created indicators to assess the extent, to which such programmes influence researchers independence.    
 
@@ -68,13 +75,14 @@ These researchers and their PhD advisors with their full publication history (li
 
 *Independence*
 
-We decided to use the recently created independence indicator by Van den Besselaar & Sandström (2019), since it is based on scientific production (rather than impact) and captures the phenomena in the most complete manner. The indicator has 4 parts: I1: The eigenvector centrality of the supervisor in the researcher’s co-author network; I2: The clustering coefficient of the supervisor in the researcher’s co-author network; I3: The share of own papers of the researcher Pns/Pall where Pns is the number of publications of the researcher, not coauthored with the former supervisor(s) and Pall is the total number of publications of the researcher; and I4: The share of own research topics of the researcher Tns/Tall where Tns is the number of research topics of the researcher in which the former supervisor(s) is not active, and Tall is the total number of topics of the researcher.
+We decided to use the recently created independence indicator by @vandenbesselaarMeasuringResearcherIndependence2019, since it is based on scientific production (rather than impact) and captures the phenomena in the most complete manner. The indicator has 4 parts: I1: The eigenvector centrality of the supervisor in the researcher’s co-author network; I2: The clustering coefficient of the supervisor in the researcher’s co-author network; I3: The share of own papers of the researcher Pns/Pall where Pns is the number of publications of the researcher, not coauthored with the former supervisor(s) and Pall is the total number of publications of the researcher; and I4: The share of own research topics of the researcher Tns/Tall where Tns is the number of research topics of the researcher in which the former supervisor(s) is not active, and Tall is the total number of topics of the researcher.
 
 
 However, we have made some changes to the indicator. After consulting with its authors, we have changed the aggregation formula to 
-$$RII = ((1- I1) + I2 + I3 + I4) / 4$$, since the previous formula had a small error (it weighted I4 double,, i.e. 2*I4). For calculating the share of own research topics of the researcher (I4), we have also not used bibliographic coupling as originally suggested, but text-based topic modelling using publication titles and abstracts. Finally, the original indicator, while tracking not only collaboration independence but also topical independence, is still skewed significantly towards collaboration independence (three-quarters of the indicator measure collaboration, while only one-quarter measures topics). Since we consider cognitive/topical independence an important asset of this indicator, we have decided to adjust the formula a bit further and drop the I3 part, to give more weight to the cognitive/topical independence in the whole indicator. Throughout this paper, we will thus refer to the original indicator as RIIo, our adjusted version as RIIa and the part of the indicator measuring only the cognitive independence RIIc.
+$$RII = ((1- I1) + I2 + I3 + I4) / 4$$ 
+since the previous formula had a small error (it weighted I4 double,, i.e. 2*I4). In determining the proportion of a researcher's own research topics (I4), we opted for text-based topic modeling utilizing publication titles and abstracts, diverging from the originally suggested bibliographic coupling method. Initially, we conducted a random sampling of 1200 publications from a set of all publications produced by researchers affiliated with Czech institutions as cataloged in the RIV database, estimated number of topics using Griffiths2004 indicator and calculated LDA topic model on this set of publications. Then we  compiled all publications generated by the researchers within our sample and their respective supervisors. We then calculated the posterior distribution of topics for this compilation, employing a pre-trained topic model. This way we wanted to mitigate the endogeneity of the topic modelling which would be stronger if we calculated topic model directly on the publications of our sample researchers.
 
----> popsat víc jak počítám topic model??
+<!-- Finally, the original indicator, while tracking not only collaboration independence but also topical independence, is still skewed significantly towards collaboration independence (three-quarters of the indicator measure collaboration, while only one-quarter measures topics). Since we consider cognitive/topical independence an important asset of this indicator, we have decided to adjust the formula a bit further and drop the I3 part, to give more weight to the cognitive/topical independence in the whole indicator. Throughout this paper, we will thus refer to the original indicator as RIIo, our adjusted version as RIIa and the part of the indicator measuring only the cognitive independence RIIc. -->
 
 *Career age*
 
@@ -411,7 +419,7 @@ bal_df <- bal_df[!grepl("^disc_ford", rownames(bal_df)), ]
 
 
 # Display the cleaned-up table with kable
-kable(bal_df, "html", caption = "Balance Statistics For Unfunded Control Group") %>%
+kable(bal_df, "pipe", caption = "Balance Statistics For Unfunded Control Group") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 
@@ -447,7 +455,7 @@ bal_df_funded <- bal_df_funded[!grepl("^disc_ford", rownames(bal_df_funded)), ]
 
 
 # Display the cleaned-up table with kable
-kable(bal_df_funded, "html", caption = "Balance Statistics For Funded Control Group") %>%
+kable(bal_df_funded, "pipe", caption = "Balance Statistics For Funded Control Group") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 
@@ -477,6 +485,21 @@ pp <- d %>%
      filter(!any(is.na(RII))) %>%
      ungroup()
 
+pp <- pp %>%
+     group_by(vedidk, subclass) %>%  # Assuming 'id' is your current unique identifier
+     mutate(subject_id = cur_group_id()) %>%  # This creates a unique ID for each group
+     ungroup()
+
+diff_data <- pp %>%
+  select(subject_id, independence_timing, RII) %>%
+  spread(independence_timing, RII) %>%
+  mutate(RII_diff = after_intervention - before_intervention) %>%
+  select(subject_id, RII_diff)
+
+pp <- left_join(pp, diff_data, by = "subject_id")
+
+
+
 filtered_by_subclass_1 <- pp %>% 
     group_by(subclass) %>% 
     filter(!any(treatment == 2)) %>% 
@@ -505,22 +528,22 @@ filtered_by_subclass_1$field <- as.factor(filtered_by_subclass_1$field)
 ## here should be some assumptions tests that I will run to see whtehr it is correct, but later I will comment it so that it doesnt show in the final paper
 
 
-model <- lmer(RII ~ treatment * independence_timing + (1 | subclass), data = filtered_by_subclass_1)
-# summary(model)
-# r.squaredGLMM(model)
-
-model_no_interaction <- lmer(RII ~ treatment + independence_timing + (1 | subclass), data = filtered_by_subclass_1)
-
-RSS_no_interaction <- sum(residuals(model_no_interaction)^2)
-RSS_full <- sum(residuals(model)^2)
-delta_RSS <- RSS_no_interaction - RSS_full
-R2_interaction <- delta_RSS / RSS_no_interaction
-# print(R2_interaction)
-
-
-model_disc <- lmer(RII ~ treatment * independence_timing * field + 
-              (1 + independence_timing|subclass), 
-              data = filtered_by_subclass_1)
+# model <- lmer(RII ~ treatment * independence_timing + (1 | subclass), data = filtered_by_subclass_1)
+# # summary(model)
+# # r.squaredGLMM(model)
+# 
+# model_no_interaction <- lmer(RII ~ treatment + independence_timing + (1 | subclass), data = filtered_by_subclass_1)
+# 
+# RSS_no_interaction <- sum(residuals(model_no_interaction)^2)
+# RSS_full <- sum(residuals(model)^2)
+# delta_RSS <- RSS_no_interaction - RSS_full
+# R2_interaction <- delta_RSS / RSS_no_interaction
+# # print(R2_interaction)
+# 
+# 
+# model_disc <- lmer(RII ~ treatment * independence_timing * field + 
+#               (1 + independence_timing|subclass), 
+#               data = filtered_by_subclass_1)
 
 # summary(model_disc)
 
@@ -617,11 +640,7 @@ filtered_data_disc_1 <- filtered_by_subclass_1 %>%
   group_by(field) %>%
   filter(n() >= 10)
 
-filtered_data_disc_1 <- filtered_data_disc_1 %>%
-     group_by(vedidk, subclass) %>%  # Assuming 'id' is your current unique identifier
-     mutate(subject_id = cur_group_id()) %>%  # This creates a unique ID for each group
-     ungroup()
-
+filtered_data_disc_1$field <- droplevels(filtered_data_disc_1$field)
 
 # Calculate weights based on group size (you can adjust this based on other criteria if needed)
 group_sizes <- table(filtered_data_disc_1$field)
@@ -646,7 +665,7 @@ model_gls_interactions_subclass <- gls(RII ~ field * treatment * independence_ti
                               method = "ML",
                               correlation = corAR1(form = ~ 1 | subclass/independence_timing)) 
 
-# summary(model_gls_interactions_subclass)
+# aa <- summary(model_gls_interactions_subclass)
 
 
 #one potential strategy to get the neat result of "yes, there are some significant differences between disciplines" is following: create two similar models 
@@ -664,6 +683,7 @@ model_with_field_main_effect <- gls(RII ~ treatment + field + independence_timin
 
 anova_result <- anova(model_without_field, model_with_field_main_effect)
 
+model_summary <- summary(model_with_field_main_effect)
 
 
 # Your result specifically shows that the model_with_field_main_effect is significantly better at explaining the variance in your response variable compared to the model_without_field. The p-value is extremely small (1e-04), indicating a significant main effect of "field".
@@ -684,7 +704,105 @@ anova_result <- anova(model_without_field, model_with_field_main_effect)
 # # print(result_disc)
 
 
+##here I calculate the interaction of filed * treatment not from the full RII score, but from RR delta, ie change in RII from before to after intervetion. below the results are plotted, showing that the effect of treatment on disciplines is universal, expect for social sciences where there is almost no effect. it also shows that almost in all cases the effect of time is positive - i.e people are getting more independent over time, in some case by quite a lot (e.g. 0.2 in RII, which is 20 % oif the RII score)
+
+# filtered_data_disc_1 <- filtered_data_disc_1 %>% 
+#     filter(independence_timing != "after_intervention")
+# 
+# means_table_disc_1 <- filtered_data_disc_1 %>%
+#      group_by(field, treatment) %>%
+#      summarise(mean_RII = mean(RII_diff, na.rm = TRUE))
+# 
+# # Set up sum coding for "field"
+# contrasts(filtered_data_disc_1$field) <- contr.sum(levels(filtered_data_disc_1$field))
+# 
+# 
+# model_wls <- lm(RII_diff ~ field * treatment, data = filtered_data_disc_1, weights = weights)
+# summary(model_wls)
+# 
+# 
+# contrasts(filtered_data_disc_1$field)
+# 
+# # Extract the variance-covariance matrix
+# vcov_mat <- vcov(model_wls_sum_coded)
+# 
+# # Coefficient for Social Sciences
+# coef_SS <- -sum(coef(model_wls_sum_coded)[c("field1", "field2", "field3")])
+# 
+# # Variance for Social Sciences
+# var_SS <- sum(diag(vcov_mat[2:4, 2:4])) + 2*sum(vcov_mat[2,3:4]) + 2*sum(vcov_mat[3,4])
+# 
+# # Standard Error for Social Sciences
+# se_SS <- sqrt(var_SS)
+# 
+# # t-value for Social Sciences
+# t_value_SS <- coef_SS / se_SS
+# 
+# # Degrees of Freedom
+# df <- df.residual(model_wls_sum_coded)
+# 
+# # p-value for Social Sciences
+# p_value_SS <- 2 * pt(-abs(t_value_SS), df)
+# 
+# coef_SS
+# se_SS
+# t_value_SS
+# p_value_SS
+# 
+# vcov_matrix <- vcov(model_wls_sum_coded)
+# 
+# 
+# var_interaction <- vcov_matrix["treatment1", "treatment1"] + 
+#                    vcov_matrix["field1:treatment1", "field1:treatment1"] + 
+#                    vcov_matrix["field2:treatment1", "field2:treatment1"] + 
+#                    vcov_matrix["field3:treatment1", "field3:treatment1"] + 
+#                    2*(vcov_matrix["treatment1", "field1:treatment1"] + 
+#                       vcov_matrix["treatment1", "field2:treatment1"] + 
+#                       vcov_matrix["treatment1", "field3:treatment1"])
+# 
+# se_interaction <- sqrt(var_interaction)
+# 
+# t_value <- -0.01905 / se_interaction
+# 
+# df_residual <- df.residual(model_wls_sum_coded)
+# p_value <- 2 * (1 - pt(abs(t_value), df_residual))
+
+
  
+## visualise field*treatment
+
+# means_table <- filtered_by_subclass_1 %>%
+#   filter(independence_timing != "before_intervention") %>% 
+#   group_by(field, treatment) %>%
+#   summarise(mean_RII = mean(RII_diff, na.rm = TRUE))
+# 
+# sd_counts <- filtered_by_subclass_1 %>%
+#   filter(independence_timing != "before_intervention") %>% 
+#   group_by(field, treatment) %>%
+#   summarise(sd_RII = sd(RII_diff, na.rm = TRUE),
+#             n = n())
+# 
+# means_table <- merge(means_table, sd_counts, by = c("field", "treatment")) %>%
+#   mutate(se_RII = sd_RII / sqrt(n))
+# 
+# 
+# 
+# 
+# 
+# ggplot(means_table, aes(x=field, y=mean_RII, fill=treatment)) +
+#     geom_bar(stat="identity", position=position_dodge(width=0.8), width=0.7) +
+#     geom_errorbar(aes(ymin=mean_RII-se_RII, ymax=mean_RII+se_RII),
+#                   position=position_dodge(width=0.8), width=0.3) +
+#     geom_text(aes(label=n, y= 0.5 * mean_RII), # position in the middle
+#               position=position_dodge(width=0.8), vjust=0.5) + # centered vertically
+#     theme_minimal() +
+#     labs(y="Mean RII Difference", x="Field", fill="Treatment", title="Comparison of differences in RII across fields and treatment group") +
+#     theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+
+
 ```
 
 
@@ -697,22 +815,8 @@ There was a significant main effect of independence_timing on RII, F(`r summary(
 Importantly, there was a significant interaction effect between treatment and independence_timing on independence, F(`r format(summary(result)$"Error: Within"[[1]]$"Df"[2])`, `r format(summary(result)$"Error: Within"[[1]]$"Df"[3])` = `r format(summary(result)$"Error: Within"[[1]]$"F value"[2], digits=2)`, p = `r format(summary(result)$"Error: Within"[[1]]$"Pr(>F)"[2], digits=2)`. This interaction effect explained about `r format(eta_sq_result[eta_sq_result$Parameter == "treatment:independence_timing", "Eta2_partial"] * 100, digits=2)`% of the variability (partial \(\eta^2 = `r eta_sq_result[eta_sq_result$Parameter == "treatment:independence_timing", "Eta2_partial"]`\), 95% CI [`r eta_sq_result[eta_sq_result$Parameter == "treatment:independence_timing", "CI_low"]`, `r eta_sq_result[eta_sq_result$Parameter == "treatment:independence_timing", "CI_high"]`]).
 
 
-
-
-
-
-
-<!-- LMM interpretation: -->
-
-
-<!-- In the updated analysis using a linear mixed model, we examined the effects of treatment, independence_timing, and their interaction on the dependent variable, researcher independence (RII) for the treatment group and unfunded control group. -->
-
-<!-- - There was a significant main effect of `independence_timing` on RII, t(`r summary(model)$coefficients[3,3]`) = `r summary(model)$coefficients[3, "t value"]`, p = `r format(summary(model)$coefficients[3,5], scientific = TRUE)`, suggesting that there was a significant change in RII from before to after intervention in the control group. -->
-
-<!-- - There was also a significant main effect of `treatment` on RII, t(`r summary(model)$coefficients[2,3]`) = `r summary(model)$coefficients[2, "t value"]`, p = `r format(summary(model)$coefficients[2,5], scientific = TRUE)`. This effect indicates a difference in RII between the control group and the treatment group before the intervention. -->
-
-<!-- - Importantly, there was a significant interaction effect between `treatment` and `independence_timing` on RII, t(`r summary(model)$coefficients[4,3]`) = `r summary(model)$coefficients[4, "t value"]`, p = `r format(summary(model)$coefficients[4,5], scientific = TRUE)`. This interaction suggests that the effect of the intervention on independence differed based on the timing of the measurement. The effect size for all fixed effects can be approximated using the marginal \( R^2 \) which is `r r.squaredGLMM(model)[1]`, suggesting that about `r round(r.squaredGLMM(model)[1] * 100, 1)`% of the variance in RII can be explained by the main effects in our model. The effect size for the interaction specifically can be computed using \( \Delta R^2 \) due to the interaction, which is `r R2_interaction`, indicating that about `r round(R2_interaction * 100, 1)`% of variance in RII is explained by the interaction between treatment and independence_timing over and above the main effects. -->
-
+To assess effects of study field on researcher independence, we chose GLS weighted model to account for unequal group sizes and heteroscedastic variances, while keeping the repeated measures design. First, we compared models with and without the field main effect and observed a notable improvement in model fit for the model where main effect of field was included. This suggests that there are statistically significant differences in the RII based on the field of study. Specifically, adding the field of study to the model resulted in a significant increase in the log-likelihood by `r anova_result$L.Ratio[2]` units (p < `r anova_result$"p-value"[2]`), emphasizing its importance as a predictor. Specifically, compared to the Engineering and Technology field, being in the Medical and Health Sciences field is associated with a decrease in RII by `r  coef(model_summary)["fieldMedical and Health Sciences", 1]` units, on average (p = `r coef(model_summary)["fieldMedical and Health Sciences", 4]`), while being in the Social Sciences field is associated with an increase in RII by `r coef(model_summary)["fieldSocial Sciences", 1]` units (p = `r coef(model_summary)["fieldSocial Sciences", 4]`). There are no statistically significant differences between Natural Sciences and Engineering and Technology. Humanities and Agricultural sciences categories were excluded because they had too few observations.
+The interaction between treatment and field was not statistically significant, suggesting that the effect of treatment on independence was consistent across disciplines. The three-way interaction among treatment, independence_timing, and field was not statistically significant. This implies that the interaction effect of treatment and independence_timing on independence remained consistent across different disciplines.
 
 
 
@@ -949,6 +1053,59 @@ eta_sq_result2 <- eta_squared(result2)
 
 
 
+filtered_data_disc_2 <- filtered_by_subclass_2 %>%
+  group_by(field) %>%
+  filter(n() >= 10)
+
+filtered_data_disc_2$field <- droplevels(filtered_data_disc_2$field)
+
+# Calculate weights based on group size (you can adjust this based on other criteria if needed)
+group_sizes2 <- table(filtered_data_disc_2$field)
+max_size2 <- max(group_sizes2)
+filtered_data_disc_2$weights <- max_size2 / group_sizes2[filtered_data_disc_2$field]
+
+#this model addresses both unequal group sizes (via weights) and heteroscedasticity (via varIdent). Additionally, I've added a first-order autoregressive structure (corAR1) assuming you have repeated measures on the same subjects and to account for their paired nature (indicated by subclass/independence_timing)
+#this model directly tests whether there is a difference in disciplines - anyway it tests each discipline agains each other, so it doesnt produce the neat result of "yes, there are some significant differences between disciplines", but more nuanced version of "there is specifically difference between this and this discipline"
+
+model_gls_weighted2 <- gls(RII ~ field, data = filtered_data_disc_2, 
+                          weights = varIdent(form = ~ 1 | field),
+                          method = "ML",
+                          correlation = corAR1(form = ~ 1 | subject_id))  
+
+# summary(model_gls_weighted2)
+
+#this model below is the same as the above but with added predictors
+
+model_gls_interactions_subclass2 <- gls(RII ~ field * treatment * independence_timing, 
+                              data = filtered_data_disc_2, 
+                              weights = varIdent(form = ~ 1 | field),
+                              method = "ML",
+                              correlation = corAR1(form = ~ 1 | subclass/independence_timing)) 
+
+# aa <- summary(model_gls_interactions_subclass2)
+
+
+#one potential strategy to get the neat result of "yes, there are some significant differences between disciplines" is following: create two similar models 
+
+
+model_without_field2 <- gls(RII ~ treatment + independence_timing + treatment:independence_timing, 
+                           data = filtered_data_disc_2, 
+                           correlation = corCompSymm(form = ~ 1 | subclass/independence_timing), 
+                           method = "ML")
+
+model_with_field_main_effect2 <- gls(RII ~ treatment + field + independence_timing + treatment:independence_timing, 
+                                    data = filtered_data_disc_2, 
+                                    correlation = corCompSymm(form = ~ 1 | subclass/independence_timing), 
+                                    method = "ML")
+
+
+anova_result2 <- anova(model_without_field2, model_with_field_main_effect2)
+
+model_summary2 <- summary(model_with_field_main_effect2)
+
+
+
+
 ```
 
 
@@ -957,6 +1114,11 @@ eta_sq_result2 <- eta_squared(result2)
 In the second analysis, we examined the effects of treatment, independence_timing, and their interaction on the researcher independence (RII) for the treatment group and funded control group. Again, there was a significant main effect of time on independence, F(`r format(summary(result2)$"Error: subclass:independence_timing"[[1]]$"Df"[1])`, `r format(summary(result2)$"Error: subclass:independence_timing"[[1]]$"Df"[2])`) = `r format(summary(result2)$"Error: subclass:independence_timing"[[1]]$"F value"[1], digits=2)`, p = `r format(summary(result2)$"Error: subclass:independence_timing"[[1]]$"Pr(>F)"[1], digits=4)`). The effect accounted for approximately `r format(eta_sq_result2[eta_sq_result2$Parameter == "independence_timing", "Eta2_partial"] * 100, digits=2)`% of the observed variance (partial \(\eta^2 = `r eta_sq_result2[eta_sq_result2$Parameter == "independence_timing", "Eta2_partial"]`\), 95% CI [`r eta_sq_result2[eta_sq_result2$Parameter == "independence_timing", "CI_low"]`, `r eta_sq_result2[eta_sq_result2$Parameter == "independence_timing", "CI_high"]`]).
 
 Importantly, this time the interaction effect between treatment and time was not significant, F(`r format(summary(result2)$"Error: Within"[[1]]$"Df"[2])`, `r format(summary(result2)$"Error: Within"[[1]]$"Df"[3])`) = `r format(summary(result2)$"Error: Within"[[1]]$"F value"[2], digits=2)`, p = `r format(summary(result2)$"Error: Within"[[1]]$"Pr(>F)"[2], digits=2)`. This interaction effect explained about `r format(eta_sq_result2[eta_sq_result2$Parameter == "treatment:independence_timing", "Eta2_partial"] * 100, digits=2)`% of the variability (partial \(\eta^2 = `r eta_sq_result2[eta_sq_result2$Parameter == "treatment:independence_timing", "Eta2_partial"]`\), 95% CI [`r eta_sq_result2[eta_sq_result2$Parameter == "treatment:independence_timing", "CI_low"]`, `r eta_sq_result2[eta_sq_result2$Parameter == "treatment:independence_timing", "CI_high"]`]), suggesting that funding has the same effects, regardless of its type or source.
+
+
+Same as in previous chapter, the comparison of models suggested that there are statistically significant differences in the RII based on the field of study. Specifically, adding the field of study to the model resulted in a significant increase in the log-likelihood by `r anova_result2$L.Ratio[2]` units (p < `r anova_result2$"p-value"[2]`), emphasizing its importance as a predictor. Specifically, compared to the Engineering and Technology field, being in the Medical and Health Sciences field is associated with a decrease in RII by `r  coef(model_summary2)["fieldMedical and Health Sciences", 1]` units, on average (p = `r coef(model_summary2)["fieldMedical and Health Sciences", 4]`), while being in the Social Sciences field is associated with an increase in RII by `r coef(model_summary2)["fieldSocial Sciences", 1]` units (p = `r coef(model_summary2)["fieldSocial Sciences", 4]`). There are no statistically significant differences between Natural Sciences and Engineering and Technology. Humanities and Agricultural sciences categories were excluded because they had too few observations.
+The interaction between treatment and field was not statistically significant, suggesting that the effect of treatment on independence was consistent across disciplines. The three-way interaction among treatment, independence_timing, and field was not statistically significant. This implies that the interaction effect of treatment and independence_timing on independence remained consistent across different disciplines.
+
 
 
 ```{r echo=FALSE}
@@ -1055,15 +1217,20 @@ print(combined_plot2)
 
 
 
+# disc_data <- pp %>% 
+#     filter(independence_timing != "after_intervention")
+
 
 disc_data <- d %>%
-     filter(!is.na(RII)) %>% 
+     filter(!is.na(RII)) %>%
      group_by(vedidk, field, RII) %>%
      sample_n(1) %>%
      ungroup()
 
 means_disc_complete <- aggregate(RII ~ field, data = disc_data, FUN = mean)
-     
+    
+
+
 num_disc_complete <- disc_data %>%
   group_by(field) %>%
   summarise(count = n(), .groups = "drop")

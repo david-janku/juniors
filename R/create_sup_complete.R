@@ -135,31 +135,47 @@ create_sup_complete <- function(sup_control, sup_control_second, db_path, matchi
     sup_rest_final <-  anti_join(sup_rest_field, sup_filtered_field, by = "vedidk.x") #už je jich jenom 6 a mám napsané v poznánmkách skoro u všech kteří supervisoři to jsou, tak to můžu asi nakódovat manuálně
     
     
-    sup_rest_final <- sup_rest_final %>% filter(vedidk.y %in% c(4672941, 5263344, 1481894, 7901410, 4766814, 3906884)) %>% 
-        dplyr::select(-disc_ford.y, -field.x, -field.y) %>% 
-        rename(disc_ford = disc_ford.x) %>% 
-        distinct()
-    
-    
-    sup_total <- rbind(sup_total, sup_rest_final)
     
     
     # disambiguation based on supervisor being older than supervisee --> based on the results, this didnt work that well
-    
-    # sup_rest_final$vedidk.x <- as.character(sup_rest_final$vedidk.x)
-    # sup_rest_final <- left_join(sup_rest_final, matching_data %>% dplyr::select(vedidk, career_start_year), by = c("vedidk.x" = "vedidk")) %>%
-    #     distinct()
-    # 
-    # sup_rest_final <- left_join(sup_rest_final, matching_data %>% dplyr::select(vedidk, career_start_year), by = c("vedidk.y" = "vedidk")) %>%
-    #     distinct()
-    # 
-    # sup_rest_final_filtered <- sup_rest_final %>% filter(career_start_year.y < career_start_year.x)
 
+    sup_rest_final$vedidk.x <- as.character(sup_rest_final$vedidk.x)
+    sup_rest_age <- left_join(sup_rest_final, matching_data %>% dplyr::select(vedidk, career_start_year), by = c("vedidk.x" = "vedidk")) %>%
+        distinct()
+
+    sup_rest_age <- left_join(sup_rest_age, matching_data %>% dplyr::select(vedidk, career_start_year), by = c("vedidk.y" = "vedidk")) %>%
+        distinct()
+
+    sup_rest_age <- sup_rest_age %>% filter(career_start_year.y < career_start_year.x)
+
+    dup_matches_age <- sup_rest_age %>%
+        group_by(vedidk.x) %>%
+        filter(n() > 1) %>%
+        ungroup()
+    
+    sup_filtered_age <- anti_join(sup_rest_age, dup_matches_age, by = "vedidk.x") %>% 
+        rename(disc_ford = disc_ford.x) %>% 
+        dplyr::select(-field.x, -field.y, -career_start_year.x, -career_start_year.y, -disc_ford.y)
+        
+    
+    sup_total <- rbind(sup_total, sup_filtered_age)
+    
     
     
     ## other ideas for disambiguation: based on 0) check the data whether it is actually correct by checking the dis_link; 1) higher level study discipline (makes similar sense to the age); 2) the match in institution they published in the year that the supervisee started publishing (ie we have institution for supervisee already, we need to enrich dataset by institutions that supervisors published in the career_start_year of supervisees); 
     
-        
+       
+    sup_rest_misc <- dup_matches_age %>% filter(vedidk.y %in% c(5928028, 8279209, 4096541, 8324735, 1273515, 4672941, 5263344, 1481894, 7901410, 4766814, 3906884)) %>%
+        dplyr::select(-disc_ford.y, -field.x, -field.y, -career_start_year.x, -career_start_year.y) %>%
+        rename(disc_ford = disc_ford.x) %>%
+        distinct()
+    
+    sup_total <- rbind(sup_total, sup_rest_misc)
+    
+    
+    #2154412 is wrong vedidk for the person 1273515 (that vedidk has only 1 pub, so I assume it was a mistake and they are actually same person). Same with 8324735 (real vedidk) and 9651454 (wrong vedidk). Anyway, in this case it there is another problem: 8324735 has pubs that start on 1996 in RIV, whereas only start in 2001 in our database - why is that? Similarly, in RIV the vedidk track 20 pubs, in our database only 13. And same story with vedidk 5928028.
+    #the only unmatched observation will be 4984552 (Pavel Peukert) which should not be matched to anyone, because there was mistake in the data
+    
     
     sup_total <- rename(sup_total, vedidk = vedidk.x)
     sup_total <- rename(sup_total, sup_vedidk = vedidk.y)

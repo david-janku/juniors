@@ -107,7 +107,7 @@ list(
 
   
      # tar_target(ids_path, here::here("data", "raw", "supervisors_updated.csv"), format = "file"),
-     tar_target(ids, read.csv2(ids_path)),
+     tar_target(ids, read.csv(ids_path)),
      # tar_target(gender_path, here::here("data", "raw", "names4api_tagged.tsv"), format = "file"),
      tar_target(gender, read.delim(gender_path)),
      tar_target(authors_arrow, arrow::read_feather(authors_arrow_path)),
