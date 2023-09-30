@@ -7,12 +7,12 @@ output:
     df_print: paged
   word_document: default
 always_allow_html: yes
-bibliography: researcher_independence.bib
+bibliography: merged.bib
 csl: apa.csl
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE)
 library(targets)
 library(tidyr)
 library(dplyr)
@@ -36,10 +36,54 @@ library(nlme)
 Independence is important quality constituting one factor of research excellence, often used in assessments for hiring, tenure and promotion in academia [@moherAssessingScientistsHiring2018]. From a bigger picture view, encouraging more independence might also lead to faster exploration of the cognitive map of science and thus lead to faster innovation. Many national research funders have created programmes specifically aimed at increasing independence of early career researchers, yet until recently, there was no quantifiable way to measure changes in independence. We employed recently proposed measure by @vandenbesselaarMeasuringResearcherIndependence2019 to asses whether one such funding programme by Czech Science Foundation is effective at stimulating more independence. We found that funding for early career researchers is effective at stimulating their independence, though the effect is relatively small (2 % of variance) and the source of funding does not matter. The funding also helped selected researchers to catch up with the unfunded group, rather than to outrun them. Additionally, we found differences in levels of independence across disciplines that were stable across time and treatment groups, with Social Sciences and Humanities showing highest independence, while Medical and Heath Sciences and Natural Sciences showing lowest independence.  
 
 
-# Intro
+# Intro 
+
+## Intro 1: focus on the bigger picture, sociology and policy perspective
+
+
 
 Researchers’ independence from their PhD advisor is one of the criteria often used for assessing researchers for hiring, tenure and promotion (@vanarensbergenDifferentViewsScholarly2014; @moherAssessingScientistsHiring2018), constituting one factor of research excellence.
 The promise of independence is that researchers will “challenge the existing common views and open up new lines of research” (@vandenbesselaarMeasuringResearcherIndependence2019, p.2). 
+
+Early career researcher independence is central to the long-lasting debate about how science progresses - whether it is indeed guided mostly by the truth and empirical evidence, or whether more social and demographic factors might play an important role. @hull1978 found that even more senior researchers readily updated their beliefs with the new evidence, supporting the former, though many (famously including Max Planck) observed that senior researchers were more fixed in their beliefs and new ideas were mostly brought up by the incoming early career researchers giving rise to the “science moves forward one funeral at the time” proverb. More recently, @azoulay2010 provided further support for the latter by investigating the effects of unexpected deaths of prominent scientists on their research fields and their collaborators' careers. They found a decrease in the productivity of junior collaborators and an increase in published work by young newcomers to the field rewarded by an increased citation rate. That suggests the sudden deaths of prominent scientists gave room for more disruptive changes in the field and for bringing new ideas and perspectives while harming the status quo holders who worked with the prominent scientists on their research agendas - a “Goliath effect”, as coined by @wang2021, p.42).
+
+
+
+/// here I can potentially talk a bit more about Inheritance of research agendas - how often does that happen, etc..///
+
+
+Insofar as the latter is true, in order to accelerate scientific progress, we might want to tackle this trend by supporting early career researchers to gain more independence from their PhD advisors. Younger researchers are already more likely to come up with new topics and ideas, as found by @packalen2019 by looking at the usage of new words in research papers. However, they might still feel various kinds of pressures to stick with their mentor’s research agendas and lack of opportunities to become more independent. In recent decades, there has been a worry that researchers’ independence is decreasing, illustrated by an increase in age at which US biomedical researchers received their first grant (NAS, 2005; @danielsGenerationRiskYoung2015), as well as direct measures of new researchers becoming more dependent on their PhD advisors across almost all disciplines in Slovenia (@rojkoScientificPerformanceResearch2022, table 6 on p.9). 
+
+Perhaps to tackle this trend, many grant agencies decided to start awarding grants for early career researchers, usually up to 8 years after finishing their PhD. Such programmes have often explicitly stated goals of helping researchers become more independent, set up their own research group and open up new lines of research. The examples of such programmes could be Starting Grants by European Research Council (@StartingGrantERC), Junior project and Junior Star by Czech Science Foundation (2020), Walter N. Benjamin Programme by DFG (@WalterBenjaminProgramme), Innovation Research Incentives Scheme by Netherlands Organization of Scientific Research (NWO) (2021).
+
+Moreover, stimulating independence and supporting researchers to open up new lines of research is also a worthy policy goal regardless of researchers’ age. @rzhetsky2015 found that biomedical researchers are in practice often choosing less exploratory strategies for topic choice than would be socially optimal if we wanted to explore the cognitive map of science (or in this case chemicals) as fast as possible, and their choices become more conservative over time. They suggest that increased interdisciplinarity, risk-taking and the publication of experimental failures would substantially improve the speed of discovery.
+
+
+//// factors influencing independence////
+There are few known factors influencing the level of research independence. One of them is study discipline. Based on some early empirical studies (@rojkoScientificPerformanceResearch2022), it seems that researchers in disciplines such as philosophy, psychology; religion, theology; social sciences; the arts, recreation, entertainment, sport; language, linguistics, literature; and geography, biography, history experience significantly higher levels of independence on their PhD advisor than researchers in disciplines such as science and knowledge, organization, computer science, information, documentation, librarianship, institutions, publications; mathematics, natural sciences; and applied sciences, medicine, technology. 
+
+
+Interestingly, there is also some evidence that the propensity to cognitive independence might be inherited and passed down from generation to generation in mentor-mentee relationships @yoshioka-kobayashi2021 - perhaps it is not only research agendas that students inherit from their advisors but also the tendency to deviate from those research agendas. This might also suggest that to increase junior researchers’ independence, we might want to teach their advisors to be more independent, in order to have a ripple effect down the line.
+
+Finally, there is also some preliminary evidence that higher independence modestly correlates with the number of citations acquired (@rojkoScientificPerformanceResearch2022), but others argue that even the research systems with very low independence can create a lot of scientific impact, and thus the relationships between independence and impact might not be as clear (@glaserIndependenceResearchReview2022)
+
+Although researcher independence seems to be an important feature that is acknowledged by many actors in the research systems and that research funders try to stimulate, there hasn’t been much effort focused on quantifying this phenomenon. Some studies try to measure independence in a simple way, as a ratio of publications the given researcher produced without their supervisor divided by the total number of publications of the given researchers (e.g. @rojkoScientificPerformanceResearch2022). However, such an indicator could be misleading in the world of team science, and also only focuses on collaborations, not tracking whether a given researcher becomes independent in their thinking and research topics. [@vandenbesselaarMeasuringResearcherIndependence2019] therefore proposed a more complex indicator for measuring researcher independence on the individual level, based on co-authorship network and topical overlaps. Their measure uses only information about publications’ characteristics (authorship and reference list) regardless of their impacts, unlike other alternative measures that focus solely on the impact of the independent work in terms of received citations (Dey, et al., 2021, @ALISNovelMetric).
+
+Since the explicit goal of many funding instruments that are being used by research funders all over the world is to help early career researchers become independent, we decided to use the newly created indicators to assess the extent, to which such programmes influence researchers' independence.    
+
+
+
+
+## Intro 2: Perspective of “What are the effects of competitive grant funding? And looking at independence as one of such effects”
+
+///Primer of grant-making context:
+
+Grant funding mechanisms have previously been shown to stimulate productivity in terms of the number of publications, impact in terms of citations, and even scientific novelty (@wang2018, or as some authors argue rather interdisciplinarity: @fontana2020). In terms of researchers’ careers, obtaining grant funding was connected to significantly higher chances of career progression and obtaining a professorship (@bloch2014).
+
+///Though there is still some disagreement about the direction and magnitude of some of these effects, c.f. @@glaserIndependenceResearchReview2022 on novelty. --> here I can potentially go more in-depth into the critiques of grant funding mechanisms? E.g. spell out the critiques, such that they are strengthening the Matthews effect, they reduce novelty, etc....
+
+However, there are still several components of research excellence (see @vanarensbergenDifferentViewsScholarly2014; @moherAssessingScientistsHiring2018) that have not been investigated yet, with one having specifically important effects on researchers’ carers and development: their independence. Researchers’ independence from their PhD advisor is one of the criteria often used for assessing researchers for hiring, tenure and promotion (@vanarensbergenDifferentViewsScholarly2014; @moherAssessingScientistsHiring2018). The promise of independence is that researchers will “challenge the existing common views and open up new lines of research” (@vandenbesselaarMeasuringResearcherIndependence2019, p.2). 
+
 
 An independent investigator is then defined by the US National Academies of Science (NAS) as “one who enjoys independence of thought—the freedom to define the problem of interest and to choose or develop the best strategies and approaches to address that problem–especially during the earlier career phase” (@vandenbesselaarMeasuringResearcherIndependence2019, p.4). Such a definition does not necessarily put independence in relation to other actors (e.g. one’s PhD advisor), but only in relation to one’s own freedom and resources. However other institutions, such as European Research Council via their Starting Grants scheme (@neufeldPeerReviewbasedSelection2013) think of independence in a relational manner, in terms of having one (or a few) publications without the former PhD supervisor being co-author; being PI on a grant; or being lab director or research leader. 
 
@@ -52,9 +96,32 @@ In recent decades, there has been a worry that researchers’ indepedence is dec
 
 Although researcher independence seems to be important feature that is acknowledged by many actors in the research systems and that research funders try to stimulate, there hasn’t been much effort focused on quantifying this phenomenon. Some studies try to measure independence in a simple way, as a ratio of publications the given researcher produced without their supervisor divided by the total number of publications of the given researchers (e.g. @rojkoScientificPerformanceResearch2022). However, such indicator could be misleading in the world of team science, and also only focuses on collaborations, not tracking whether given researcher become independent in their thinking and research topics. [@vandenbesselaarMeasuringResearcherIndependence2019] therefore proposed more complex indicator for measuring researcher independence on the individual level, based on co-authorship network and topical overlaps. Their measure uses only information about publications’ characteristics (authorship and reference list) regardless of it’s impacts, unlike other alternative measures that focus solely on the impact of the independent work in terms of received citations (Dey, et al., 2021, @ALISNovelMetric).
 
-Since the explicit goal of many funding instruments that are being used by research funders all over the world is to help early career researchers become independent, we would like to use the newly created indicators to assess the extent, to which such programmes influence researchers independence.    
+Since the explicit goal of many funding instruments that are being used by research funders all over the world is to help early career researchers become independent, we used the newly created indicators to assess the extent, to which such programmes influence researchers independence.    
 
-H1: Researchers, who received funding from programmes aimed at funding early career researchers, will show more independence on their PhD advisor 5 years after receiving the funding than researchers who did not receive this kind of funding.
+H1: Researchers, who received funding from programmes aimed at funding early career researchers, will show more independence from their PhD advisors after receiving the funding than researchers who did not receive funding.
+
+H2: Researchers, who received funding from programmes aimed at funding early career researchers, will show more independence from their PhD advisors compared to similar researchers who received other types of funding at similar point in theri career.
+
+
+
+## Intro 3: focusing on support for early career researchers (and why is that important topic) and then mention the independence as one of the ways how we can test whether our support mechanisms for early stage researchers actually work
+
+
+Funding for early career researchers is an important topic in science funding policy discussions as it might have a significant impact on career progression of the new generations of researchers (@wright2017; @pickett2019; @vandenbesselaar2015). At the same time, the age of receiving a first grant has been growing significantly over the past decades (@powell2016, @christian2021). These trends have motivated some to create new proposals for funding agencies and other research funders in order to support early career researchers (@dewinde2021). Some funding agencies decided to tackle this trend by giving advantage to first-awardees and early career researchers in their usual distribution process, while others have created specific programmes designated to funding young researchers soon after their PhD. 
+
+///maybe talk about other types of support that early career researchers get? Or maybe have another paragraph describing what does the life of early career researchers usually look like? (--> perhaps mentioning that the time to finish PhD gets longer and longer, people are now expected to do multiple post-docs, etc... --> perhaps borrow some info from Science of Science book Careers section)///
+
+It is expected, that by giving early-stage researchers funding, they will be able to develop more independence and open up new lines of research (@vandenbesselaarMeasuringResearcherIndependence2019, p.2). Younger researchers are already more likely to come up with new topics and ideas, as found by [@packalen2019] by looking at the usage of new words in research papers. However, they might still feel various kinds of pressures to stick with their mentor’s research agendas and lack of opportunities to become more independent. In recent decades, there has been a worry that researchers’ independence is decreasing, illustrated by increase in age at which US (biomedical) researchers received their first grant (NAS, 2005; @danielsGenerationRiskYoung2015), as well as direct measures of new researchers becoming more dependent on their PhD advisors across almost all disciplines in Slovenia (@rojkoScientificPerformanceResearch2022, table 6 on p.9).
+///talk about the balance between experience and independence??///
+
+Perhaps to tackle this trend, many grant agencies decided to start awarding grants for early career researchers, usually up to 8 years after finishing their PhD. Such programmes have often explicitly stated goals of helping researchers become more independent, set up their own research group and open up new lines of research. The examples of such programmes could be Starting Grants by European Research Council (@StartingGrantERC), Junior project and Junior Star by Czech Science Foundation (2020), Walter N. Benjamin Programme by DFG (@WalterBenjaminProgramme), Innovation Research Incentives Scheme by Netherlands Organization of Scientific Research (NWO) (2021)... something from the US would be also good)
+
+Although researcher independence seems to be important feature that is acknowledged by many actors in the research systems and that research funders try to stimulate, there hasn’t been much effort focused on quantifying this phenomenon. Some studies try to measure independence in a simple way, as a ratio of publications the given researcher produced without their supervisor divided by the total number of publications of the given researchers (e.g. @rojkoScientificPerformanceResearch2022). However, such indicator could be misleading in the world of team science, and also only focuses on collaborations, not tracking whether given researcher become independent in their thinking and research topics. [@vandenbesselaarMeasuringResearcherIndependence2019] therefore proposed more complex indicator for measuring researcher independence on the individual level, based on co-authorship network and topical overlaps. Their measure uses only information about publications’ characteristics (authorship and reference list) regardless of it’s impacts, unlike other alternative measures that focus solely on the impact of the independent work in terms of received citations (Dey, et al., 2021, @ALISNovelMetric).
+
+Since the explicit goal of many funding instruments that are being used by research funders all over the world is to help early career researchers become independent, we would like to use the newly created indicators to assess the extent, to which such programmes influence researchers' independence.    
+
+
+
 
 # Method
 
@@ -65,9 +132,13 @@ This allowed us to identify all researchers who received Junior Grants from the 
 
 In the second step, we manually searched for PhD advisors of these 341 researchers in the databases of theses and dissertations that cover most universities in Czechia (https://theses.cz and https://dspace.cuni.cz/). We were able to match `r nrow(tar_read(ids_complete))` researchers with a PhD advisor (69,2 % of the Czech subsample). Further, we have not managed to find a suitable matched pair for another `r nrow(tar_read(ids_complete))-nrow(tar_read("matching") %>% filter(treatment == 1) %>% distinct(vedidk))` researchers in the matching procedure, reducing our final sample to `r nrow(tar_read("matching") %>% filter(treatment == 1) %>% distinct(vedidk))`. 
 
-For the matched researchers from control groups (see the matching description below in the Analysis section), we didn't search for their supervisors manually, but rather used the "most frequent co-author of the first 5 publications" as a proxy to identify supervisors. Crosschecking this proxy with the actual data about supervisors we have, we found that this algorithm was able to identify supervisors correctly in about 50 % of cases (see the Attachment 1). Using this method, we were able to find `r (nrow(tar_read("final_data") %>% filter(treatment != 1) %>% filter(!is.na(sup_name))) / nrow(tar_read("matching") %>% filter(treatment != 1)))*100` % of the observations in the matched control groups. 
+For the matched researchers from control groups see the matching description below in the Analysis section.
 
 These researchers and their PhD advisors with their full publication history (limited to publications created at Czech institutions) created our final sample.
+
+We also tested an assumption that had a hope of reducing time intensity of data collection by substitution it for algorithmic approach: using the "most frequent co-author of the first 5 publications" as a proxy to identify supervisors. Crosschecking this proxy with the actual data about supervisors we found manually, we found that this algorithm was able to identify supervisors correctly in about XXXXX % of cases (see the Attachment 1). 
+
+
 
 
 
@@ -1301,6 +1372,14 @@ Finally, the significant interaction between treatment and time when comparing t
 --> only talks about the Czech environment and considers researchers growing up and most of their careers in the Czech republic
 
 # Attachments
+
+## construction of the independnece identificator
+
+Correlation of its components
+
+correlation with other stuff
+
+- test whether results for the "cognitive" part are the same as results for the "collaboration" part -> do all the tests
 
 ## Identification of supervisors
 
