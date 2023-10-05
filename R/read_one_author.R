@@ -48,7 +48,7 @@ read_one_author <- function(db_path, ids_complete, matching, ids_full_vector, in
      # purrr::when(matching$independence_timing == "before_intervention" ~ filter(., year <= matching$treatment_year), ~ filter(., year >= matching$treatment_year)) %>% 
      as_tibble()
      
-     one_vedidk_filtered_pubs <- if(unique(one_vedidk_filtered_pubs$independence_timing) == "before_intervention"){filter(one_vedidk_filtered_pubs, year <= intervention_year)}else{filter(one_vedidk_filtered_pubs, year >= intervention_year)}
+     one_vedidk_filtered_pubs <- if(unique(one_vedidk_filtered_pubs$independence_timing) == "before_intervention"){filter(one_vedidk_filtered_pubs, year < intervention_year)}else{filter(one_vedidk_filtered_pubs, year >= intervention_year)}
      
      
      

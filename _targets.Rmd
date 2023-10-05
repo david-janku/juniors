@@ -104,6 +104,12 @@ list(
   tarchetypes::tar_download(sup_path_second,
       urls = Sys.getenv("link_to_manual_sup_search_second"),
       paths = here::here("data", "raw", "manual_sup_search_second.csv")),
+  tarchetypes::tar_download(blacklist_path,
+      urls = Sys.getenv("link_to_blacklist_control"),
+      paths = here::here("data", "raw", "blacklist_control_after_disamb.csv")),
+  tarchetypes::tar_download(all_sup_path,
+      urls = Sys.getenv("link_to_all_sup"),
+      paths = here::here("data", "raw", "all_sup.csv")),
 
   
      # tar_target(ids_path, here::here("data", "raw", "supervisors_updated.csv"), format = "file"),
@@ -129,8 +135,9 @@ list(
                 format = "file"
                 ),
      tar_target(sup_control, read.csv(sup_path)),
-     tar_target(sup_control_second, read.csv(sup_path_second))
-   
+     tar_target(sup_control_second, read.csv(sup_path_second)),
+     tar_target(blacklist_control, read.csv(blacklist_path)),
+     tar_target(all_sup, read.csv(all_sup_path))
 
 )
 ```
@@ -143,7 +150,7 @@ Here we perform construction of control groups via mahalanobis distance matching
 ```{r, engine="targets", matching}
 list(
      
-      tar_target(matching_data, match_data_prep(db_path, ids, gender, sup_control, sup_control_second)),
+      tar_target(matching_data, match_data_prep(db_path, ids, gender, blacklist_control)),
       tar_target(matched_obj_unfunded, match_obj_unfunded(matching_data)), 
       tar_target(matched_obj_funded, match_obj_funded(db_path, matching_data)),
       tar_target(matching, match_data(matched_obj_unfunded, matched_obj_funded))
@@ -161,7 +168,7 @@ Further, we prepare the data for the construction of topic models in the targets
 ```{r, engine="targets", data_prep}
 list(
 
- tar_target(sup_complete, create_sup_complete(sup_control, sup_control_second, db_path, matching_data)),
+ tar_target(sup_complete, create_sup_complete(all_sup, db_path, matching_data)),
      tar_target(ids_complete, create_ids_complete(ids, db_path, matching_data)),
       tar_target(final_data, connect_data(matching, db_path, ids_complete, sup_complete)),
                
@@ -303,6 +310,31 @@ list(
 
 
 ```
+
+
+# Attachments and additional analyses
+
+Here we test to what extent can PhD advisors be identified algorithmically.
+
+```{r, engine="targets", attachments}
+
+list(
+    
+    #  # tar_target(testing,
+    #  #           just_test(db_path),
+    #  #           format = "qs")
+    
+    tar_target(sup_alg,
+               refine_data(matching, db_path, sup_complete))
+    
+
+)
+
+
+```
+
+
+
 
 # Article
 
