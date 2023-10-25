@@ -100,7 +100,7 @@ list(
        mode = "wb"),
    tarchetypes::tar_download(sup_path,
       urls = Sys.getenv("link_to_manual_sup_search"),
-      paths = here::here("data", "raw", "manual_sup_search.csv")),
+      paths = here::here("data", "raw", "manual_sup_search_4.csv")),
   tarchetypes::tar_download(sup_path_second,
       urls = Sys.getenv("link_to_manual_sup_search_second"),
       paths = here::here("data", "raw", "manual_sup_search_second.csv")),
@@ -168,7 +168,7 @@ Further, we prepare the data for the construction of topic models in the targets
 ```{r, engine="targets", data_prep}
 list(
 
- tar_target(sup_complete, create_sup_complete(all_sup, db_path, matching_data)),
+ tar_target(sup_complete, create_sup_complete(all_sup, sup_control, db_path, matching_data)),
      tar_target(ids_complete, create_ids_complete(ids, db_path, matching_data)),
       tar_target(final_data, connect_data(matching, db_path, ids_complete, sup_complete)),
                

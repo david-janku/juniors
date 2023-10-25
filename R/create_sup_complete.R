@@ -7,13 +7,13 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-create_sup_complete <- function(all_sup, db_path, matching_data) {
+create_sup_complete <- function(all_sup, sup_control, db_path, matching_data) {
     
     
-    sup_complete <- all_sup %>%   
+    sup_complete <- bind_rows(all_sup, sup_control) %>%   
         mutate(across(everything(), ~replace(., . == "", NA))) %>% 
         filter(!is.na(sup_name_first)) %>%
-        dplyr::select(-sup_vedidk, -sec_sup_vedidk, -ID) %>% 
+        dplyr::select(vedidk, disc_ford, name_first, name_last, org_name, sup_name_first, sup_name_last) %>% 
         distinct() 
     
     
