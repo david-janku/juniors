@@ -302,7 +302,7 @@ match_data_prep <- function(db_path, ids, gender, blacklist_control) {
     
     funding_vedidk <- DBI::dbReadTable(con, "cep_investigators") %>%
         filter(!is.na(vedidk)) %>% #pozor! více než 50 % projektů v databázi nemá přiřazený vedidk řešitele!
-        # filter(role_researcher == G) %>% filtruje jen hlavní řešitele (G) a ne "další řešitele" (R)
+        filter(role_researcher == "G") %>% # filtruje jen hlavní řešitele (G) a ne "další řešitele" (R)
         dplyr::select(kod, vedidk) %>% 
         distinct() %>% 
         as_tibble
@@ -324,7 +324,7 @@ match_data_prep <- function(db_path, ids, gender, blacklist_control) {
     
     
     grants2014 <- funding_data %>% 
-        filter(year_start < 2014) %>% 
+        filter(year_start < 2018) %>% 
         group_by(vedidk) %>% 
         dplyr::count(name = "grants2014") %>% 
         ungroup() 
@@ -587,7 +587,7 @@ match_data_prep <- function(db_path, ids, gender, blacklist_control) {
     
     
     grants2015 <- funding_data %>% 
-        filter(year_start < 2015) %>% 
+        filter(year_start < 2019) %>% 
         group_by(vedidk) %>% 
         dplyr::count(name = "grants2015") %>% 
         ungroup() 
@@ -767,7 +767,7 @@ match_data_prep <- function(db_path, ids, gender, blacklist_control) {
     
     
     grants2016 <- funding_data %>% 
-        filter(year_start < 2016) %>% 
+        filter(year_start < 2020) %>% 
         group_by(vedidk) %>% 
         dplyr::count(name = "grants2016") %>% 
         ungroup() 
@@ -944,7 +944,7 @@ match_data_prep <- function(db_path, ids, gender, blacklist_control) {
     
     
     grants2017 <- funding_data %>% 
-        filter(year_start < 2017) %>% 
+        filter(year_start < 2021) %>% 
         group_by(vedidk) %>% 
         dplyr::count(name = "grants2017") %>% 
         ungroup() 
@@ -1130,7 +1130,7 @@ match_data_prep <- function(db_path, ids, gender, blacklist_control) {
     
     
     grants2018 <- funding_data %>% 
-        filter(year_start < 2018) %>% 
+        filter(year_start < 2022) %>% 
         group_by(vedidk) %>% 
         dplyr::count(name = "grants2018") %>% 
         ungroup() 
@@ -1305,7 +1305,7 @@ match_data_prep <- function(db_path, ids, gender, blacklist_control) {
     
     
     grants2019 <- funding_data %>% 
-        filter(year_start < 2019) %>% 
+        filter(year_start < 2023) %>% 
         group_by(vedidk) %>% 
         dplyr::count(name = "grants2019") %>% 
         ungroup() 
