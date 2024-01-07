@@ -8,7 +8,8 @@ author:
 - name: Radim Hladík
   affiliation: '[1] Centre for Science, Technology, and Society Studies, Institute
     of Philosophy, Czech Academy of Sciences, Czech Republic'
-output: bookdown::html_document2
+output: bookdown::word_document2
+always_allow_html: true
   # pdf_document: default
   # html_document:
    
@@ -21,7 +22,16 @@ output: bookdown::html_document2
 bibliography: merged.bib
 csl: apa.csl
 ---
-<!-- \doublespacing -->
+
+**Authors:**
+
+David Janků  
+[1] Institute of Sociological Studies, Faculty of Social Sciences, Charles University, Czech Republic; 
+[2] Centre for Science, Technology, and Society Studies, Institute of Philosophy, Czech Academy of Sciences, Czech Republic
+
+Radim Hladík  
+[1] Centre for Science, Technology, and Society Studies, Institute of Philosophy, Czech Academy of Sciences, Czech Republic
+
 
 
 ## Acknowledgements
@@ -30,11 +40,18 @@ This work was supported by the Czech Science Foundation (project no. GJ20-01752Y
 
 ## Declaration of Interest
 
-Your declaration of interest statement here.
+ 
+☐ The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+ 
+☒ The authors declare the following financial interests/personal relationships which may be considered as potential competing interests:
+
+David Janku reports a relationship with Czech Science Foundation that includes: employment. If there are other authors, they declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+
 
 ## Corresponding Author
 
 Name: David Janků 
+
 Affiliation: 
 [1] Institute of Sociological Studies, Faculty of Social Sciences, Charles University, Czech Republic
 [2] Centre for Science, Technology, and Society Studies, Institute of Philosophy, Czech Academy of Sciences, Czech Republic  
@@ -67,7 +84,7 @@ library(nlme)
 
 # Abstract
 
-Independence is important quality constituting one factor of research excellence, often used in assessments for hiring, tenure and promotion in academia [@moherAssessingScientistsHiring2018]. From a bigger picture view, encouraging more independence might also lead to faster exploration of the cognitive map of science and thus lead to faster innovation. Many national research funders have created programmes specifically aimed at increasing independence of early career researchers, yet until recently, there was no quantifiable way to measure changes in independence. We employed recently proposed measure by @vandenbesselaarMeasuringResearcherIndependence2019 to asses whether one such funding programme by Czech Science Foundation is effective at stimulating more independence. We found that funding for early career researchers is not effective at stimulating their independence, regardless of the source of funding. The strongest effect on independence growth is time, explaining around 60% of the variance in independence.  Additionally, we found differences in levels of independence across disciplines that were stable across time and treatment groups, with Social Sciences and Humanities showing highest independence, while  Agricultural and Veterinary sciences and Medical and Health Sciences showing lowest independence. However, these differences reflect only changes in collaboration patterns, while there were no changes in cognitive patterns across disciplines and only modest changes across time (from 40 % to 46 % of topics not shared by their PhD advisor).
+Independence is important quality constituting one factor of research excellence, often used in assessments for hiring, tenure and promotion in academia [@moherAssessingScientistsHiring2018]. From a bigger picture view, encouraging more independence might also lead to faster exploration of the cognitive map of science and thus lead to faster innovation. Many national research funders have created programmes specifically aimed at increasing independence of early career researchers, yet until recently, there was no quantifiable way to measure changes in independence. We employed recently proposed measure by @vandenbesselaarMeasuringResearcherIndependence2019 to assess whether one such a funding programme by Czech Science Foundation is effective at stimulating more independence. We found that funding for early career researchers is not effective at stimulating their independence, regardless of the source of funding. The strongest effect on independence growth is time, explaining around 60% of the variance in independence.  Additionally, we found differences in levels of independence across disciplines that were stable across time and treatment groups, with Social Sciences and Humanities showing highest independence, while  Agricultural and Veterinary sciences and Medical and Health Sciences showing lowest independence. However, these differences reflect only changes in collaboration patterns, while there were no changes in cognitive patterns across disciplines and only modest changes across time (from 40 % to 46 % of topics not shared by their PhD advisor).
 
 ## Keywords
 research independence; early career researchers; grant funding; mentoring; counter-factual analysis; research evaluation   
@@ -77,28 +94,28 @@ research independence; early career researchers; grant funding; mentoring; count
 
 # Introduction 
 
-To what extent is scientific progress conserved and impeded by novices mirroring seniors’ research agendas? Such a phenomenon is likely to occur because following tradition is usually a more beneficial and safer option for novices. Indeed, empirical data suggest that this strategy is chosen by a majority of researchers (@foster2015), and only a small fraction dares to deviate and explore the cognitive map of science more rapidly. For early career researchers specifically, partnering with already well-established seniors provides a large career boost (@li2019) and being thematically closer to their PhD as well as post-doc advisor increases the probability of continuing in academia and having more mentees later on (@lienard2018). However, this effect might stifle scientific progress as it leads to a slower exploration of its cognitive map (@rzhetsky2015). Moreover, this mirroring further strengthens the existing positions of senior faculty, making little space for disrupting the status quo and creating new perspectives.
-This was illustrated by @azoulay2010, who investigated the effects of unexpected deaths of prominent scientists in their research fields and their collaborators' careers. They found a decrease in the productivity of junior collaborators and an increase in published work by young newcomers in the field rewarded by an increased citation rate. That suggests the sudden departures of prominent scientists gave room for more disruptive changes in the field and for bringing new ideas and perspectives while harming the status quo holders who worked with the prominent scientists on their research agendas - a “Goliath effect,” as coined by @wang2021, p.42).
+To what extent is scientific progress conserved and impeded by novices mirroring seniors’ research agendas? Such a phenomenon is likely to occur because following tradition is usually a more beneficial and safer option for novices. Indeed, empirical data suggest that this strategy is chosen by a majority of researchers [@foster2015], and only a small fraction dares to deviate and explore the cognitive map of science more rapidly. For early career researchers specifically, partnering with already well-established seniors provides a large career boost [@li2019] and being thematically closer to their PhD as well as their post-doc advisor increases the probability of continuing in academia and having more mentees later on [@lienard2018]. However, this effect might stifle scientific progress as it leads to a slower exploration of its cognitive map [@rzhetsky2015]. Moreover, this mirroring further strengthens the existing positions of senior faculty, making little space for disrupting the status quo and creating new perspectives.
+This was illustrated by @azoulay2010, who investigated the effects of unexpected deaths of prominent scientists in their research fields and their collaborators' careers. They found a decrease in the productivity of junior collaborators and an increase in published work by young newcomers in the field rewarded by an increased citation rate. That suggests the sudden departures of prominent scientists gave room for more disruptive changes in the field and for bringing new ideas and perspectives while harming the status quo holders who worked with the prominent scientists on their research agendas - a “Goliath effect,” as coined by @wang2021, p.42.
 
-This mirroring effect is also closely connected to the concept of academic inbreeding (@machacek2022), which focuses more on academic mobility and conservation of institutional habitus rather than specifically on the inheritance of research agendas. However, inbreeding is also often thought to increase dependence and decrease exploration of new ideas.
+This mirroring effect is also closely connected to the concept of academic inbreeding [@machacek2022], which focuses more on academic mobility and conservation of institutional habitus rather than specifically on the inheritance of research agendas. However, inbreeding is also often thought to increase dependence and decrease exploration of new ideas.
 
-As younger researchers are already more likely to come up with new topics and ideas (@packalen2019), it would be fitting to empower them and stimulate their independence so that they can “challenge the existing common views and open up new lines of research” (@vandenbesselaarMeasuringResearcherIndependence2019, p.2) and accelerate scientific progress rather than recreate the existing status quo. An independent investigator is then defined by the US National Academies of Science (NAS) as “one who enjoys the independence of thought—the freedom to define the problem of interest and to choose or develop the best strategies and approaches to addressing that problem–especially during the earlier career phase” (@vandenbesselaarMeasuringResearcherIndependence2019, 2019, p.4). Such a definition does not necessarily put independence in relation to other actors (e.g. one’s PhD advisor), but only in relation to one’s own freedom and resources. However other institutions, such as European Research Council via their Starting Grants scheme (@neufeldPeerReviewbasedSelection2013) think of independence in a relational manner, in terms of having one (or a few) publications without the former PhD supervisor being co-author; being PI on a grant; or being lab director or research leader. 
+As younger researchers are already more likely to come up with new topics and ideas [@packalen2019], it would be fitting to empower them and stimulate their independence so that they can “challenge the existing common views and open up new lines of research” [@vandenbesselaarMeasuringResearcherIndependence2019, p.2] and accelerate scientific progress rather than recreate the existing status quo. An independent investigator is then defined by the US National Academies of Science [@nationalresearchcouncilus2005] as “one who enjoys the independence of thought—the freedom to define the problem of interest and to choose or develop the best strategies and approaches to addressing that problem–especially during the earlier career phase” [@vandenbesselaarMeasuringResearcherIndependence2019, p.4]. Such a definition does not necessarily put independence in relation to other actors (e.g. one’s PhD advisor), but only in relation to one’s own freedom and resources. However other institutions, such as European Research Council via their Starting Grants scheme [@neufeldPeerReviewbasedSelection2013] think of independence in a relational manner, in terms of having one (or a few) publications without the former PhD supervisor being co-author; being PI on a grant; or being lab director or research leader. 
 
-Developing independence is also one of the things that the system of science expects from its members - it is one of the criteria often used for assessing researchers for hiring, tenure and promotion (@vanarensbergenDifferentViewsScholarly2014; @moherAssessingScientistsHiring2018), constituting one factor of research excellence. Even from the perspective of scholarly output, protégés were found to “do their best work when they break from their mentor’s research topics and coauthor no more than a small portion of their overall research with their mentors” (@ma2020). @lienard2018 found that making a larger thematic step from the PhD advisor and finding a post-doc advisor with less similar interests was also related to increased chances of continuing in academia and having more mentees later on (although under the condition that one remains thematically close to the post-doc advisor). There is also some direct preliminary evidence that higher independence modestly correlates with the number of citations acquired (Rojko & Lužar, 2022), but others argue that even the research systems with very low independence can create a lot of scientific impact, and thus the relationships between independence and impact might not be as clear (Gläser et al., 2021)
-
-
-However, developing this independence does not go without saying. There are few known factors influencing the level of research independence. One of them is study discipline. Based on some early empirical studies (@rojkoScientificPerformanceResearch2022), it seems that researchers in disciplines such as philosophy, psychology; religion, theology; social sciences; the arts, recreation, entertainment, sport; language, linguistics, literature; and geography, biography, history experience significantly higher levels of independence on their PhD advisor than researchers in disciplines such as science and knowledge, organization, computer science, information, documentation, librarianship, institutions, publications; mathematics, natural sciences; and applied sciences, medicine, technology. 
+Developing independence is also one of the things that the system of science expects from its members - it is one of the criteria often used for assessing researchers for hiring, tenure and promotion [@vanarensbergenDifferentViewsScholarly2014; @moherAssessingScientistsHiring2018], constituting one factor of research excellence. Even from the perspective of scholarly output, protégés were found to “do their best work when they break from their mentor’s research topics and coauthor no more than a small portion of their overall research with their mentors” [@ma2020]. @lienard2018 found that making a larger thematic step from the PhD advisor and finding a post-doc advisor with less similar interests was also related to increased chances of continuing in academia and having more mentees later on (although under the condition that one remains thematically close to the post-doc advisor). There is also some direct preliminary evidence that higher independence modestly correlates with the number of citations acquired [@rojkoScientificPerformanceResearch2022], but others argue that even the research systems with very low independence can create a lot of scientific impact, and thus the relationships between independence and impact might not be as clear [@glaserIndependenceResearchReview2022].
 
 
-Interestingly, there is also some evidence that the propensity to cognitive independence might be inherited and passed down from generation to generation in mentor-mentee relationships (@yoshioka-kobayashi2021) - perhaps it is not only research agendas that students inherit from their advisors but also the tendency to deviate from those research agendas. 
+However, developing this independence does not go without saying. There are few known factors influencing the level of research independence. One of them is study discipline. Based on some early empirical studies [@rojkoScientificPerformanceResearch2022], it seems that researchers in social sciences and humanities experience significantly higher levels of independence from their PhD advisor than researchers in other disciplines. 
 
-In recent decades, there has been a worry that researchers’ independence is decreasing, illustrated by an increase in the age at which researchers received their first grant (@powell2016, @christian2021; and NAS, 2005; @danielsGenerationRiskYoung2015 for US biomedical researchers specifically), as well as direct measures of new researchers becoming more dependent on their PhD advisors across almost all disciplines in Slovenia (@rojkoScientificPerformanceResearch2022, table 6 on p.9). These trends have motivated some to create new proposals for funding agencies and other research funders in order to support early career researchers (@dewinde2021)
+
+Interestingly, there is also some evidence that the propensity to cognitive independence might be inherited and passed down from generation to generation in mentor-mentee relationships [@yoshioka-kobayashi2021] - perhaps it is not only research agendas that students inherit from their advisors but also the tendency to deviate from those research agendas. 
+
+In recent decades, there has been a worry that researchers’ independence is decreasing, illustrated by an increase in the age at which researchers received their first grant [@powell2016; @christian2021; and @nationalresearchcouncilus2005; @danielsGenerationRiskYoung2015 for US biomedical researchers specifically], as well as direct measures of new researchers becoming more dependent on their PhD advisors across almost all disciplines in Slovenia [@rojkoScientificPerformanceResearch2022, table 6 on p.9]. These trends have motivated some to create new proposals for funding agencies and other research funders in order to support early career researchers [@dewinde2021]
       
-Perhaps to tackle this trend, many grant agencies decided to support early career researcher by funding. Some have decided to tackle this trend by giving advantage to first-awardees and early career researchers in their usual distribution process, while others have created specific programmes designated to funding young researchers soon, usually up to 8 years, after finishing their PhD. Such programmes have often explicitly stated goals of helping researchers become more independent, set up their own research groups and open up new lines of research. Examples of such programmes could be Starting Grants by European Research Council (@StartingGrantERC), Junior project and Junior Star by Czech Science Foundation (2020), Walter N. Benjamin Programme by DFG (@WalterBenjaminProgramme), Innovation Research Incentives Scheme by Netherlands Organization of Scientific Research (NWO) (2021).
+Perhaps to tackle this trend, many grant agencies decided to support early career researcher by funding. Some have decided to address this trend by giving advantage to first-awardees and early career researchers in their usual distribution process, while others have created specific programmes dedicated to funding young researchers, typically up to 8 years after completing their PhD. Such programmes have often explicitly stated goals of helping researchers become more independent, set up their own research groups and open up new lines of research. Examples of such programmes could be Starting Grants by European Research Council [@StartingGrantERC], Junior project and Junior Star by @czechsciencefoundation2019, Walter N. Benjamin Programme by DFG [@WalterBenjaminProgramme], Innovation Research Incentives Scheme by Netherlands Organization of Scientific Research [@nwo2023].
 
-Grant funding mechanisms have previously been shown to stimulate productivity in terms of the number of publications and impact in terms of citations (@gallo2018; for the Czech environment specifically see @bajgar2021; notable exception is @vandenbesselaar2015, who specifically looked at funding programmes for early career researchers and found small or no effect), and even scientific novelty (@wang2018, or, as some authors argue, rather interdisciplinarity: @fontana2020). In terms of career progress, obtaining grant funding was connected to significantly higher chances of career progression and obtaining a professorship (@bloch2014, @vandenbesselaar2015).
+Grant funding mechanisms have previously been shown to stimulate productivity in terms of the number of publications and impact in terms of citations [@gallo2018; for the Czech environment specifically see @bajgar2021; notable exception is @vandenbesselaar2015, who specifically looked at funding programmes for early career researchers and found small or no effect], and even scientific novelty [@wang2018, or, as some authors argue, rather interdisciplinarity: @fontana2020]. In terms of career progress, obtaining grant funding was connected to significantly higher chances of career progression and obtaining a professorship [@bloch2014, @vandenbesselaar2015].
 
-Funding is thus thought to be one of the mechanisms that could stimulate researchers' independence. However, there hasn’t been much effort focused on quantifying this phenomenon. Some studies try to measure independence in a simple way, as a ratio of publications the given researcher produced without their supervisor divided by the total number of publications of the given researchers (e.g. @rojkoScientificPerformanceResearch2022). However, such an indicator could be misleading in the world of team science, and also only focuses on collaborations, not tracking whether a given researcher becomes independent in their thinking and research topics. @vandenbesselaarMeasuringResearcherIndependence2019 therefore proposed a more complex indicator for measuring researcher independence on the individual level, based on co-authorship network and topical overlaps. Their measure uses only information about publications’ characteristics (authorship and reference list) regardless of their impacts, unlike other alternative measures that focus solely on the impact of the independent work in terms of received citations (Dey, et al., 2021 -> ALIS, citation need repair).
+Funding is thus thought to be one of the mechanisms that could stimulate researchers' independence. However, there hasn’t been much effort focused on quantifying this phenomenon. Some studies try to measure independence in a simple way, as a ratio of publications the given researcher produced without their supervisor divided by the total number of publications of the given researchers [e.g. @rojkoScientificPerformanceResearch2022]. However, such an indicator could be misleading in the world of team science, and also only focuses on collaborations, not tracking whether a given researcher becomes independent in their thinking and research topics. @vandenbesselaarMeasuringResearcherIndependence2019 therefore proposed a more complex indicator for measuring researcher independence on the individual level, based on co-authorship network and topical overlaps. Their measure uses only information about publications’ characteristics (authorship and reference list) regardless of their impacts, unlike other alternative measures that focus solely on the impact of the independent work in terms of received citations [@dey2023].
 
 Understanding the impact of early-career funding on research independence is crucial for shaping future funding policies and, ultimately, the trajectory of scientific innovation. This study serves as a pivotal step in quantifying that impact, providing actionable insights for funding agencies and academic institutions alike.
 
@@ -111,13 +128,14 @@ Understanding the impact of early-career funding on research independence is cru
 We used the database of all publications produced by researchers employed at Czech research institutions (RIV) combined with a database of all publicly funded research projects and grants in the Czech Republic (CEP), both publicly accessible at https://www.isvavai.cz/, and transformed into a single database with cleaned data, unique person and publication identifiers, and better structure (Hladik, XXX).
 This allowed us to identify all researchers who received Junior Grants from the Czech Science Foundation, a funding programme that has an explicit goal to help early career researchers become independent and set up their own research groups. There were 491 projects funded from 2015 to 2020, usually 3 years long (with some being only 2 years long), where the PI must have been up to 8 years after their PhD defence (with potential extension of 2 years for each child the researcher had in that period) and the grant could contribute up to 100 % of their salary (usually, this is limited to 50 % in other funding programmes). From these 491 funded projects, we selected 348 (71 %) grants of the recipients from Czechia, since the remaining recipients were from abroad, and thus would not have their previous publications recorded in the database of researchers employed at Czech research institutions (RIV) that we used for all analyses. There were also 7 cases where one researcher received this grant two times - in these cases, we counted only the first project that was funded, reducing the number of recipients we worked with to 341.
 
-In the second step, we manually searched for PhD advisors of these 341 researchers in the databases of theses and dissertations that cover most universities in Czechia (https://theses.cz and https://dspace.cuni.cz/). We were able to match `r nrow(tar_read(ids_complete))` researchers with a PhD advisor (81 % of the Czech subsample). Further, we have not managed to find a suitable matched pair for another `r nrow(tar_read(ids_complete))-nrow(tar_read("matching") %>% filter(treatment == 1) %>% distinct(vedidk))` researchers in the matching procedure, reducing our final sample to `r nrow(tar_read("matching") %>% filter(treatment == 1) %>% distinct(vedidk))`. 
+In the second step, we manually searched for PhD advisors of these 341 researchers in the databases of theses and dissertations that cover most universities in Czechia (https://theses.cz and https://dspace.cuni.cz/). We were able to match `r nrow(tar_read(ids_complete) %>% filter(!is.na(sup_name)))` researchers with a PhD advisor (82 % of the Czech subsample) and find suitable matched pair from control group for each of them. 
+<!-- Further, we have not managed to find a suitable matched pair for another `r nrow(tar_read(ids_complete))-nrow(tar_read("matching") %>% filter(treatment == 1) %>% distinct(vedidk))` researchers in the matching procedure, reducing our final sample to `r nrow(tar_read("matching") %>% filter(treatment == 1) %>% distinct(vedidk))`.  -->
 
 For the matched researchers from control groups see the matching description below in the Analysis section.
 
-These researchers and their PhD advisors with their full publication history (limited to publications created at Czech institutions) created our final sample.
+These researchers and their PhD advisors with their full publication history (limited to publications created at Czech institutions) constituted our final sample.
 
-We also tested an assumption that had a hope of reducing time intensity of data collection by substitution it for algorithmic approach: using the "most frequent co-author of the first 5 publications" as a proxy to identify supervisors. Crosschecking this proxy with the actual data about supervisors we found manually, we found that this algorithm was able to identify supervisors correctly in about 56 % of cases (see the Attachment 1). 
+We also tested an assumption that had a hope of reducing time intensity of data collection by substituting it with an algorithmic approach: using the "most frequent co-author of the first 5 publications" as a proxy to identify supervisors. Crosschecking this proxy with the actual data about supervisors we found manually showed that this algorithm was able to identify supervisors correctly in only about 56 % of cases (see the Attachments).
 
 
 
@@ -132,9 +150,9 @@ We decided to use the recently created independence indicator by @vandenbesselaa
 
 However, we have made some changes to the indicator. After consulting with its authors, we have changed the aggregation formula to 
 $$RII = ((1- I1) + I2 + I3 + I4) / 4$$ 
-since the previous formula had a small error (it weighted I4 double,, i.e. 2*I4). In determining the proportion of a researcher's own research topics (I4), we opted for text-based topic modeling utilizing publication titles and abstracts, diverging from the originally suggested bibliographic coupling method. Initially, we conducted a random sampling of 3000 publications from a set of all publications produced by researchers affiliated with Czech institutions as cataloged in the RIV database, estimated number of topics using Griffiths2004 indicator and calculated LDA topic model on this set of publications. Then we  compiled all publications generated by the researchers within our sample and their respective supervisors. We then calculated the posterior distribution of topics for this compilation, employing a pre-trained topic model. This way we wanted to mitigate the endogeneity of the topic modelling which would be stronger if we calculated topic model directly on the publications of our sample researchers.
+since the previous formula had a small error (it weighted I4 double,, i.e. 2*I4). In determining the proportion of a researcher's own research topics (I4), we opted for text-based topic modeling utilizing publication titles and abstracts, diverging from the originally suggested bibliographic coupling method. Initially, we conducted a random sampling of 3000 publications from a set of all publications produced by researchers affiliated with Czech institutions as cataloged in the RIV database, estimated number of topics using Griffiths2004 indicator, and calculated LDA topic model on this set of publications. Then we  compiled all publications generated by the researchers within our sample and their respective supervisors. We then calculated the posterior distribution of topics for this compilation, employing a pre-trained topic model. This way we wanted to mitigate the endogeneity of the topic modelling which would be stronger if we calculated topic model directly on the publications of our sample researchers.
 
-To calculate this indicator, we required at least 3 publications. This led to an increased number of missing observations (see section Descriptives -> Missing data).
+To calculate this indicator, we required at least 3 publications. This led to an increased number of missing observations (see section Descriptives - Missing data).
 
 <!-- Finally, the original indicator, while tracking not only collaboration independence but also topical independence, is still skewed significantly towards collaboration independence (three-quarters of the indicator measure collaboration, while only one-quarter measures topics). Since we consider cognitive/topical independence an important asset of this indicator, we have decided to adjust the formula a bit further and drop the I3 part, to give more weight to the cognitive/topical independence in the whole indicator. Throughout this paper, we will thus refer to the original indicator as RIIo, our adjusted version as RIIa and the part of the indicator measuring only the cognitive independence RIIc. -->
 
@@ -144,7 +162,7 @@ We measured researchers’ career age as the number of years since their first p
 
 *Discipline*
 
-We used the highest level of the OECD classification of disciplines, containing categories Natural Sciences; Engineering and Technology; Medical and Health Sciences; Agricultural Sciences; Social Sciences; Humanities. We chose this classification because it is widely used and also used in the dataset we worked with. For the matching we used the 42 sub-categories of this classification to achieve more granularity.
+We used the highest level of the OECD classification of disciplines: containing categories Natural Sciences; Engineering and Technology; Medical and Health Sciences; Agricultural Sciences; Social Sciences; Humanities. We chose this classification because it is widely used and also present in the dataset we worked with. For the matching we used the 42 sub-categories of this classification to achieve more granularity.
 
 We attributed a discipline to a given researcher based on disciplines attributed to their each publication, choosing the most frequent discipline for each author.  
 
@@ -172,18 +190,19 @@ We calculated the career age of each researcher when they received their first g
 
 *Gender*
 
-We used Genderize.io API to estimate the probability of perceived gender based on the first names of researchers. Where available, information about the nationality of researchers was included in the API call to improve accuracy. 
-We have also manually specified gender for 2 obrsevtation from the treatment group for which the gender was not calculated automatically. 
+We used Genderize.io API to estimate the probability of perceived gender based on the first names of researchers. We had also manually specify gender for 2 observations from the treatment group for which the gender was not calculated automatically. 
 
 ## Analysis
 
-We analysed the data in the R version 4.2.3. using R studio and [this code](https://github.com/david-janku/juniors). For the construction of the independence indicator, we used network modelling (maybe more specific?) and text-based topic modelling (maybe more specific??).
+We analysed the data in the R version 4.2.3. using R studio and [this code](https://github.com/david-janku/juniors). For the construction of the independence indicator, we used network modelling and text-based topic modelling.
 
-For the construction of the control group, we implemented propensity matching using the package MatchIt (citation?) and matching exactly by the discipline (42 sub-categories of OECD classification) and treatment year, and approximately by number of publications in total, number of publications in WoS/Scopus, career age, interdisciplinary proportion, number of grants received prior to Junior Grant, career age when receiving the first grant and gender. All of these variables were calculated at the intervention year (i.e. year when the given researcher from experimental group received the Junior Grant). The distance was set to "mahalanobis". The matching was done in 1:1 ratio and with replacement. 
+For the construction of the control group, we implemented propensity matching using the package MatchIt [@ho2011] and matching exactly by the discipline (42 sub-categories of OECD classification) and treatment year, and approximately by number of publications in total, number of publications in WoS/Scopus, career age, interdisciplinary proportion, number of grants received prior to Junior Grant, career age when receiving the first grant, and gender. All of these variables were calculated in the intervention year (i.e. year when the given researcher from experimental group received the Junior Grant). The distance was set to "mahalanobis". The matching was done in 1:1 ratio and with replacement. 
 
 Using the matching algorithm, we have created 2 control groups: "Unfunded" group did not receive any grants prior to and 3 years after the treatment year. "Funded" group was matched based on career year at which they received their first grant, ensuring that while treatment group researchers received Junior Grant, "funded" researchers received a different grant at the same time. That allowed us to better track the impact of any grant funding vs specifically Junior Grants funding on researchers’ independence.
 
-The difference between groups was tested using paired t-test and subsequent differences between discipline groups was tested using ANOVA post-hoc Tukey test.
+The difference between treatment groups was tested using repeated measures ANOVA with a special error term taking into account paired nature of the data. The ANOVA model was specified as RII ~ treatment * independence_timing, incorporating both the main effects and the interaction between treatment and independence timing. A significant aspect of our ANOVA approach was the inclusion of an error term structured as Error(subclass/independence_timing). This error structure accounts for the nested or hierarchical nature of our data, where measurements are nested within subclasses and vary across different independence timings. By doing so, the model adjusts for potential within-subclass correlations and differences across independence timings.
+
+To ascertain the significance of academic field as a predictor, we constructed two additional GLS models. The first model included treatment, independence timing, and their interaction as predictors (treatment + independence_timing + treatment:independence_timing), while the second model added the main effect of the academic field (+ field). Both models employed a compound symmetry correlation structure (corCompSymm) based on subclass and independence timing, suitable for data with equal correlation between observations. By comparing these models, we aimed to evaluate the impact of including the academic field as a predictor on the model's explanatory power, thereby testing its statistical significance in explaining variations in RII.
 
 ## Descriptives
 
@@ -277,12 +296,12 @@ final_after_control2 <- nrow(filtered_by_subclass %>% filter(independence_timing
 ```
 
 
-The independence indicator was not possible to calculate for `r na_counts` (`r na_percentage` % of observations). This is in `r na_sup` % caused by missing data about supervisors, and in `r na_pubs` % due to given researcher not having any publications in the given period (`r na_pubs_after` % of these cases are in the period after the intervention, which sometimes mean in the past few years).
+The independence indicator was not possible to calculate for `r na_counts` (`r na_percentage` % of observations). This is in `r na_sup` % caused by missing data about supervisors, and in `r na_pubs` % due to absence of publications by the researcher during the specified period (`r na_pubs_after` % of these cases occurred post-intervention, often in the past few years).
 
 There are `r na_treatment` missing observations in the treatment group, `r na_control1` in the unfunded control group and  `r na_control2` in the funded control group.
 If we only keep observations that have a match with non-missing values, we are left with a sample of `r final_before_control1` matched observations in unfunded control group and `r final_before_control2` matched observations in funded control group before intervention and a sample of `r final_after_control1` matched observations in unfunded control group and `r final_after_control2` matched observations in funded control group after intervention.
 
-When Looking at disciplines, we see that there are slightly more missing data in Agricultural and veterinary sciences and the Humanities and the Arts.
+From a perspective of disciplines, we see that there are slightly more missing data in Agricultural and veterinary sciences and the Humanities and the Arts.
 
 ```{r echo=FALSE}
 
@@ -317,9 +336,7 @@ df_summary <- df_summary %>%
   )
 
 # Print the updated table
-kable(df_summary, digits = 3, caption = "Counts and Proportions of Missing Data by Field") %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
-
+kable(df_summary, format = "markdown", digits = 3, caption = "Counts and Proportions of Missing Data by Field") 
 
 
 ```
@@ -337,19 +354,18 @@ numeric_vars <- df %>%
   names()
 
 # descriptive stats for each treatment level
-table_before_1 <- df %>% filter(treatment == 1) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
-table_before_0 <- df %>% filter(treatment == 0) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
-table_before_2 <- df %>% filter(treatment == 2) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
+table_before_1 <- df %>% filter(treatment == 1) %>% distinct(vedidk, .keep_all = TRUE) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
+table_before_0 <- df %>% filter(treatment == 0) %>% distinct(vedidk, .keep_all = TRUE) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
+table_before_2 <- df %>% filter(treatment == 2) %>% distinct(vedidk, .keep_all = TRUE) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
 
 colnames(table_before_0) <- paste0(colnames(table_before_0), "_0")
 colnames(table_before_2) <- paste0(colnames(table_before_2), "_2")
 
-combined_table_before <- cbind(table_before_1, table_before_0[, -1], table_before_2[, -1])
+combined_table_before <- cbind(table_before_1, table_before_0, table_before_2)
 
 kable(combined_table_before, 
-      digits = 3, align = "c", booktabs = TRUE, caption = "Descriptives of All Groups Before Intervention") %>%
-  kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>%
-  add_header_above(c(" " = 1, "Treatment Group" = 5, "Unfunded Control Group" = 4, "Funded Control Group" = 4))
+      format = "markdown", digits = 3, align = "c", booktabs = TRUE, caption = "Descriptives of All Groups Before Intervention") 
+  # kableExtra::add_header_above(c(" " = 1, "Treatment Group" = 5, "Unfunded Control Group" = 5, "Funded Control Group" = 5))
 
 
 
@@ -370,9 +386,9 @@ numeric_vars <- df %>%
   names()
 
 # descriptive stats for each treatment level
-table_after_1 <- df %>% filter(treatment == 1) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
-table_after_0 <- df %>% filter(treatment == 0) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
-table_after_2 <- df %>% filter(treatment == 2) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
+table_after_1 <- df %>% filter(treatment == 1) %>% distinct(vedidk, .keep_all = TRUE) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
+table_after_0 <- df %>% filter(treatment == 0) %>% distinct(vedidk, .keep_all = TRUE) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
+table_after_2 <- df %>% filter(treatment == 2) %>% distinct(vedidk, .keep_all = TRUE) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
 
 colnames(table_after_0) <- paste0(colnames(table_after_0), "_0")
 colnames(table_after_2) <- paste0(colnames(table_after_2), "_2")
@@ -387,12 +403,62 @@ table_after_0 <- reorder_row(table_after_0)
 table_after_2 <- reorder_row(table_after_2)
 
 # Re-combine tables
-combined_table_after <- cbind(table_after_1, table_after_0[, -1], table_after_2[, -1])
+combined_table_after <- cbind(table_after_1, table_after_0, table_after_2)
 
-kable(combined_table_after, 
-      digits = 3, align = "c", booktabs = TRUE, caption = "Descriptives of All Groups After Intervention") %>%
-  kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>%
-  add_header_above(c(" " = 1, "Treatment Group" = 5, "Unfunded Control Group" = 4, "Funded Control Group" = 4))
+kable(combined_table_after,
+      format = "markdown", digits = 3, align = "c", booktabs = TRUE, caption = "Descriptives of All Groups After Intervention") %>%
+  kableExtra::add_header_above(c(" " = 1, "Treatment Group" = 5, "Unfunded Control Group" = 5, "Funded Control Group" = 5))
+
+
+
+# Assuming table_after_1, table_after_0, table_after_2 are your data frames for different groups
+# 
+# # Assuming each data frame has 5 columns
+# header_columns = c("Header", rep("", 4))
+# header_1 <- data.frame(matrix(nrow = 1, ncol = 5))
+# colnames(header_1) <- header_columns
+# header_1[1, 1] <- "Treatment Group"
+# 
+# header_0 <- data.frame(matrix(nrow = 1, ncol = 5))
+# colnames(header_0) <- header_columns
+# header_0[1, 1] <- "Unfunded Control Group"
+# 
+# header_2 <- data.frame(matrix(nrow = 1, ncol = 5))
+# colnames(header_2) <- header_columns
+# header_2[1, 1] <- "Funded Control Group"
+# 
+# header_names <- colnames(table_after_1)  # Assuming all tables have the same structure
+# header_row <- setNames(data.frame(matrix(ncol = length(header_names), nrow = 1), stringsAsFactors = FALSE), header_names)
+# header_row[1, 1] <- "Your Header Title"  # Set your header title in the first column
+# 
+# combined_table_after <- rbind(header_row, table_after_1, header_row, table_after_0, header_row, table_after_2)
+# 
+# 
+# # # Assuming table_after_1, table_after_0, table_after_2 have the same column names
+# # combined_table_after <- rbind(header_1, table_after_1, 
+# #                               header_0, table_after_0, 
+# #                               header_2, table_after_2)
+# 
+# # Now create the table in R Markdown
+# knitr::kable(combined_table_after, format = "markdown", digits = 3,
+#              caption = "Descriptives of All Groups After Intervention")
+
+
+
+# # Table for Treatment Group 1
+# table_after_1_md <- knitr::kable(table_after_1, format = "markdown", 
+#                                  caption = "Treatment Group 1")
+# 
+# # Table for Unfunded Control Group
+# table_after_0_md <- knitr::kable(table_after_0, format = "markdown", 
+#                                  caption = "Unfunded Control Group")
+# 
+# # Table for Funded Control Group
+# table_after_2_md <- knitr::kable(table_after_2, format = "markdown", 
+#                                  caption = "Funded Control Group")
+# 
+
+
 
 
 ```
@@ -492,8 +558,7 @@ bal_df <- bal_df[!grepl("^disc_ford", rownames(bal_df)), ]
 
 
 # Display the cleaned-up table with kable
-kable(bal_df, "pipe", caption = "Balance Statistics For Unfunded Control Group") %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+kable(bal_df, format = "markdown", caption = "Summary of Covariate Balance Post-Matching For Unfunded Control Group", digits = 3)
 
 
 aa$Balance <- bal_df
@@ -503,7 +568,7 @@ cobalt::love.plot(aa, binary = "std", var.order = "adjusted")
 
 ```
 
-```{r echo=FALSE, fig.cap="Figure 1.2: Covariate balance table for the funded control group."}
+```{r echo=FALSE, fig.cap="Covariate balance table for the funded control group."}
 
 
 ##Funded group
@@ -530,8 +595,7 @@ bal_df_funded <- bal_df_funded[!grepl("^disc_ford", rownames(bal_df_funded)), ]
 
 
 # Display the cleaned-up table with kable
-kable(bal_df_funded, "pipe", caption = "Balance Statistics For Funded Control Group") %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+kable(bal_df_funded, format = "markdown", caption = "Summary of Covariate Balance Post-Matching For Funded Control Group", digits = 3)
 
 
 
@@ -889,7 +953,7 @@ In the first analysis, we examined the effects of treatment, time, and their int
 There was a significant main effect of time on RII, F(`r summary(result)$"Error: subclass:independence_timing"[[1]]$"Df"[1]`, `r format(summary(result)$"Error: subclass:independence_timing"[[1]]$"Df"[2])`) = `r format(summary(result)$"Error: subclass:independence_timing"[[1]]$"F value"[1], digits=2)`, p = `r round(summary(result)$"Error: subclass:independence_timing"[[1]]$"Pr(>F)"[1], 3)`). This effect accounted for approximately `r format(eta_sq_result[eta_sq_result$Parameter == "independence_timing", "Eta2_partial"] * 100, digits=2)`% of the observed variance (partial \(\eta^2 = `r round(eta_sq_result[eta_sq_result$Parameter == "independence_timing", "Eta2_partial"], 3)`\), 95% CI [`r round(eta_sq_result[eta_sq_result$Parameter == "independence_timing", "CI_low"], 3)`, `r eta_sq_result[eta_sq_result$Parameter == "independence_timing", "CI_high"]`]). However, there was no significant interaction effect between treatment and time on independence, F(`r format(summary(result)$"Error: Within"[[1]]$"Df"[2])`, `r format(summary(result)$"Error: Within"[[1]]$"Df"[3])`) = `r format(summary(result)$"Error: Within"[[1]]$"F value"[2], digits=2)`, p = `r format(summary(result)$"Error: Within"[[1]]$"Pr(>F)"[2], digits=2)` and this interaction effect explained only about `r format(eta_sq_result[eta_sq_result$Parameter == "treatment:independence_timing", "Eta2_partial"] * 100, digits=2)`% of the variability (partial \(\eta^2 = `r round(eta_sq_result[eta_sq_result$Parameter == "treatment:independence_timing", "Eta2_partial"], 3)`\), 95% CI [`r eta_sq_result[eta_sq_result$Parameter == "treatment:independence_timing", "CI_low"]`, `r round(eta_sq_result[eta_sq_result$Parameter == "treatment:independence_timing", "CI_high"], 3)`]).
 
 
-To assess effects of study field on researcher independence, we chose GLS weighted model to account for unequal group sizes and heteroscedastic variances, while keeping the repeated measures design. First, we compared models with and without the field main effect and observed a notable improvement in model fit for the model where main effect of field was included. This suggests that there are statistically significant differences in the RII based on the field of study. Specifically, adding the field of study to the model resulted in a significant increase in the log-likelihood by `r round(anova_result$L.Ratio[2], 2)` units (p < `r round(anova_result$"p-value"[2], 3)`), emphasizing its importance as a predictor. Specifically, compared to the Agricultural and Veterinary Sciences field, being in the Social Sciences field is associated with an increase in RII by `r  round(coef(model_summary)["fieldSocial Sciences", 1], 2)` units, on average (p = `r round(coef(model_summary)["fieldSocial Sciences", 4], 3)`), as well as being in the Humanities and the Arts field (increase by `r round(coef(model_summary)["fieldHumanities and the Arts", 1], 2)` units, p = `r round(coef(model_summary)["fieldHumanities and the Arts", 4], 3)`). Natural Sciences, Engineering and Technology and Medical and Health Sciences were not associated with a significant increase in RII compared to Agricultural and Veterinary Sciences.
+To assess effects of study field on researcher independence, we chose GLS weighted model to account for unequal group sizes and heteroscedastic variances, while keeping the repeated measures design. First, we compared models with and without the field main effect and observed a notable improvement in model fit for the model where main effect of field was included. This suggests that there are statistically significant differences in the RII based on the field of study. Specifically, adding the field of study to the model resulted in a significant increase in the log-likelihood by `r round(anova_result$L.Ratio[2], 2)` units (p = `r round(anova_result$"p-value"[2], 3)`), emphasizing its importance as a predictor. Specifically, compared to the Agricultural and Veterinary Sciences field, being in the Social Sciences field is associated with an increase in RII by `r  round(coef(model_summary)["fieldSocial Sciences", 1], 2)` units, on average (p = `r round(coef(model_summary)["fieldSocial Sciences", 4], 3)`), as well as being in the Humanities and the Arts field (increase by `r round(coef(model_summary)["fieldHumanities and the Arts", 1], 2)` units, p = `r round(coef(model_summary)["fieldHumanities and the Arts", 4], 3)`). Natural Sciences, Engineering and Technology and Medical and Health Sciences were not associated with a significant increase in RII compared to Agricultural and Veterinary Sciences.
 
 The interaction between treatment and field was not statistically significant, suggesting that the effect of treatment on independence was consistent across disciplines. The three-way interaction among treatment, independence_timing, and field was not statistically significant. This implies that the interaction effect of treatment and independence_timing on independence remained consistent across different disciplines.
 
@@ -915,7 +979,7 @@ The interaction between treatment and field was not statistically significant, s
 <!-- None of these models work well with the disciplines by default - I could make some extra edits to make ANOVA work, but I'm unsure what the interpretation would be for LMM -->
 
 
-```{r echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Figure 2.1: Violin Plot of RII Scores by Treatment and Time with Mean and CI Overlayed for the Unfunded Control Group."}
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Violin Plot of RII Scores by Treatment and Time with Mean and CI Overlayed for the Unfunded Control Group."}
 
 ### visualisations
      
@@ -979,8 +1043,7 @@ combined_plot <- ggplot() +
   scale_fill_discrete(name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
   scale_color_manual(values = c("black", "red"), name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
   
-  labs(title = "Violin Plot of RII Scores by Treatment and Time with Mean and CI Overlayed",
-       x = "Treatment Group",
+  labs(x = "Treatment Group",
        y = "RII Score") +
   theme_bw()
 
@@ -1146,7 +1209,7 @@ model_gls_weighted2 <- gls(RII ~ field, data = filtered_data_disc_2,
                           method = "ML",
                           correlation = corAR1(form = ~ 1 | subject_id))  
 
-# summary(model_gls_weighted2)
+interaction_summary <- summary(model_gls_weighted2)
 
 #this model below is the same as the above but with added predictors
 
@@ -1190,12 +1253,13 @@ In the second analysis, we examined the effects of treatment, independence_timin
 Importantly, this time the interaction effect between treatment and time was not significant, F(`r format(summary(result2)$"Error: Within"[[1]]$"Df"[2])`, `r format(summary(result2)$"Error: Within"[[1]]$"Df"[3])`) = `r format(summary(result2)$"Error: Within"[[1]]$"F value"[2], digits=2)`, p = `r format(summary(result2)$"Error: Within"[[1]]$"Pr(>F)"[2], digits=2)`. This interaction effect explained about `r format(eta_sq_result2[eta_sq_result2$Parameter == "treatment:independence_timing", "Eta2_partial"] * 100, digits=2)`% of the variability (partial \(\eta^2 = `r round(eta_sq_result2[eta_sq_result2$Parameter == "treatment:independence_timing", "Eta2_partial"], 3)`\), 95% CI [`r round(eta_sq_result2[eta_sq_result2$Parameter == "treatment:independence_timing", "CI_low"], 3)`, `r eta_sq_result2[eta_sq_result2$Parameter == "treatment:independence_timing", "CI_high"]`]), suggesting that funding has the same effects, regardless of its type or source.
 
 
-Same as in previous chapter, the comparison of models suggested that there are statistically significant differences in the RII based on the field of study. Specifically, adding the field of study to the model resulted in a significant increase in the log-likelihood by `r round(anova_result2$L.Ratio[2], 2)` units (p < `r round(anova_result2$"p-value"[2], 3)`), emphasizing its importance as a predictor. Specifically, compared to the Engineering and Technology field, being in the Medical and Health Sciences field is associated with a decrease in RII by `r  round(coef(model_summary2)["fieldMedical and Health Sciences", 1], 2)` units, on average (p = `r round(coef(model_summary2)["fieldMedical and Health Sciences", 4], 3)`), while being in the Social Sciences field is associated with an increase in RII by `r round(coef(model_summary2)["fieldSocial Sciences", 1], 2)` units (p = `r round(coef(model_summary2)["fieldSocial Sciences", 4], 3)`). There are no statistically significant differences between Natural Sciences and Engineering and Technology. Humanities and Agricultural sciences categories were excluded because they had too few observations.
-The interaction between treatment and field was not statistically significant, suggesting that the effect of treatment on independence was consistent across disciplines. The three-way interaction among treatment, independence_timing, and field was not statistically significant. This implies that the interaction effect of treatment and independence_timing on independence remained consistent across different disciplines.
+Same as in previous chapter, the comparison of models suggested that there are statistically significant differences in the RII based on the field of study. Specifically, adding the field of study to the model resulted in a significant increase in the log-likelihood by `r round(anova_result2$L.Ratio[2], 2)` units (p = `r round(anova_result2$"p-value"[2], 3)`), emphasizing its importance as a predictor. Specifically, compared to the Agricultural and Veterinary Sciences, being in the Medical and Health Sciences field is associated with an increase in RII by `r  round(coef(model_summary2)["fieldMedical and Health Sciences", 1], 2)` units (p = `r round(coef(model_summary2)["fieldMedical and Health Sciences", 4], 3)`), being in the Natural Sciences is associated with an increase in RII by `r  round(coef(model_summary2)["fieldNatural Sciences", 1], 2)` units (p = `r round(coef(model_summary2)["fieldNatural Sciences", 4], 3)`), Engineering and Technology are associated with an increase in RII by `r  round(coef(model_summary2)["fieldEngineering and Technology", 1], 2)` units (p = `r round(coef(model_summary2)["fieldEngineering and Technology", 4], 3)`), Social Sciences are associated with an increase in RII by `r round(coef(model_summary2)["fieldSocial Sciences", 1], 2)` units (p = `r round(coef(model_summary2)["fieldSocial Sciences", 4], 3)`), and Humanities and the Arts are associated with an increase in RII by `r round(coef(model_summary2)["fieldHumanities and the Arts", 1], 2)` units (p = `r round(coef(model_summary2)["fieldHumanities and the Arts", 4], 3)`). 
+
+The three-way interaction among treatment, independence_timing, and field was not statistically significant. This implies that the interaction effect of treatment and independence_timing on independence remained consistent across different disciplines.
 
 
 
-```{r echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Figure 2.2: Violin Plot of RII Scores by Treatment and Time with Mean and CI Overlayed for the Funded Control Group."}
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Violin Plot of RII Scores by Treatment and Time with Mean and CI Overlayed for the Funded Control Group."}
 
 
 ### visualisations
@@ -1231,8 +1295,7 @@ combined_plot2 <- ggplot() +
   scale_fill_discrete(name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
   scale_color_manual(values = c("black", "red"), name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
   
-  labs(title = "Violin Plot of RII Scores by Treatment and Time with Mean and CI Overlayed",
-       x = "Treatment Group",
+  labs(x = "Treatment Group",
        y = "RII Score") +
   theme_bw()
 
@@ -1297,7 +1360,7 @@ print(combined_plot2)
 
 ```
 
-```{r echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Figure 2.3: Differences in average RII across disciplines."}
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Differences in average RII across disciplines."}
 
 
 disc_data <- d %>%
@@ -1347,8 +1410,7 @@ ggplot(data = means_disc_complete, aes(x = field, y = mean_RII, fill = field)) +
   labs(
     x = "Field", 
     y = "Mean RII",
-    title = "Differences in average RII across disciplines"
-  ) +
+    ) +
   scale_fill_discrete(name = "Field") +
   theme_bw()
 
@@ -1369,8 +1431,7 @@ cor_matrix <- cor(cor_data, use = "pairwise.complete.obs")
 
 # reversed_cor_matrix <- cor_matrix[rev(rownames(cor_matrix)), rev(colnames(cor_matrix))]
 
-kable(cor_matrix, format = "html", digits = 2) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+kable(cor_matrix, format = "markdown", digits = 2, caption = "Correlation Matrix of RII indicator and its sub-parts")
 
 
 
@@ -1399,7 +1460,7 @@ From the violin plot it seems that the cognitive part of the indicator has lower
 This might suggest that while funding helps early career researchers to become more independent from their PhD advisors overall, this is likely driven creating new collaboration networks, rather than "opening up new lines of research". That being said, the average level of cognitive (topical) independence is around `r round(ind_top_mean_before, 2)` (which could roughly be translated as `r round(ind_top_mean_before*100, 2)` %) even before the funding intervention and rises to about `r round(ind_top_mean_after, 2)` (`r round(ind_top_mean_after*100, 2)` %) in the time after the intervention.
 
 
-```{r echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Figure 3.1: Violin Plot of the Cognitive Part of RII Scores by Treatment and Time with Mean and CI Overlayed for the Unfunded Control Group."}
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Violin Plot of the Cognitive Part of RII Scores by Treatment and Time with Mean and CI Overlayed for the Unfunded Control Group."}
 
 ### visualisations
      
@@ -1440,8 +1501,7 @@ combined_plot <- ggplot() +
   scale_fill_discrete(name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
   scale_color_manual(values = c("black", "red"), name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
   
-  labs(title = "Violin Plot of ind_topics Scores by Treatment and Time with Mean and CI Overlayed",
-       x = "Treatment Group",
+  labs(x = "Treatment Group",
        y = "ind_topics Score") +
   theme_bw()
 
@@ -1454,7 +1514,7 @@ print(combined_plot)
 Similar pattern can be observed in differences across disciplines - while there were significant differences in full indicator scores, its cognitive part doesn't show any differences, suggesting that collaboration is the factor driving differences across fields of study.
 
 
-```{r echo=FALSE, fig.cap="Figure 3.2: Differences in Average Cognitive RII Scores (ind_topic) Across Disciplines and Time."}
+```{r echo=FALSE, fig.cap="Differences in Average Cognitive RII Scores (ind_topic) Across Disciplines and Time."}
 
 disc_data <- d %>%
      group_by(vedidk, subclass) %>%  # Assuming 'id' is your current unique identifier
@@ -1522,8 +1582,7 @@ ggplot(data = means_disc_complete, aes(x = field, y = mean_ind_topics, fill = fi
   labs(
     x = "Field", 
     y = "Mean ind_topics",
-    title = "Differences in average ind_topics across disciplines and time"
-  ) +
+     ) +
   scale_fill_discrete(name = "Field") +
   theme_bw()
 
@@ -1532,7 +1591,7 @@ ggplot(data = means_disc_complete, aes(x = field, y = mean_ind_topics, fill = fi
 
 ```
 
-```{r echo=FALSE, fig.cap="Figure 3.3: Average Change in Cognitive RII Scores (ind_topic) Across Disciplines."}
+```{r echo=FALSE, fig.cap="Average Change in Cognitive RII Scores (ind_topic) Across Disciplines."}
 
 
 
@@ -1585,8 +1644,7 @@ ggplot(data = means_disc_change, aes(x = field, y = mean_ind_topics_diff, fill =
   labs(
     x = "Field", 
     y = "Mean ind_topics_diff",
-    title = "Average change in cognitive independence across disciplines"
-  ) +
+    ) +
   scale_fill_discrete(name = "Field") +
   theme_bw()
 
@@ -1597,22 +1655,18 @@ ggplot(data = means_disc_change, aes(x = field, y = mean_ind_topics_diff, fill =
 
 # Discussion
 
-The results of this study provide important insights into the effects of funding interventions on researcher independence. The strongest effect we found across all control group comparisons was the effect of time - over time, researchers become more independent, regardless of their access to funding or their study discipline. This effect explains around 60% of the variance in independence.
+The results of this study provide important insights into the effects of funding interventions on researcher independence. We did not find a significant intervention effect of funding programmes for early career researchers, compared to no funding or other types of grant funding. These results suggest funding might not be an important factor in developing researcher independence. This is surprising finding, since many people have voiced worries about funding having strong effect either by making junior researchers more cautious and risk-averse in order to fulfill the grant conditions, limiting the novelty of their work; or by giving them more protected space where they can freely experiment and step off the traditional paths, opening new lines of research. Neither of these theories are supported by our findings. Instead, there are likely other factors influencing development of research independence more significantly.
 
-Additionally, the observed variation in independence across different disciplines underscores the importance of considering disciplinary differences, suggested by a moderate effect size. A moderate effect size for the field effect emphasizes that certain disciplines might inherently have variations in researchers' independence, but this is driven mostly by collaboration patterns rather than cognitive patterns via to differences in practices, methodologies, or norms specific to each discipline. These differences remain constant across time and funding interventions, suggesting that funding has a uniform effect on the independence across disciplines.
+The strongest effect we found across all control group comparisons was the effect of time: over time, researchers become more independent, regardless of their access to funding or their study discipline. This effect explains around 60% of the variance in independence.
 
-Importantly, the significant interaction between treatment and time when comparing treatment vs unfunded control group suggests the funding has positive effect on stimulating researchers' independence. However, the effect size is only modest, explaining about 2 % of variance in independence, indicating relatively small practical relevance. Further, the insignificant interaction when comparing the treatment vs funded control group suggests that funding in this career stage has the same effect, regardless of its type or source. Interestingly, in our sample both funded groups (treatment as well as control) started with lower independence compared to unfunded control group. This might suggest that in the early career stages, being more dependent on one's PhD advisor might be  beneficial (or even required) to obtain independent funding.
+Additionally, the observed variation in independence across different disciplines underscores the importance of considering disciplinary differences, suggested by a moderate effect size. A moderate effect size for the field effect emphasizes that certain disciplines might inherently have variations in researchers' independence, but this is driven mostly by collaboration patterns rather than cognitive patterns (e.g. differences in practices, methodologies, or norms specific to each discipline). These differences remain constant across time and funding interventions, suggesting that funding has a uniform effect on the independence across disciplines.
 
-Finally, when looking closer into the composition of the independence indicator, we found that that the main driver of the increase in independence was the collaboration part of the indicator - creating new collaboration networks - rather than the cognitive part - opening up new lines of research in which their PhD advisor is not active. While the level of cognitive independence is still relatively high even early on after finishing one's PhD (researchers have around 40 % of topics not shared by their PhD advisor) and increases over time, the funding does not stimulate more novelty and divergence from the portfolio of topics held by their PhD advisors.
+Finally, when looking closer into the composition of the independence indicator, we found that that the main driver of the increase in independence was the collaboration part of the indicator - creating new collaboration networks - rather than the cognitive part - opening up new lines of research in which their PhD advisor is not active. While the level of cognitive independence is still relatively high even early on after finishing one's PhD (researchers have around 40 % of topics not shared by their PhD advisor 8 years after their first publication) and increases over time, the funding does not stimulate more novelty and divergence from the portfolio of topics held by their PhD advisors.
 
-Given that funding for early career researchers does not have effect on stimulating their cognitive independence, does it make sense to continue providing it? While funding itself might not be the main driver of cognitive independence, its might still play an important role - for example, it could be a necessary thought not sufficient condition for the development of independence. From a common sense view, it is hard to imagine that researchers can develop much of independence while working on someone else's (often their advisor') projects. Moreover, funding did show to modestly stimulate creation of more independent collaborative networks, which might have a value in itself by establishing early career researchers in the scientific community and making their positions more robust. This would hopefully enable them to explore more rapidly later on, though that is not guaranteed. In any case, our results suggest that the search for factors and interventions stimulating researchers' explorative behaviour should continue.       
+Given that funding for early career researchers does not have effect on stimulating their cognitive independence, does it make sense to continue providing it? While funding itself might not be the main driver of cognitive independence, it might still play an important role. For example, it could be a necessary, though not sufficient, condition for the development of independence. From a common sense view, it is hard to imagine that researchers can develop much of independence while only working on someone else's (often their advisor's) projects. In any case, our results suggest that the search for factors and interventions stimulating researchers' exploratory behaviours should continue.       
 
 
-
-Main value of this paper is manyfold:
-- it investigated one potential factor (funding) hypothesized to stimulate researcher independence, rendering this factor unimportant, contrary to expectations
-- it confirmed there are meaningful differences in level of independence across disciplines
-- it has illuminated the magnitude of cognitive independence experienced by researchers early in their careers and its development to later stages, contributing to the discussions about tradition and innovation in research topic choice strategies and recreating status quo in science
+Main value of this paper is manyfold. It investigated one potential factor (funding) hypothesized to stimulate researcher independence, rendering this factor unimportant, contrary to expectations, Further, it confirmed there are meaningful differences in level of independence across disciplines and has illuminated the magnitude of cognitive independence experienced by researchers early in their careers, including its development to later stages. This contributes to the discussions about tradition and innovation in research topic choice strategies and recreating status quo in science.
 
 
 
@@ -1620,17 +1674,17 @@ Main value of this paper is manyfold:
 
 ## Limitations
 
-One of the main limitations of this study is that it only focuses on Czech environment - researchers growing up and spending most of their careers in the Czech Republic, only taking into account their publications affiliated with Czech research institutions. Studies testing our results on samples from other countries, and possibly tracking international mobility would strengthen our conclusions.  
+One of the main limitations of this study is that it only focuses on Czech environment - researchers growing up and spending most of their careers in the Czech Republic, only taking into account their publications affiliated with Czech research institutions. Studies testing our results on samples from other countries, and possibly tracking international mobility, would strengthen our conclusions.  
 
-Another potential limitation is the length of the time after the intervention. We have tracked the effects of funding between 2-7 years after the project started, at a point where researchers created on average `r round(mean_pubs_after, 1)` publications (while `r na_counts_researchers` % of them have created less than 3 and were deleted from this analysis). It might be possible that independence needs more time to develop and had we measured the effects later, we would have found stronger effects.
+Another potential limitation is the length of the time after the intervention. We have tracked the effects of funding between 2-7 years after the grant projects started, at a point where researchers created on average `r round(mean_pubs_after, 1)` publications (while `r na_counts_researchers` % of them have created less than 3 publications and were removed from this analysis). It might be possible that independence needs more time to develop and had we measured the effects later, we would have found stronger effects.
 
-Further research could look more into which other factors influence researcher independence (especially the cognitive part) and how strongly compared to grant funding. 
+Further research could look into which other factors influence researcher independence (especially its cognitive part) and how strongly, compared to grant funding. 
 
 
 
 ## Conclusion
 
-Our results showed that funding helps modestly to stimulate collaborative independence of early career researchers, but does not stimulate their cognitive independence. The largest effect on increase in composite independence was time - over time, researchers become more independent, regardless of their access to funding or their study discipline. There were also significant differences in independence level across study disciplines, where social sciences and humanities allowed for more independence than medical and health sciences and natural sciences. Researchers usually start with around 40 % of topics not shared by their PhD advisor early on after finishing their PhD and grow more independent over time (up to 47 % 13.5 years after their first publication). Search for factors and interventions stimulating researchers' cognitive independence and explorative behaviour should thus continue.
+Our results showed that funding does not help to stimulate independence of early career researchers. The largest effect on increase in independence was time: over time, researchers become more independent, regardless of their access to funding or their study discipline. There were also significant differences in independence level across study disciplines, where social sciences and humanities allowed for more independence than other disciplines. Researchers usually start with around 40 % of topics not shared by their PhD advisor early on after finishing their PhD and grow more independent over time (up to 47 % of independent topics 14 years after their first publication). Search for factors and interventions stimulating researchers' cognitive independence and exploratory behaviour should thus continue.
 
 
 

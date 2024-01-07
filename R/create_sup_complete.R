@@ -166,16 +166,21 @@ create_sup_complete <- function(all_sup, sup_control, db_path, matching_data) {
     ## other ideas for disambiguation: based on 0) check the data whether it is actually correct by checking the dis_link; 1) higher level study discipline (makes similar sense to the age); 2) the match in institution they published in the year that the supervisee started publishing (ie we have institution for supervisee already, we need to enrich dataset by institutions that supervisors published in the career_start_year of supervisees); 
     
        
-    sup_rest_misc <- dup_matches_age %>% filter(vedidk.y %in% c(5928028, 8279209, 4096541, 8324735, 1273515, 4672941, 5263344, 1481894, 7901410, 4766814, 3906884)) %>%
+    sup_rest_misc <- dup_matches_age %>% filter(vedidk.y %in% c(5928028, 8279209, 4096541, 8324735, 1273515, 4672941, 5263344, 1481894, 7901410, 4766814, 3906884, 9569707, 1261037, 8334137)) %>%
         dplyr::select(-disc_ford.y, -field.x, -field.y, -career_start_year.x, -career_start_year.y) %>%
         rename(disc_ford = disc_ford.x) %>%
-        distinct()
+        distinct() %>% 
+        filter(vedidk.x != 6094996) %>% 
+        filter(!is.na(disc_ford))
     
     sup_total <- rbind(sup_total, sup_rest_misc)
     
     
     #2154412 is wrong vedidk for the person 1273515 (that vedidk has only 1 pub, so I assume it was a mistake and they are actually same person). Same with 8324735 (real vedidk) and 9651454 (wrong vedidk). Anyway, in this case it there is another problem: 8324735 has pubs that start on 1996 in RIV, whereas only start in 2001 in our database - why is that? Similarly, in RIV the vedidk track 20 pubs, in our database only 13. And same story with vedidk 5928028.
     #the only unmatched observation will be 4984552 (Pavel Peukert) which should not be matched to anyone, because there was mistake in the data
+    
+    # dup_matches_aaa <- dup_matches_age %>% filter(!vedidk.x %in% sup_rest_misc$vedidk.x)
+    
     
     
     sup_total <- rename(sup_total, vedidk = vedidk.x)

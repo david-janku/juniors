@@ -65,6 +65,9 @@ lapply(list.files(here::here("R"), full.names = TRUE), source)
 Here we import all the data we work with. Data are stored on a cloud from where we download it. 
 
 ```{r, engine="targets", data_import}
+# Set global timeout for download operations
+options(timeout = 3000) # 50 minutes
+
 list(
     
    
@@ -100,13 +103,13 @@ list(
        mode = "wb"),
    tarchetypes::tar_download(sup_path,
       urls = Sys.getenv("link_to_manual_sup_search"),
-      paths = here::here("data", "raw", "manual_sup_search_4.csv")),
+      paths = here::here("data", "raw", "manual_sup_search_6.csv")),
   tarchetypes::tar_download(sup_path_second,
       urls = Sys.getenv("link_to_manual_sup_search_second"),
       paths = here::here("data", "raw", "manual_sup_search_second.csv")),
   tarchetypes::tar_download(blacklist_path,
       urls = Sys.getenv("link_to_blacklist_control"),
-      paths = here::here("data", "raw", "blacklist_control_after_disamb.csv")),
+      paths = here::here("data", "raw", "blacklist_control_final_before_disamb.csv")),
   tarchetypes::tar_download(all_sup_path,
       urls = Sys.getenv("link_to_all_sup"),
       paths = here::here("data", "raw", "all_sup.csv")),
