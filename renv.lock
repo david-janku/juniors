@@ -50,18 +50,8 @@
     },
     "MASS": {
       "Package": "MASS",
-      "Version": "7.3-56",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "grDevices",
-        "graphics",
-        "methods",
-        "stats",
-        "utils"
-      ],
-      "Hash": "af0e1955cb80bb36b7988cc657db261e"
+      "Version": "7.3-60",
+      "Source": "Repository"
     },
     "Matrix": {
       "Package": "Matrix",
@@ -2607,31 +2597,8 @@
     },
     "targets": {
       "Package": "targets",
-      "Version": "0.14.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "R6",
-        "base64url",
-        "callr",
-        "cli",
-        "codetools",
-        "data.table",
-        "digest",
-        "igraph",
-        "knitr",
-        "rlang",
-        "stats",
-        "tibble",
-        "tidyselect",
-        "tools",
-        "utils",
-        "vctrs",
-        "withr",
-        "yaml"
-      ],
-      "Hash": "a109c461586a605e31f6c4dba801db51"
+      "Version": "1.4.0",
+      "Source": "Repository"
     },
     "testthat": {
       "Package": "testthat",

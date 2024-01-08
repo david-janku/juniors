@@ -28,7 +28,8 @@ options(tidyverse.quiet = TRUE)
 
 
 # load libraries for make
-tar_option_set(packages = c("dplyr",
+tar_option_set(packages = c("bookdown",
+                            "dplyr",
                             "tidyr",
                             "purrr",
                             "readr",
