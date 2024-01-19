@@ -1,14 +1,48 @@
 ---
-title: "Funding programmes for early career researchers influence their independence"
-author: "David Janků"
-date: "`r Sys.Date()`"
-output:
-  html_document:
-    df_print: paged
-  word_document: default
-always_allow_html: yes
+title: "Mission Unaccomplished: A Funding Programme for Early Career Researchers Fails to Promote Independence"
+author:
+- name: David Janků
+  affiliation: '[1] Centre for Science, Technology, and Society
+    Studies, Institute of Philosophy, Czech Academy of Sciences; [2] Institute of Sociological Studies, Faculty of Social Sciences,
+    Charles University'
+- name: Radim Hladík
+  affiliation: '[1] Centre for Science, Technology, and Society Studies, Institute
+    of Philosophy, Czech Academy of Sciences'
+output: bookdown::html_document2
+  # pdf_document: default
+  # html_document:
+   
+  # word_document: default
+  # # bookdown::pdf_document2: default
+  # bookdown::html_document2: default
+  #  df_print: paged
+  #  number_sections: true
+  # bookdown::word_document2: default
 bibliography: merged.bib
 csl: apa.csl
+---
+<!-- \doublespacing -->
+
+
+## Acknowledgements
+
+This work was supported by the Czech Science Foundation (project no. GJ20-01752Y, _Funded and Unfunded Research in the Czech Republic: Scientometric Analysis and Topic Modeling_). 
+
+## Declaration of Interest
+
+Your declaration of interest statement here.
+
+## Corresponding Author
+
+Name: David Janků 
+Affiliation: 
+[1] Centre for Science, Technology, and Society Studies, Institute of Philosophy, Czech Academy of Sciences
+[2] Institute of Sociological Studies, Faculty of Social Sciences, Charles University
+Address: Jilská 1, 110 00, Praha 1, Czech Republic  
+E-mail: david.janku@fsv.cuni.cz
+
+\newpage
+
 ---
 
 ```{r setup, include=FALSE}
@@ -33,8 +67,18 @@ library(nlme)
 
 # Abstract
 
-Independence is important quality constituting one factor of research excellence, often used in assessments for hiring, tenure and promotion in academia [@moherAssessingScientistsHiring2018]. From a bigger picture view, encouraging more independence might also lead to faster exploration of the cognitive map of science and thus lead to faster innovation. Many national research funders have created programmes specifically aimed at increasing independence of early career researchers, yet until recently, there was no quantifiable way to measure changes in independence. We employed recently proposed measure by @vandenbesselaarMeasuringResearcherIndependence2019 to asses whether one such funding programme by Czech Science Foundation is effective at stimulating more independence. We found that funding for early career researchers is effective at stimulating their independence, though the effect is relatively small (2 % of variance) and the source of funding does not matter. The funding also helped selected researchers to catch up with the unfunded group, rather than to outrun them. Additionally, we found differences in levels of independence across disciplines that were stable across time and treatment groups, with Social Sciences and Humanities showing highest independence, while Medical and Heath Sciences and Natural Sciences showing lowest independence.  
+Independence is an important factor in research excellence, often assessed for hiring, tenure and promotion in academia.
+From a macro perspective, increased independence might also lead to faster exploration of the cognitive map of science and thus accelerate innovation.
+Many national research funders have created programmes specifically aimed at increasing independence of early career researchers.
+A quantifiable measure of such programmes' impact on changes in independence has long been lacking..
+We employed a recently proposed independence indicator [@vandenbesselaarMeasuringResearcherIndependence2019] to asses whether one such funding programme operated by Czech Science Foundation succeeds at stimulating independence.
+We found that the e funding scheme designed for early career researchers is not effective at stimulating their independence.
+Regardless of the type of funding, the strongest effect on independence growth is time, explaining around 60% of the variance in independence.
+Additionally, we found differences in levels of independence across disciplines that were stable across time and treatment groups, with Social Sciences and Humanities showing highest independence, while  Agricultural and Veterinary sciences and Medical and Health Sciences showing lowest independence.
+However, these differences reflect only changes in collaboration patterns, while there were no changes in cognitive patterns across disciplines and only modest changes across time (from 40 % to 46 % of topics not shared by their PhD advisor).
 
+## Keywords
+research independence; early career researchers; project funding; mentoring; counter-factual analysis; research evaluation   
 
 # Intro 
 
@@ -325,7 +369,7 @@ df_summary <- df_summary %>%
   )
 
 # Print the updated table
-kable(df_summary, digits = 3, caption = "Counts and Proportions of Missing data by disc_ford") %>%
+kable(df_summary, "html", digits = 3, caption = "Counts and Proportions of Missing Data by Field") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 
@@ -355,8 +399,8 @@ colnames(table_before_2) <- paste0(colnames(table_before_2), "_2")
 
 combined_table_before <- cbind(table_before_1, table_before_0[, -1], table_before_2[, -1])
 
-kable(combined_table_before, 
-      digits = 3, align = "c", booktabs = TRUE) %>%
+kable(combined_table_before, "html",
+      digits = 3, align = "c", booktabs = TRUE, caption = "Descriptives of All Groups Before Intervention") %>%
   kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>%
   add_header_above(c(" " = 1, "Treatment Group" = 5, "Unfunded Control Group" = 4, "Funded Control Group" = 4))
 
@@ -387,8 +431,8 @@ colnames(table_after_2) <- paste0(colnames(table_after_2), "_2")
 
 combined_table_after <- cbind(table_after_1, table_after_0[, -1], table_after_2[, -1])
 
-kable(combined_table_after, 
-      digits = 3, align = "c", booktabs = TRUE) %>%
+kable(combined_table_after, "html",
+      digits = 3, align = "c", booktabs = TRUE, caption = "Descriptives of All Groups After Intervention") %>%
   kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>%
   add_header_above(c(" " = 1, "Treatment Group" = 5, "Unfunded Control Group" = 4, "Funded Control Group" = 4))
 
