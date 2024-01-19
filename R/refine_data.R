@@ -10,7 +10,7 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-refine_data <- function(matching, db_path, ids_complete, sup_control) {
+refine_data <- function(matching, db_path, sup_complete) {
 
    #  ids_refined <- ids %>%
    #      select(vedoucí.vedidk, vedidk_core_researcher) %>%
@@ -65,8 +65,7 @@ refine_data <- function(matching, db_path, ids_complete, sup_control) {
    #  # # table(d$treatment, by =d$independence_timing)
    #  
     
-    new2 <- matching %>% 
-        filter(treatment != 1) %>% 
+    new2 <- bind_rows(matching, sup_complete) %>% 
         dplyr::select(vedidk) %>% 
         distinct() %>% 
         mutate(sup_details = furrr::future_pmap(.l = list(vedidk),
@@ -79,25 +78,25 @@ refine_data <- function(matching, db_path, ids_complete, sup_control) {
     
     new_unnested <- new2 %>% tidyr::unnest(sup_details)
     
-    ids_complete_sup <- ids_complete %>% dplyr::select(vedidk, sup_name, sup_vedidk)
-    
-    new_unnested <- bind_rows(new_unnested, ids_complete_sup)
-    
-    a_final_data <- left_join(matching, new_unnested, by = "vedidk") %>% 
-        filter(!is.na(sup_name))
-    
-    b <- a_final_data %>% 
-        group_by(subclass) %>%
-        filter(n() == 1) %>%
-        ungroup() %>%
-        filter(treatment == 1)
-    d <- anti_join(a_final_data, b, by = "vedidk")
-    # table(d$treatment, by =d$independence_timing)
-    
-    #by this code below, I attach the cases in which no supervisor was found (i.e. cases where these people had no coauthors in theri first 5 publications) 
-    aa <- anti_join(matching, d, by = "vedidk")
-    bb <- left_join(aa, d)
-
-    cc <- bind_rows(d, bb)
-    
+    # ids_complete_sup <- ids_complete %>% dplyr::select(vedidk, sup_name, sup_vedidk)
+    # 
+    # new_unnested <- bind_rows(new_unnested, ids_complete_sup)
+    # 
+    # a_final_data <- left_join(matching, new_unnested, by = "vedidk") %>% 
+    #     filter(!is.na(sup_name))
+    # 
+    # b <- a_final_data %>% 
+    #     group_by(subclass) %>%
+    #     filter(n() == 1) %>%
+    #     ungroup() %>%
+    #     filter(treatment == 1)
+    # d <- anti_join(a_final_data, b, by = "vedidk")
+    # # table(d$treatment, by =d$independence_timing)
+    # 
+    # #by this code below, I attach the cases in which no supervisor was found (i.e. cases where these people had no coauthors in theri first 5 publications) 
+    # aa <- anti_join(matching, d, by = "vedidk")
+    # bb <- left_join(aa, d)
+    # 
+    # cc <- bind_rows(d, bb)
+    # 
 }

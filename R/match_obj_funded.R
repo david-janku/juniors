@@ -60,7 +60,7 @@ match_obj_funded <- function(db_path, matching_data) {
     
     funding_vedidk <- DBI::dbReadTable(con, "cep_investigators") %>%
         filter(!is.na(vedidk)) %>% #pozor! více než 50 % projektů v databázi nemá přiřazený vedidk řešitele!
-        # filter(role_researcher == G) %>% filtruje jen hlavní řešitele (G) a ne "další řešitele" (R)
+        filter(role_researcher == "G") %>% #filtruje jen hlavní řešitele (G) a ne "další řešitele" (R)
         dplyr::select(kod, vedidk) %>% 
         distinct() %>% 
         as_tibble
@@ -119,7 +119,7 @@ match_obj_funded <- function(db_path, matching_data) {
     
     
     
-    matched_obj_funded <- matchit(treatment~length+pubs_total+ws_pubs+interdisc_proportion+grants+first_grant+gender+total_coauthor_count, method="nearest", data=final_data_funded, distance = "mahalanobis", ratio = 1, exact = c("disc_ford", "treatment_year"), replace = TRUE)
+    matched_obj_funded <- matchit(treatment~length+pubs_total+ws_pubs+interdisc_proportion+first_grant+gender+total_coauthor_count, method="nearest", data=final_data_funded, distance = "mahalanobis", ratio = 1, exact = c("disc_ford", "treatment_year"), replace = TRUE)
     
    
    

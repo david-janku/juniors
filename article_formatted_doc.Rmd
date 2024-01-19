@@ -1,0 +1,1731 @@
+---
+title: "Funding programmes for early career researchers do not improve their independence"
+author:
+- name: David Janků
+  affiliation: '[1] Institute of Sociological Studies, Faculty of Social Sciences,
+    Charles University, Czech Republic; [2] Centre for Science, Technology, and Society
+    Studies, Institute of Philosophy, Czech Academy of Sciences, Czech Republic'
+- name: Radim Hladík
+  affiliation: '[1] Centre for Science, Technology, and Society Studies, Institute
+    of Philosophy, Czech Academy of Sciences, Czech Republic'
+output: bookdown::word_document2
+always_allow_html: true
+  # pdf_document: default
+  # html_document:
+   
+  # word_document: default
+  # # bookdown::pdf_document2: default
+  # bookdown::html_document2: default
+  #  df_print: paged
+  #  number_sections: true
+  # bookdown::word_document2: default
+bibliography: merged.bib
+csl: apa.csl
+---
+
+**Authors:**
+
+David Janků  
+[1] Institute of Sociological Studies, Faculty of Social Sciences, Charles University, Czech Republic; 
+[2] Centre for Science, Technology, and Society Studies, Institute of Philosophy, Czech Academy of Sciences, Czech Republic
+
+Radim Hladík  
+[1] Centre for Science, Technology, and Society Studies, Institute of Philosophy, Czech Academy of Sciences, Czech Republic
+
+
+
+## Acknowledgements
+
+This work was supported by the Czech Science Foundation (project no. GJ20-01752Y, Funded and Unfunded Research in the Czech Republic: Scientometric Analysis and Topic Modeling) 
+
+## Declaration of Interest
+
+ 
+☐ The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+ 
+☒ The authors declare the following financial interests/personal relationships which may be considered as potential competing interests:
+
+David Janku reports a relationship with Czech Science Foundation that includes: employment. If there are other authors, they declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+
+
+## Corresponding Author
+
+Name: David Janků 
+
+Affiliation: 
+[1] Institute of Sociological Studies, Faculty of Social Sciences, Charles University, Czech Republic
+[2] Centre for Science, Technology, and Society Studies, Institute of Philosophy, Czech Academy of Sciences, Czech Republic  
+Address: U Kříže 661/8, Praha 5 – Jinonice  
+E-mail: david.janku@fsv.cuni.cz
+
+\newpage
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE)
+library(targets)
+library(tidyr)
+library(dplyr)
+library(cobalt)
+library(knitr)
+library(psych)
+library(kableExtra)
+library(ggplot2)
+library(lme4)
+library(lmerTest)
+library(MuMIn)
+library(ez)
+library(plm)
+library(effectsize)
+library(nlme)
+
+```
+
+# Abstract
+
+Independence is important quality constituting one factor of research excellence, often used in assessments for hiring, tenure and promotion in academia [@moherAssessingScientistsHiring2018]. From a bigger picture view, encouraging more independence might also lead to faster exploration of the cognitive map of science and thus lead to faster innovation. Many national research funders have created programmes specifically aimed at increasing independence of early career researchers, yet until recently, there was no quantifiable way to measure changes in independence. We employed recently proposed measure by @vandenbesselaarMeasuringResearcherIndependence2019 to assess whether one such a funding programme by Czech Science Foundation is effective at stimulating more independence. We found that funding for early career researchers is not effective at stimulating their independence, regardless of the source of funding. The strongest effect on independence growth is time, explaining around 60% of the variance in independence.  Additionally, we found differences in levels of independence across disciplines that were stable across time and treatment groups, with Social Sciences and Humanities showing highest independence, while  Agricultural and Veterinary sciences and Medical and Health Sciences showing lowest independence. However, these differences reflect only changes in collaboration patterns, while there were no changes in cognitive patterns across disciplines and only modest changes across time (from 40 % to 46 % of topics not shared by their PhD advisor).
+
+## Keywords
+research independence; early career researchers; grant funding; mentoring; counter-factual analysis; research evaluation   
+
+
+
+
+# Introduction 
+
+To what extent is scientific progress conserved and impeded by novices mirroring seniors’ research agendas? Such a phenomenon is likely to occur because following tradition is usually a more beneficial and safer option for novices. Indeed, empirical data suggest that this strategy is chosen by a majority of researchers [@foster2015], and only a small fraction dares to deviate and explore the cognitive map of science more rapidly. For early career researchers specifically, partnering with already well-established seniors provides a large career boost [@li2019] and being thematically closer to their PhD as well as their post-doc advisor increases the probability of continuing in academia and having more mentees later on [@lienard2018]. However, this effect might stifle scientific progress as it leads to a slower exploration of its cognitive map [@rzhetsky2015]. Moreover, this mirroring further strengthens the existing positions of senior faculty, making little space for disrupting the status quo and creating new perspectives.
+This was illustrated by @azoulay2010, who investigated the effects of unexpected deaths of prominent scientists in their research fields and their collaborators' careers. They found a decrease in the productivity of junior collaborators and an increase in published work by young newcomers in the field rewarded by an increased citation rate. That suggests the sudden departures of prominent scientists gave room for more disruptive changes in the field and for bringing new ideas and perspectives while harming the status quo holders who worked with the prominent scientists on their research agendas - a “Goliath effect,” as coined by @wang2021, p.42.
+
+This mirroring effect is also closely connected to the concept of academic inbreeding [@machacek2022], which focuses more on academic mobility and conservation of institutional habitus rather than specifically on the inheritance of research agendas. However, inbreeding is also often thought to increase dependence and decrease exploration of new ideas.
+
+As younger researchers are already more likely to come up with new topics and ideas [@packalen2019], it would be fitting to empower them and stimulate their independence so that they can “challenge the existing common views and open up new lines of research” [@vandenbesselaarMeasuringResearcherIndependence2019, p.2] and accelerate scientific progress rather than recreate the existing status quo. An independent investigator is then defined by the US National Academies of Science [@nationalresearchcouncilus2005] as “one who enjoys the independence of thought—the freedom to define the problem of interest and to choose or develop the best strategies and approaches to addressing that problem–especially during the earlier career phase” [@vandenbesselaarMeasuringResearcherIndependence2019, p.4]. Such a definition does not necessarily put independence in relation to other actors (e.g. one’s PhD advisor), but only in relation to one’s own freedom and resources. However other institutions, such as European Research Council via their Starting Grants scheme [@neufeldPeerReviewbasedSelection2013] think of independence in a relational manner, in terms of having one (or a few) publications without the former PhD supervisor being co-author; being PI on a grant; or being lab director or research leader. 
+
+Developing independence is also one of the things that the system of science expects from its members - it is one of the criteria often used for assessing researchers for hiring, tenure and promotion [@vanarensbergenDifferentViewsScholarly2014; @moherAssessingScientistsHiring2018], constituting one factor of research excellence. Even from the perspective of scholarly output, protégés were found to “do their best work when they break from their mentor’s research topics and coauthor no more than a small portion of their overall research with their mentors” [@ma2020]. @lienard2018 found that making a larger thematic step from the PhD advisor and finding a post-doc advisor with less similar interests was also related to increased chances of continuing in academia and having more mentees later on (although under the condition that one remains thematically close to the post-doc advisor). There is also some direct preliminary evidence that higher independence modestly correlates with the number of citations acquired [@rojkoScientificPerformanceResearch2022], but others argue that even the research systems with very low independence can create a lot of scientific impact, and thus the relationships between independence and impact might not be as clear [@glaserIndependenceResearchReview2022].
+
+
+However, developing this independence does not go without saying. There are few known factors influencing the level of research independence. One of them is study discipline. Based on some early empirical studies [@rojkoScientificPerformanceResearch2022], it seems that researchers in social sciences and humanities experience significantly higher levels of independence from their PhD advisor than researchers in other disciplines. 
+
+
+Interestingly, there is also some evidence that the propensity to cognitive independence might be inherited and passed down from generation to generation in mentor-mentee relationships [@yoshioka-kobayashi2021] - perhaps it is not only research agendas that students inherit from their advisors but also the tendency to deviate from those research agendas. 
+
+In recent decades, there has been a worry that researchers’ independence is decreasing, illustrated by an increase in the age at which researchers received their first grant [@powell2016; @christian2021; and @nationalresearchcouncilus2005; @danielsGenerationRiskYoung2015 for US biomedical researchers specifically], as well as direct measures of new researchers becoming more dependent on their PhD advisors across almost all disciplines in Slovenia [@rojkoScientificPerformanceResearch2022, table 6 on p.9]. These trends have motivated some to create new proposals for funding agencies and other research funders in order to support early career researchers [@dewinde2021]
+      
+Perhaps to tackle this trend, many grant agencies decided to support early career researcher by funding. Some have decided to address this trend by giving advantage to first-awardees and early career researchers in their usual distribution process, while others have created specific programmes dedicated to funding young researchers, typically up to 8 years after completing their PhD. Such programmes have often explicitly stated goals of helping researchers become more independent, set up their own research groups and open up new lines of research. Examples of such programmes could be Starting Grants by European Research Council [@StartingGrantERC], Junior project and Junior Star by @czechsciencefoundation2019, Walter N. Benjamin Programme by DFG [@WalterBenjaminProgramme], Innovation Research Incentives Scheme by Netherlands Organization of Scientific Research [@nwo2023].
+
+Grant funding mechanisms have previously been shown to stimulate productivity in terms of the number of publications and impact in terms of citations [@gallo2018; for the Czech environment specifically see @bajgar2021; notable exception is @vandenbesselaar2015, who specifically looked at funding programmes for early career researchers and found small or no effect], and even scientific novelty [@wang2018, or, as some authors argue, rather interdisciplinarity: @fontana2020]. In terms of career progress, obtaining grant funding was connected to significantly higher chances of career progression and obtaining a professorship [@bloch2014, @vandenbesselaar2015].
+
+Funding is thus thought to be one of the mechanisms that could stimulate researchers' independence. However, there hasn’t been much effort focused on quantifying this phenomenon. Some studies try to measure independence in a simple way, as a ratio of publications the given researcher produced without their supervisor divided by the total number of publications of the given researchers [e.g. @rojkoScientificPerformanceResearch2022]. However, such an indicator could be misleading in the world of team science, and also only focuses on collaborations, not tracking whether a given researcher becomes independent in their thinking and research topics. @vandenbesselaarMeasuringResearcherIndependence2019 therefore proposed a more complex indicator for measuring researcher independence on the individual level, based on co-authorship network and topical overlaps. Their measure uses only information about publications’ characteristics (authorship and reference list) regardless of their impacts, unlike other alternative measures that focus solely on the impact of the independent work in terms of received citations [@dey2023].
+
+Understanding the impact of early-career funding on research independence is crucial for shaping future funding policies and, ultimately, the trajectory of scientific innovation. This study serves as a pivotal step in quantifying that impact, providing actionable insights for funding agencies and academic institutions alike.
+
+
+
+# Method
+
+## Sample / data
+
+We used the database of all publications produced by researchers employed at Czech research institutions (RIV) combined with a database of all publicly funded research projects and grants in the Czech Republic (CEP), both publicly accessible at https://www.isvavai.cz/, and transformed into a single database with cleaned data, unique person and publication identifiers, and better structure (Hladik, XXX).
+This allowed us to identify all researchers who received Junior Grants from the Czech Science Foundation, a funding programme that has an explicit goal to help early career researchers become independent and set up their own research groups. There were 491 projects funded from 2015 to 2020, usually 3 years long (with some being only 2 years long), where the PI must have been up to 8 years after their PhD defence (with potential extension of 2 years for each child the researcher had in that period) and the grant could contribute up to 100 % of their salary (usually, this is limited to 50 % in other funding programmes). From these 491 funded projects, we selected 348 (71 %) grants of the recipients from Czechia, since the remaining recipients were from abroad, and thus would not have their previous publications recorded in the database of researchers employed at Czech research institutions (RIV) that we used for all analyses. There were also 7 cases where one researcher received this grant two times - in these cases, we counted only the first project that was funded, reducing the number of recipients we worked with to 341.
+
+In the second step, we manually searched for PhD advisors of these 341 researchers in the databases of theses and dissertations that cover most universities in Czechia (https://theses.cz and https://dspace.cuni.cz/). We were able to match `r nrow(tar_read(ids_complete) %>% filter(!is.na(sup_name)))` researchers with a PhD advisor (82 % of the Czech subsample) and find suitable matched pair from control group for each of them. 
+<!-- Further, we have not managed to find a suitable matched pair for another `r nrow(tar_read(ids_complete))-nrow(tar_read("matching") %>% filter(treatment == 1) %>% distinct(vedidk))` researchers in the matching procedure, reducing our final sample to `r nrow(tar_read("matching") %>% filter(treatment == 1) %>% distinct(vedidk))`.  -->
+
+For the matched researchers from control groups see the matching description below in the Analysis section.
+
+These researchers and their PhD advisors with their full publication history (limited to publications created at Czech institutions) constituted our final sample.
+
+We also tested an assumption that had a hope of reducing time intensity of data collection by substituting it with an algorithmic approach: using the "most frequent co-author of the first 5 publications" as a proxy to identify supervisors. Crosschecking this proxy with the actual data about supervisors we found manually showed that this algorithm was able to identify supervisors correctly in only about 56 % of cases (see the Attachments).
+
+
+
+
+
+## Measures
+
+*Independence*
+
+We decided to use the recently created independence indicator by @vandenbesselaarMeasuringResearcherIndependence2019, since it is based on scientific production (rather than impact) and captures the phenomena in the most complete manner. The indicator has 4 parts: I1: The eigenvector centrality of the supervisor in the researcher’s co-author network; I2: The clustering coefficient of the supervisor in the researcher’s co-author network; I3: The share of own papers of the researcher Pns/Pall where Pns is the number of publications of the researcher, not coauthored with the former supervisor(s) and Pall is the total number of publications of the researcher; and I4: The share of own research topics of the researcher Tns/Tall where Tns is the number of research topics of the researcher in which the former supervisor(s) is not active, and Tall is the total number of topics of the researcher.
+
+
+However, we have made some changes to the indicator. After consulting with its authors, we have changed the aggregation formula to 
+$$RII = ((1- I1) + I2 + I3 + I4) / 4$$ 
+since the previous formula had a small error (it weighted I4 double,, i.e. 2*I4). In determining the proportion of a researcher's own research topics (I4), we opted for text-based topic modeling utilizing publication titles and abstracts, diverging from the originally suggested bibliographic coupling method. Initially, we conducted a random sampling of 3000 publications from a set of all publications produced by researchers affiliated with Czech institutions as cataloged in the RIV database, estimated number of topics using Griffiths2004 indicator, and calculated LDA topic model on this set of publications. Then we  compiled all publications generated by the researchers within our sample and their respective supervisors. We then calculated the posterior distribution of topics for this compilation, employing a pre-trained topic model. This way we wanted to mitigate the endogeneity of the topic modelling which would be stronger if we calculated topic model directly on the publications of our sample researchers.
+
+To calculate this indicator, we required at least 3 publications. This led to an increased number of missing observations (see section Descriptives - Missing data).
+
+<!-- Finally, the original indicator, while tracking not only collaboration independence but also topical independence, is still skewed significantly towards collaboration independence (three-quarters of the indicator measure collaboration, while only one-quarter measures topics). Since we consider cognitive/topical independence an important asset of this indicator, we have decided to adjust the formula a bit further and drop the I3 part, to give more weight to the cognitive/topical independence in the whole indicator. Throughout this paper, we will thus refer to the original indicator as RIIo, our adjusted version as RIIa and the part of the indicator measuring only the cognitive independence RIIc. -->
+
+*Career age*
+
+We measured researchers’ career age as the number of years since their first publication.
+
+*Discipline*
+
+We used the highest level of the OECD classification of disciplines: containing categories Natural Sciences; Engineering and Technology; Medical and Health Sciences; Agricultural Sciences; Social Sciences; Humanities. We chose this classification because it is widely used and also present in the dataset we worked with. For the matching we used the 42 sub-categories of this classification to achieve more granularity.
+
+We attributed a discipline to a given researcher based on disciplines attributed to their each publication, choosing the most frequent discipline for each author.  
+
+*Interdisciplinary proportion*
+
+This measure was calculated as the ratio of publications authored by the given researcher which were not assigned to the author’s main discipline.  
+
+*Number of publications*
+
+We counted all publications the given researcher produced before the intervention year (i.e. receiving a Junior Grant) while affiliated with the Czech institution (our database only contained publications affiliated with Czech institutions). We only counted publications of types: journal articles, conference proceedings, book chapters, and full books. 
+
+
+*Number of publications in Web of Science and Scopus*
+
+We counted all publications the given researcher produced before the intervention year (i.e. receiving a Junior Grant) while affiliated with the Czech institution (our database only contained publications affiliated with Czech institutions), that were also linked in Web of Science or Scopus (which means they were likely published in more recognised journals). We only counted publications of types: journal articles, conference proceedings, book chapters, and full books. 
+
+
+*Number of grants received prior to Junior Grant*
+
+We calculated how many (Czech) grants each researcher has received prior and 3 years after the intervention year (i.e. receiving a Junior Grant). We did not use this variable for matching, but for filtering out control group researchers pre-matching. 
+
+*Career age when receiving the first grant*
+
+We calculated the career age of each researcher when they received their first grant.
+
+*Gender*
+
+We used Genderize.io API to estimate the probability of perceived gender based on the first names of researchers. We had also manually specify gender for 2 observations from the treatment group for which the gender was not calculated automatically. 
+
+## Analysis
+
+We analysed the data in the R version 4.2.3. using R studio and [this code](https://github.com/david-janku/juniors). For the construction of the independence indicator, we used network modelling and text-based topic modelling.
+
+For the construction of the control group, we implemented propensity matching using the package MatchIt [@ho2011] and matching exactly by the discipline (42 sub-categories of OECD classification) and treatment year, and approximately by number of publications in total, number of publications in WoS/Scopus, career age, interdisciplinary proportion, number of grants received prior to Junior Grant, career age when receiving the first grant, and gender. All of these variables were calculated in the intervention year (i.e. year when the given researcher from experimental group received the Junior Grant). The distance was set to "mahalanobis". The matching was done in 1:1 ratio and with replacement. 
+
+Using the matching algorithm, we have created 2 control groups: "Unfunded" group did not receive any grants prior to and 3 years after the treatment year. "Funded" group was matched based on career year at which they received their first grant, ensuring that while treatment group researchers received Junior Grant, "funded" researchers received a different grant at the same time. That allowed us to better track the impact of any grant funding vs specifically Junior Grants funding on researchers’ independence.
+
+The difference between treatment groups was tested using repeated measures ANOVA with a special error term taking into account paired nature of the data. The ANOVA model was specified as RII ~ treatment * independence_timing, incorporating both the main effects and the interaction between treatment and independence timing. A significant aspect of our ANOVA approach was the inclusion of an error term structured as Error(subclass/independence_timing). This error structure accounts for the nested or hierarchical nature of our data, where measurements are nested within subclasses and vary across different independence timings. By doing so, the model adjusts for potential within-subclass correlations and differences across independence timings.
+
+To ascertain the significance of academic field as a predictor, we constructed two additional GLS models. The first model included treatment, independence timing, and their interaction as predictors (treatment + independence_timing + treatment:independence_timing), while the second model added the main effect of the academic field (+ field). Both models employed a compound symmetry correlation structure (corCompSymm) based on subclass and independence timing, suitable for data with equal correlation between observations. By comparing these models, we aimed to evaluate the impact of including the academic field as a predictor on the model's explanatory power, thereby testing its statistical significance in explaining variations in RII.
+
+## Descriptives
+
+### Missing data
+```{r echo=FALSE}
+d <- tar_read(full_indicator)
+d$disc_ford <- as.factor(d$disc_ford)
+
+na_counts <- sum(is.na(d$RII))
+na_percentage <- round((na_counts / nrow(d))*100, 1)
+
+na_sup <- round((sum(is.na(d$sup_name))/na_counts)*100, 1)
+na_pubs <- round((nrow(d %>% filter(!is.na(sup_name)) %>% filter(is.na(pubs_number)))/na_counts)*100, 1)
+
+na_pubs_after <- round((nrow(d %>% filter(!is.na(sup_name)) %>% filter(is.na(pubs_number)) %>% filter(independence_timing == "after_intervention"))/nrow(d %>% filter(!is.na(sup_name)) %>% filter(is.na(pubs_number))))*100, 1)
+
+na_treatment <- nrow(d %>% filter(is.na(RII)) %>% filter(treatment == 1))
+na_control1 <- nrow(d %>% filter(is.na(RII)) %>% filter(treatment == 0))
+na_control2 <- nrow(d %>% filter(is.na(RII)) %>% filter(treatment == 2))
+
+na_counts_researchers <- round(nrow(d %>% filter(!is.na(sup_name)) %>% filter(is.na(pubs_number)) %>% filter(independence_timing == "after_intervention") %>% distinct(vedidk))/nrow(d %>% filter(independence_timing == "after_intervention") %>% distinct(vedidk))*100, 1)
+
+mean_pubs_after <- d %>%
+  filter(independence_timing == "after_intervention") %>%
+  group_by(vedidk) %>%
+  summarise(pubs_number = first(pubs_number)) %>% 
+  summarise(mean_pubs_number = mean(pubs_number, na.rm = TRUE)) %>%
+  pull()
+
+
+# s <- d %>% filter(is.na(RII))
+#                   
+# f_after <- d %>% filter(!is.na(RII)) %>% filter(independence_timing == "after_intervention") 
+# f_before <- d %>% filter(!is.na(RII)) %>% filter(independence_timing == "before_intervention") 
+# 
+# 
+# v_after <- c(f_after$vedidk[f_after$treatment == 1 ], NA)
+# v_before <- c(f_before$vedidk[f_before$treatment == 1 ], NA)
+# 
+# r_after <- f_after %>% filter(vedidk_treatment %in% v_after)
+# r_before <- f_before %>% filter(vedidk_treatment %in% v_before)
+# 
+# 
+# 
+# v_after_control <- c(r_after$vedidk[r_after$treatment != 1 ], r_after$vedidk_treatment)
+# v_before_control <- c(r_before$vedidk[r_before$treatment != 1 ], r_before$vedidk_treatment)
+# 
+# r_after_final <- r_after %>% filter(vedidk %in% v_after_control)
+# r_before_final <- r_before %>% filter(vedidk %in% v_before_control)
+
+
+# r_test <- r_after %>% filter(treatment != 2)
+# v_after_test <- c(r_test$vedidk[r_test$treatment != 1 ], r_test$vedidk_treatment)
+# r_test_final <- r_test %>% filter(vedidk %in% v_after_test)
+
+
+# final_before_control1 <- nrow(r_before_final %>% filter(treatment == 0)) 
+# final_before_control2 <- nrow(r_before_final %>% filter(treatment == 2))
+# 
+# 
+# final_after_control1 <- nrow(r_after_final %>% filter(treatment == 0)) 
+# final_after_control2 <- nrow(r_after_final %>% filter(treatment == 2))
+
+
+# a <- intersect(
+#     r_after_final$vedidk,
+#     r_before_final$vedidk
+# )
+# 
+# 
+# all <- rbind(r_before_final, r_after_final) %>% filter(vedidk %in% a)
+
+
+filtered_by_subclass <- d %>%
+     group_by(subclass, independence_timing) %>%
+     filter(!any(is.na(RII))) %>%
+     ungroup()
+
+filtered_subclass <- nrow(filtered_by_subclass %>% distinct(subclass))
+subclass_all <- nrow(d %>% distinct(subclass))
+filtered_subclass_perc <- round((filtered_subclass/subclass_all)*100, 1)
+
+
+final_before_control1 <- nrow(filtered_by_subclass %>% filter(independence_timing == "before_intervention") %>% filter(treatment == 0))
+final_before_control2 <- nrow(filtered_by_subclass %>% filter(independence_timing == "before_intervention") %>% filter(treatment == 2))
+
+final_after_control1 <- nrow(filtered_by_subclass %>% filter(independence_timing == "after_intervention") %>% filter(treatment == 0))
+final_after_control2 <- nrow(filtered_by_subclass %>% filter(independence_timing == "after_intervention") %>% filter(treatment == 2))
+
+
+```
+
+
+The independence indicator was not possible to calculate for `r na_counts` (`r na_percentage` % of observations). This is in `r na_sup` % caused by missing data about supervisors, and in `r na_pubs` % due to absence of publications by the researcher during the specified period (`r na_pubs_after` % of these cases occurred post-intervention, often in the past few years).
+
+There are `r na_treatment` missing observations in the treatment group, `r na_control1` in the unfunded control group and  `r na_control2` in the funded control group.
+If we only keep observations that have a match with non-missing values, we are left with a sample of `r final_before_control1` matched observations in unfunded control group and `r final_before_control2` matched observations in funded control group before intervention and a sample of `r final_after_control1` matched observations in unfunded control group and `r final_after_control2` matched observations in funded control group after intervention.
+
+From a perspective of disciplines, we see that there are slightly more missing data in Agricultural and veterinary sciences and the Humanities and the Arts.
+
+```{r echo=FALSE}
+
+dt <- d
+dt$missing <- ifelse(is.na(dt$RII), "Missing", "Complete")
+
+# Calculate counts and proportions
+df_summary <- dt %>%
+  group_by(field, missing) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  mutate(Proportion = count / sum(count)) %>%
+  pivot_wider(names_from = missing, values_from = c(count, Proportion))
+
+# If there are any NA values in the 'count_Missing' column, replace them with 0
+df_summary$count_Missing[is.na(df_summary$count_Missing)] <- 0
+
+# Calculate Missing / (Missing + Complete) in percentages for each disc_ford
+df_summary <- df_summary %>%
+  mutate(Proportion = ifelse(!is.na(`count_Missing`) & !is.na(`count_Complete`), `count_Missing` / (`count_Missing` + `count_Complete`) * 100, NA))
+
+# If there are any NA values in the 'Proportion' column, replace them with 0
+df_summary$Proportion[is.na(df_summary$Proportion)] <- 0
+
+# Remove unnecessary columns and rename the others
+df_summary <- df_summary %>%
+  select(field, count_Complete, count_Missing, Proportion) %>%
+  rename(
+    Field = field,
+    Complete = count_Complete,
+    Missing = count_Missing,
+    Proportion_Missing = Proportion
+  )
+
+# Print the updated table
+kable(df_summary, format = "markdown", digits = 3, caption = "Counts and Proportions of Missing Data by Field") 
+
+
+```
+
+
+### Before intervention
+
+
+```{r echo=FALSE}
+
+df <- filtered_by_subclass %>% filter(independence_timing == "before_intervention")
+numeric_vars <- df %>% 
+  select(where(is.numeric)) %>% 
+  select(-weights, -funded_control, -id, -treatment_year, -career_start_year) %>% 
+  names()
+
+# descriptive stats for each treatment level
+table_before_1 <- df %>% filter(treatment == 1) %>% distinct(vedidk, .keep_all = TRUE) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
+table_before_0 <- df %>% filter(treatment == 0) %>% distinct(vedidk, .keep_all = TRUE) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
+table_before_2 <- df %>% filter(treatment == 2) %>% distinct(vedidk, .keep_all = TRUE) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
+
+colnames(table_before_0) <- paste0(colnames(table_before_0), "_0")
+colnames(table_before_2) <- paste0(colnames(table_before_2), "_2")
+
+combined_table_before <- cbind(table_before_1, table_before_0, table_before_2)
+
+kable(combined_table_before, 
+      format = "markdown", digits = 3, align = "c", booktabs = TRUE, caption = "Descriptives of All Groups Before Intervention") 
+  # kableExtra::add_header_above(c(" " = 1, "Treatment Group" = 5, "Unfunded Control Group" = 5, "Funded Control Group" = 5))
+
+
+
+
+```
+
+
+
+### After intervention
+
+```{r echo=FALSE}
+
+df <- filtered_by_subclass %>% filter(independence_timing == "after_intervention")
+df$career_length2022 <- 2022-df$career_start_year
+numeric_vars <- df %>% 
+  select(where(is.numeric)) %>% 
+  select(-weights, -funded_control, -id, -treatment_year, -career_start_year, -career_length, -pubs_total, -ws_pubs, -interdisc_proportion, -grants, -total_coauthor_count, -first_grant) %>% 
+  names()
+
+# descriptive stats for each treatment level
+table_after_1 <- df %>% filter(treatment == 1) %>% distinct(vedidk, .keep_all = TRUE) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
+table_after_0 <- df %>% filter(treatment == 0) %>% distinct(vedidk, .keep_all = TRUE) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
+table_after_2 <- df %>% filter(treatment == 2) %>% distinct(vedidk, .keep_all = TRUE) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
+
+colnames(table_after_0) <- paste0(colnames(table_after_0), "_0")
+colnames(table_after_2) <- paste0(colnames(table_after_2), "_2")
+
+# Move 'career_length2022' row to the top for each table
+reorder_row <- function(tbl) {
+  return(tbl[c("career_length2022", setdiff(rownames(tbl), "career_length2022")), ])
+}
+
+table_after_1 <- reorder_row(table_after_1)
+table_after_0 <- reorder_row(table_after_0)
+table_after_2 <- reorder_row(table_after_2)
+
+# Re-combine tables
+combined_table_after <- cbind(table_after_1, table_after_0, table_after_2)
+
+kable(combined_table_after,
+      format = "markdown", digits = 3, align = "c", booktabs = TRUE, caption = "Descriptives of All Groups After Intervention") %>%
+  kableExtra::add_header_above(c(" " = 1, "Treatment Group" = 5, "Unfunded Control Group" = 5, "Funded Control Group" = 5))
+
+
+
+# Assuming table_after_1, table_after_0, table_after_2 are your data frames for different groups
+# 
+# # Assuming each data frame has 5 columns
+# header_columns = c("Header", rep("", 4))
+# header_1 <- data.frame(matrix(nrow = 1, ncol = 5))
+# colnames(header_1) <- header_columns
+# header_1[1, 1] <- "Treatment Group"
+# 
+# header_0 <- data.frame(matrix(nrow = 1, ncol = 5))
+# colnames(header_0) <- header_columns
+# header_0[1, 1] <- "Unfunded Control Group"
+# 
+# header_2 <- data.frame(matrix(nrow = 1, ncol = 5))
+# colnames(header_2) <- header_columns
+# header_2[1, 1] <- "Funded Control Group"
+# 
+# header_names <- colnames(table_after_1)  # Assuming all tables have the same structure
+# header_row <- setNames(data.frame(matrix(ncol = length(header_names), nrow = 1), stringsAsFactors = FALSE), header_names)
+# header_row[1, 1] <- "Your Header Title"  # Set your header title in the first column
+# 
+# combined_table_after <- rbind(header_row, table_after_1, header_row, table_after_0, header_row, table_after_2)
+# 
+# 
+# # # Assuming table_after_1, table_after_0, table_after_2 have the same column names
+# # combined_table_after <- rbind(header_1, table_after_1, 
+# #                               header_0, table_after_0, 
+# #                               header_2, table_after_2)
+# 
+# # Now create the table in R Markdown
+# knitr::kable(combined_table_after, format = "markdown", digits = 3,
+#              caption = "Descriptives of All Groups After Intervention")
+
+
+
+# # Table for Treatment Group 1
+# table_after_1_md <- knitr::kable(table_after_1, format = "markdown", 
+#                                  caption = "Treatment Group 1")
+# 
+# # Table for Unfunded Control Group
+# table_after_0_md <- knitr::kable(table_after_0, format = "markdown", 
+#                                  caption = "Unfunded Control Group")
+# 
+# # Table for Funded Control Group
+# table_after_2_md <- knitr::kable(table_after_2, format = "markdown", 
+#                                  caption = "Funded Control Group")
+# 
+
+
+
+
+```
+
+
+
+## Matching
+
+```{r echo=FALSE}
+
+removed_treatment_unfunded <- (tar_read(ids_complete) %>% distinct(vedidk) %>% nrow())-(tar_read(matching) %>% group_by(subclass) %>% filter(!any(treatment == 2)) %>%
+  ungroup() %>% filter(treatment == "1") %>% distinct(vedidk) %>% nrow()) 
+
+removed_treatment_funded <- (tar_read(ids_complete) %>% distinct(vedidk) %>% nrow())-(tar_read(matching) %>% group_by(subclass) %>% filter(!any(treatment == 0)) %>%
+  ungroup() %>% filter(treatment == "1") %>% distinct(vedidk) %>% nrow()) 
+
+unique_treatment_unfunded <- d %>% group_by(subclass) %>% filter(!any(treatment == 2)) %>% ungroup() %>% filter(treatment == "1") %>% distinct(vedidk) %>% nrow()
+
+unique_treatment_funded <- d %>% group_by(subclass) %>% filter(!any(treatment == 0)) %>%
+  ungroup() %>% filter(treatment == "1") %>% distinct(vedidk) %>% nrow()
+
+unique_control_unfunded <- d %>% filter(treatment == 0) %>% distinct(vedidk) %>% nrow()
+    
+unique_control_funded <- d %>% filter(treatment == 2) %>% distinct(vedidk) %>% nrow()
+    
+
+replaced_control_unfunded <- unique_treatment_unfunded-unique_control_unfunded 
+
+replaced_control_funded <- unique_treatment_funded-unique_control_funded 
+
+
+overlap_control <- unique_control_unfunded+unique_control_funded-(d %>% filter(treatment != 1) %>% distinct(vedidk) %>% nrow())
+
+
+```
+
+
+After matching, all standardized mean differences for the covariates were below 0.1 and all standardized mean differences for squares and two-way interactions between covariates were below .15, indicating adequate balance. 
+
+Matching process removed `r removed_treatment_unfunded` treatment observations from matching with unfunded control group and `r removed_treatment_funded` treatment observations from matching with funded control group. This observation was removed because the researchers had no publications prior to the year of application for the grant, which would make it not possible to calculate the independence score for them anyway.
+
+The resulting sample had `r unique_treatment_unfunded` unique treatment group observations paired with `r unique_control_unfunded` unique unfunded control group observations suggesting that `r replaced_control_unfunded` observations from unfunded control group were matched to multiple treatment group observations. Similarly, there were `r unique_treatment_funded` unique treatment group observations paired with `r unique_control_funded` unique funded control group observations, suggesting that `r replaced_control_funded` funded control group observations were matched to multiple treatment group observations.
+ 
+There is an overlap between control group observations: `r overlap_control` observations from the unfunded control group also appears in the funded control group, showing that they did eventually received grant at the similar time as those from treatment group.
+ 
+
+```{r echo=FALSE, fig.cap="Covariate balance table for the unfunded control group."}
+# # Create a subset for treatment group and control group 1
+# subset_1 <- (tar_read(matching)) %>% filter(treatment != 2)
+# subset_2 <- (tar_read(matching)) %>% filter(treatment != 0)
+# 
+# # Generate balance table for treatment vs control group 1
+# balance_results_1 <- bal.tab(treatment ~ career_lenght + pubs_total + ws_pubs + interdisc_proportion + grants + gender, data = subset_1, disp = c("mean", "std"))
+# balance_results_2 <- bal.tab(treatment ~ career_lenght + pubs_total + ws_pubs + interdisc_proportion + grants + gender, data = subset_2, disp = c("mean", "std"))
+# 
+# # Define a function to manually extract balance statistics from bal.tab object
+# extract_balance_stats <- function(bal_results) {
+#   covariates <- rownames(bal_results$Balance)
+#   means_treat <- bal_results$Balance$`M.1.Un`
+#   means_ctrl <- bal_results$Balance$`M.0.Un`
+#   diff <- bal_results$Balance$`Diff.Un`
+#   
+#   data.frame(Covariate = covariates, 
+#              Mean_Treatment = means_treat, 
+#              Mean_Control = means_ctrl, 
+#              Diff = diff)
+# }
+# 
+# # Extract balance stats for subset_1 and subset_2
+# balance_stats_1 <- extract_balance_stats(balance_results_1)
+# balance_stats_2 <- extract_balance_stats(balance_results_2)
+# 
+# # Print tables in R Markdown
+# knitr::kable(balance_stats_1, caption = "Balance Statistics: Treatment vs Control Group 1") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+# knitr::kable(balance_stats_2, caption = "Balance Statistics: Treatment vs Control Group 2") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+
+##Unfunded group
+
+
+unf_sum <- summary(tar_read(matched_obj_unfunded), un = TRUE)
+
+# summary(tar_read(matched_obj_unfunded))
+#     
+# plot(unf_sum, var.order = "unmatched")
+
+
+aa <- cobalt::bal.tab(tar_read(matched_obj_unfunded), un = TRUE, stats = c("m", "v", "ks"), binary = "std")
+
+# aa <- aa[!grepl("^disc_ford", names(aa))]
+
+# aa <- aa[!grepl("^disc_ford", names(aa$Balance))]
+
+bal_df <- aa$Balance
+
+bal_df <- bal_df[!grepl("^disc_ford", rownames(bal_df)), ]
+
+
+# Display the cleaned-up table with kable
+kable(bal_df, format = "markdown", caption = "Summary of Covariate Balance Post-Matching For Unfunded Control Group", digits = 3)
+
+
+aa$Balance <- bal_df
+
+cobalt::love.plot(aa, binary = "std", var.order = "adjusted")
+
+
+```
+
+```{r echo=FALSE, fig.cap="Covariate balance table for the funded control group."}
+
+
+##Funded group
+
+
+
+fun_sum <- summary(tar_read(matched_obj_funded), un = TRUE)
+
+# summary(tar_read(matched_obj_funded))
+#     
+# plot(fun_sum, var.order = "unmatched")
+
+
+bb <- cobalt::bal.tab(tar_read(matched_obj_funded), un = TRUE, stats = c("m", "v", "ks"), binary = "std")
+
+# aa <- aa[!grepl("^disc_ford", names(aa))]
+
+# aa <- aa[!grepl("^disc_ford", names(aa$Balance))]
+
+
+bal_df_funded <- bb$Balance
+
+bal_df_funded <- bal_df_funded[!grepl("^disc_ford", rownames(bal_df_funded)), ]
+
+
+# Display the cleaned-up table with kable
+kable(bal_df_funded, format = "markdown", caption = "Summary of Covariate Balance Post-Matching For Funded Control Group", digits = 3)
+
+
+
+bb$Balance <- bal_df_funded 
+
+cobalt::love.plot(bb, binary = "std", var.order = "adjusted")
+
+
+
+```
+
+# Results 
+
+## Main results
+
+To ascertain the differences in independence scores before and after intervention, while accounting for the treatment type, academic disciplines, and paired nature of the data, we used repeated measures ANOVA. This allowed us to measure the main effect of change in independence across time, across disciplines, and the main treatment effect was the interaction between treatment type and time.
+
+
+<!-- POZN: only for comparison: -->
+<!-- To estimate the treatment effect and its standard error, we fit a linear regression model with 1978 earnings as the outcome and the treatment, covariates, and their interaction as predictors and included the full matching weights in the estimation. The lm() function was used to fit the outcome, and the comparisons() function in the marginaleffects package was used to perform g-computation in the matched sample to estimate the ATT. A cluster-robust variance was used to estimate its standard error with matching stratum membership as the clustering variable. -->
+
+<!-- The estimated effect was XXXX (SE = XXXX, p = XXXX), indicating that the average effect of the treatment for those who received it is to increase earnings. -->
+
+```{r echo=FALSE}
+
+pp <- d %>%
+     group_by(subclass) %>%
+     filter(!any(is.na(RII))) %>%
+     ungroup()
+
+pp <- pp %>%
+     group_by(vedidk, subclass) %>%  # Assuming 'id' is your current unique identifier
+     mutate(subject_id = cur_group_id()) %>%  # This creates a unique ID for each group
+     ungroup()
+
+diff_data <- pp %>%
+  select(subject_id, independence_timing, RII) %>%
+  spread(independence_timing, RII) %>%
+  mutate(RII_diff = after_intervention - before_intervention) %>%
+  select(subject_id, RII_diff)
+
+pp <- left_join(pp, diff_data, by = "subject_id")
+
+
+
+filtered_by_subclass_1 <- pp %>% 
+    group_by(subclass) %>% 
+    filter(!any(treatment == 2)) %>% 
+    ungroup() %>%
+    mutate(treatment = factor(treatment, levels = c(0, 1)))
+
+filtered_by_subclass_1$subclass <- as.factor(filtered_by_subclass_1$subclass)
+filtered_by_subclass_1$treatment <- as.factor(filtered_by_subclass_1$treatment)
+filtered_by_subclass_1$independence_timing <- as.factor(filtered_by_subclass_1$independence_timing)
+filtered_by_subclass_1$field <- as.factor(filtered_by_subclass_1$field)
+
+# this DiD model unfortunately doesnt work for some reason that I cannot resolve, but it is possible to calculate the same using repeated measures anova or mixes effects model, so it should be fine
+
+# # Run regression model with interaction term
+# did_model <- plm::plm(RII ~ independence_timing * treatment + factor(subclass),
+#                  data = filtered_by_subclass_1,
+#                  index = c("subclass"),
+#                  model = "within")
+# 
+# # Calculate clustered standard errors
+# clustered_se <- coeftest(did_model, vcov = function(x) vcovHC(x, type = "HC1", cluster = "subclass"))
+
+
+
+
+## here should be some assumptions tests that I will run to see whtehr it is correct, but later I will comment it so that it doesnt show in the final paper
+
+
+# model <- lmer(RII ~ treatment * independence_timing + (1 | subclass), data = filtered_by_subclass_1)
+# # summary(model)
+# # r.squaredGLMM(model)
+# 
+# model_no_interaction <- lmer(RII ~ treatment + independence_timing + (1 | subclass), data = filtered_by_subclass_1)
+# 
+# RSS_no_interaction <- sum(residuals(model_no_interaction)^2)
+# RSS_full <- sum(residuals(model)^2)
+# delta_RSS <- RSS_no_interaction - RSS_full
+# R2_interaction <- delta_RSS / RSS_no_interaction
+# # print(R2_interaction)
+# 
+# 
+# model_disc <- lmer(RII ~ treatment * independence_timing * field + 
+#               (1 + independence_timing|subclass), 
+#               data = filtered_by_subclass_1)
+
+# summary(model_disc)
+
+
+##checking assumptions fro repeated measures ANOVA
+
+
+
+result <- aov(RII ~ treatment * independence_timing + Error(subclass/independence_timing), data=filtered_by_subclass_1)
+# summary(result)
+eta_sq_result <- eta_squared(result)
+
+# Normality: You can check the normality of the residuals using a Q-Q plot and the Shapiro-Wilk test.
+
+# Check residuals from lm
+# plot(resid(result))
+
+#Linearity and Homoscedasticity (Equal Variances) of Residuals: If the assumptions hold, you should not see any obvious patterns or funnel shapes in the plot.
+
+# plot(result$fitted.values, resid(result), 
+#      xlab = "Fitted values", ylab = "Residuals", 
+#      main = "Residuals vs. Fitted Values")
+# abline(h = 0, col = "red")
+
+# Normality of Residuals: 
+# qqnorm(resid(result))
+# qqline(resid(result))
+# 
+# shapiro.test(resid(result)) 
+
+
+# Independence of Residuals: If your data has a time sequence (e.g., repeated measurements over time), then you would be concerned about the independence of residuals. For this, you can use the Durbin-Watson test from the car package. The Durbin-Watson test statistic ranges from 0 to 4. A value around 2 suggests no autocorrelation, while values below 1 and above 3 are cause for concern.
+
+# library(car)
+# durbinWatsonTest(result)
+
+
+# Multicollinearity: Check the variance inflation factor (VIF) for each predictor. Typically, a VIF above 5-10 indicates multicollinearity.
+
+# vif(result)
+
+# Outliers and Influence Points: Leverage vs. studentized residuals plot can be used to identify influential points.
+
+# plot(hatvalues(result), rstudent(result),
+#      xlab = "Leverage", ylab = "Studentized Residuals",
+#      main = "Residuals vs. Leverage")
+# abline(h = c(-2,2), col = "red", lty = 2)
+
+
+
+# Sphericity: Use the mauchly.test function on your model. If the test is significant, then the assumption of sphericity has been violated.
+
+# mauchly.test(model_aov)
+
+# Homogeneity of Variance: Use Levene's Test. The car package offers leveneTest.
+
+# library(car)
+# leveneTest(RII ~ treatment, data = filtered_by_subclass_1)
+
+# Outliers:You can inspect boxplots or use Mahalanobis distance.
+
+# boxplot(RII ~ treatment, data = filtered_by_subclass_1)
+
+
+
+##conducting repeated measures ANOVA
+
+# filtered_by_subclass_1 <- filtered_by_subclass_1 %>%
+#      group_by(vedidk, subclass) %>%  # Assuming 'id' is your current unique identifier
+#      mutate(subject_id = cur_group_id()) %>%  # This creates a unique ID for each group
+#      ungroup()
+
+# #this is preferable because it takes into account the matched nature of the data, as well as repeated measures nature of the data -> see chatGPT conversation "ANOVA `wid` parameter clarification"
+# result <- aov(RII ~ treatment * independence_timing + Error(subclass/independence_timing), data=filtered_by_subclass_1)
+# # summary(result)
+# eta_sq_result <- eta_squared(result)
+
+#this is less preferable because it takes into account only the repeated measure nature of the data, not the matched nature -> you can see that when you run this tests, there is warning that says "there were non-unique subclass values across the between-subjects variable (treatment). Essentially, ezANOVA detected the problem and internally "fixed" it by making subclass unique across the treatment groups, so it behaves similarly to subject_id you later created." -> this means that it effectively converts the subclass to subject_id anyway
+# result <- ezANOVA(data = filtered_by_subclass_1,
+#                  dv = RII,
+#                  wid = subclass,
+#                  within = .(independence_timing),
+#                  between = treatment)
+# # print(result)
+
+
+
+
+
+
+## adding disciplines:
+
+filtered_data_disc_1 <- filtered_by_subclass_1 %>%
+  group_by(field) %>%
+  filter(n() >= 8)
+
+filtered_data_disc_1$field <- droplevels(filtered_data_disc_1$field)
+
+# Calculate weights based on group size (you can adjust this based on other criteria if needed)
+group_sizes <- table(filtered_data_disc_1$field)
+max_size <- max(group_sizes)
+filtered_data_disc_1$weights <- max_size / group_sizes[filtered_data_disc_1$field]
+
+#this model addresses both unequal group sizes (via weights) and heteroscedasticity (via varIdent). Additionally, I've added a first-order autoregressive structure (corAR1) assuming you have repeated measures on the same subjects and to account for their paired nature (indicated by subclass/independence_timing)
+#this model directly tests whether there is a difference in disciplines - anyway it tests each discipline agains each other, so it doesnt produce the neat result of "yes, there are some significant differences between disciplines", but more nuanced version of "there is specifically difference between this and this discipline"
+
+model_gls_weighted <- gls(RII ~ field, data = filtered_data_disc_1, 
+                          weights = varIdent(form = ~ 1 | field),
+                          method = "ML",
+                          correlation = corAR1(form = ~ 1 | subject_id))  
+
+# summary(model_gls_weighted)
+
+#this model below is the same as the above but with added predictors
+
+model_gls_interactions_subclass <- gls(RII ~ field * treatment * independence_timing, 
+                              data = filtered_data_disc_1, 
+                              weights = varIdent(form = ~ 1 | field),
+                              method = "ML",
+                              correlation = corAR1(form = ~ 1 | subclass/independence_timing)) 
+
+# aa <- summary(model_gls_interactions_subclass)
+
+
+#one potential strategy to get the neat result of "yes, there are some significant differences between disciplines" is following: create two similar models 
+
+model_without_field <- gls(RII ~ treatment + independence_timing + treatment:independence_timing, 
+                           data = filtered_data_disc_1, 
+                           correlation = corCompSymm(form = ~ 1 | subclass/independence_timing), 
+                           method = "ML")
+
+model_with_field_main_effect <- gls(RII ~ treatment + field + independence_timing + treatment:independence_timing, 
+                                    data = filtered_data_disc_1, 
+                                    correlation = corCompSymm(form = ~ 1 | subclass/independence_timing), 
+                                    method = "ML")
+
+
+anova_result <- anova(model_without_field, model_with_field_main_effect)
+
+model_summary <- summary(model_with_field_main_effect)
+
+
+# Your result specifically shows that the model_with_field_main_effect is significantly better at explaining the variance in your response variable compared to the model_without_field. The p-value is extremely small (1e-04), indicating a significant main effect of "field".
+# 
+# In other words, the main effect of "field" significantly improves the model fit, suggesting that the variable "field" has a significant main effect on the response variable RII after accounting for other predictors in the model.
+
+
+
+
+
+#this model does NOT address unequal group sizes (via weights) and heteroscedasticity 
+
+# result_disc <- ezANOVA(data = filtered_data_disc_1,
+#                  dv = RII,
+#                  wid = subclass,
+#                  within = .(independence_timing),
+#                  between = .(treatment, field))
+# # print(result_disc)
+
+
+##here I calculate the interaction of filed * treatment not from the full RII score, but from RR delta, ie change in RII from before to after intervetion. below the results are plotted, showing that the effect of treatment on disciplines is universal, expect for social sciences where there is almost no effect. it also shows that almost in all cases the effect of time is positive - i.e people are getting more independent over time, in some case by quite a lot (e.g. 0.2 in RII, which is 20 % oif the RII score)
+
+# filtered_data_disc_1 <- filtered_data_disc_1 %>% 
+#     filter(independence_timing != "after_intervention")
+# 
+# means_table_disc_1 <- filtered_data_disc_1 %>%
+#      group_by(field, treatment) %>%
+#      summarise(mean_RII = mean(RII_diff, na.rm = TRUE))
+# 
+# # Set up sum coding for "field"
+# contrasts(filtered_data_disc_1$field) <- contr.sum(levels(filtered_data_disc_1$field))
+# 
+# 
+# model_wls <- lm(RII_diff ~ field * treatment, data = filtered_data_disc_1, weights = weights)
+# summary(model_wls)
+# 
+# 
+# contrasts(filtered_data_disc_1$field)
+# 
+# # Extract the variance-covariance matrix
+# vcov_mat <- vcov(model_wls_sum_coded)
+# 
+# # Coefficient for Social Sciences
+# coef_SS <- -sum(coef(model_wls_sum_coded)[c("field1", "field2", "field3")])
+# 
+# # Variance for Social Sciences
+# var_SS <- sum(diag(vcov_mat[2:4, 2:4])) + 2*sum(vcov_mat[2,3:4]) + 2*sum(vcov_mat[3,4])
+# 
+# # Standard Error for Social Sciences
+# se_SS <- sqrt(var_SS)
+# 
+# # t-value for Social Sciences
+# t_value_SS <- coef_SS / se_SS
+# 
+# # Degrees of Freedom
+# df <- df.residual(model_wls_sum_coded)
+# 
+# # p-value for Social Sciences
+# p_value_SS <- 2 * pt(-abs(t_value_SS), df)
+# 
+# coef_SS
+# se_SS
+# t_value_SS
+# p_value_SS
+# 
+# vcov_matrix <- vcov(model_wls_sum_coded)
+# 
+# 
+# var_interaction <- vcov_matrix["treatment1", "treatment1"] + 
+#                    vcov_matrix["field1:treatment1", "field1:treatment1"] + 
+#                    vcov_matrix["field2:treatment1", "field2:treatment1"] + 
+#                    vcov_matrix["field3:treatment1", "field3:treatment1"] + 
+#                    2*(vcov_matrix["treatment1", "field1:treatment1"] + 
+#                       vcov_matrix["treatment1", "field2:treatment1"] + 
+#                       vcov_matrix["treatment1", "field3:treatment1"])
+# 
+# se_interaction <- sqrt(var_interaction)
+# 
+# t_value <- -0.01905 / se_interaction
+# 
+# df_residual <- df.residual(model_wls_sum_coded)
+# p_value <- 2 * (1 - pt(abs(t_value), df_residual))
+
+
+ 
+## visualise field*treatment
+
+# means_table <- filtered_by_subclass_1 %>%
+#   filter(independence_timing != "before_intervention") %>%
+#   group_by(field, treatment) %>%
+#   summarise(mean_RII = mean(RII_diff, na.rm = TRUE))
+# 
+# sd_counts <- filtered_by_subclass_1 %>%
+#   filter(independence_timing != "before_intervention") %>%
+#   group_by(field, treatment) %>%
+#   summarise(sd_RII = sd(RII_diff, na.rm = TRUE),
+#             n = n())
+# 
+# means_table <- merge(means_table, sd_counts, by = c("field", "treatment")) %>%
+#   mutate(se_RII = sd_RII / sqrt(n))
+# 
+# 
+# 
+# 
+# ggplot(means_table, aes(x=field, y=mean_RII, fill=treatment)) +
+#     geom_bar(stat="identity", position=position_dodge(width=0.8), width=0.7) +
+#     geom_errorbar(aes(ymin=mean_RII-se_RII, ymax=mean_RII+se_RII),
+#                   position=position_dodge(width=0.8), width=0.3) +
+#     geom_text(aes(label=n, y= 0.5 * mean_RII), # position in the middle
+#               position=position_dodge(width=0.8), vjust=0.5) + # centered vertically
+#     theme_minimal() +
+#     labs(y="Mean RII Difference", x="Field", fill="Treatment", title="Comparison of differences in RII across fields and treatment group") +
+#     theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+
+
+```
+
+
+
+
+In the first analysis, we examined the effects of treatment, time, and their interaction on the dependent variable, researcher independence (RII) for the treatment group and unfunded control group. 
+
+There was a significant main effect of time on RII, F(`r summary(result)$"Error: subclass:independence_timing"[[1]]$"Df"[1]`, `r format(summary(result)$"Error: subclass:independence_timing"[[1]]$"Df"[2])`) = `r format(summary(result)$"Error: subclass:independence_timing"[[1]]$"F value"[1], digits=2)`, p = `r round(summary(result)$"Error: subclass:independence_timing"[[1]]$"Pr(>F)"[1], 3)`). This effect accounted for approximately `r format(eta_sq_result[eta_sq_result$Parameter == "independence_timing", "Eta2_partial"] * 100, digits=2)`% of the observed variance (partial \(\eta^2 = `r round(eta_sq_result[eta_sq_result$Parameter == "independence_timing", "Eta2_partial"], 3)`\), 95% CI [`r round(eta_sq_result[eta_sq_result$Parameter == "independence_timing", "CI_low"], 3)`, `r eta_sq_result[eta_sq_result$Parameter == "independence_timing", "CI_high"]`]). However, there was no significant interaction effect between treatment and time on independence, F(`r format(summary(result)$"Error: Within"[[1]]$"Df"[2])`, `r format(summary(result)$"Error: Within"[[1]]$"Df"[3])`) = `r format(summary(result)$"Error: Within"[[1]]$"F value"[2], digits=2)`, p = `r format(summary(result)$"Error: Within"[[1]]$"Pr(>F)"[2], digits=2)` and this interaction effect explained only about `r format(eta_sq_result[eta_sq_result$Parameter == "treatment:independence_timing", "Eta2_partial"] * 100, digits=2)`% of the variability (partial \(\eta^2 = `r round(eta_sq_result[eta_sq_result$Parameter == "treatment:independence_timing", "Eta2_partial"], 3)`\), 95% CI [`r eta_sq_result[eta_sq_result$Parameter == "treatment:independence_timing", "CI_low"]`, `r round(eta_sq_result[eta_sq_result$Parameter == "treatment:independence_timing", "CI_high"], 3)`]).
+
+
+To assess effects of study field on researcher independence, we chose GLS weighted model to account for unequal group sizes and heteroscedastic variances, while keeping the repeated measures design. First, we compared models with and without the field main effect and observed a notable improvement in model fit for the model where main effect of field was included. This suggests that there are statistically significant differences in the RII based on the field of study. Specifically, adding the field of study to the model resulted in a significant increase in the log-likelihood by `r round(anova_result$L.Ratio[2], 2)` units (p = `r round(anova_result$"p-value"[2], 3)`), emphasizing its importance as a predictor. Specifically, compared to the Agricultural and Veterinary Sciences field, being in the Social Sciences field is associated with an increase in RII by `r  round(coef(model_summary)["fieldSocial Sciences", 1], 2)` units, on average (p = `r round(coef(model_summary)["fieldSocial Sciences", 4], 3)`), as well as being in the Humanities and the Arts field (increase by `r round(coef(model_summary)["fieldHumanities and the Arts", 1], 2)` units, p = `r round(coef(model_summary)["fieldHumanities and the Arts", 4], 3)`). Natural Sciences, Engineering and Technology and Medical and Health Sciences were not associated with a significant increase in RII compared to Agricultural and Veterinary Sciences.
+
+The interaction between treatment and field was not statistically significant, suggesting that the effect of treatment on independence was consistent across disciplines. The three-way interaction among treatment, independence_timing, and field was not statistically significant. This implies that the interaction effect of treatment and independence_timing on independence remained consistent across different disciplines.
+
+
+
+
+<!-- POZN ON MODEL CHOICE: -->
+
+<!-- In Conclusion: -->
+
+<!-- Both the mixed-effects model and the RM-ANOVA suggest a significant interaction between the treatment and the timing of the intervention. This means that the effect of the intervention differed between the treatment and control groups. -->
+
+<!-- Both methods also indicate that the timing of the intervention (i.e., whether it's before or after) has a significant effect on the outcome RII. -->
+
+<!-- The models are in agreement with their primary findings, which is a good sign. It suggests that the treatment has a distinct effect on RII after the intervention, different from that of the control group. -->
+
+<!-- However, it's worth noting that while the methods reach similar conclusions, they approach the problem from different angles. The mixed-effects model incorporates the correlation within each subclass through its random effect, while the RM-ANOVA primarily focuses on the repeated measures nature of the data. Both models provide valuable insights, but the mixed-effects model might be a more robust choice for this particular dataset, given its explicit modeling of the subclass structure. -->
+
+
+<!-- My take: -->
+
+<!-- The advantage of ANOVa is that it provides information about the "average" effect of independence timing across the dataset, whereas LMM does not do that (but it could be calculated extra, by default it only shows change in time in the control group, not the treatment group, which makes the interpretation harder). On the other hand  -->
+<!-- None of these models work well with the disciplines by default - I could make some extra edits to make ANOVA work, but I'm unsure what the interpretation would be for LMM -->
+
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Violin Plot of RII Scores by Treatment and Time with Mean and CI Overlayed for the Unfunded Control Group."}
+
+### visualisations
+     
+     
+means <- aggregate(RII ~ treatment + independence_timing, data = filtered_by_subclass_1, FUN = mean)
+
+ # ggplot(data = filtered_by_subclass_1, aes(x = treatment, y = RII, fill = independence_timing)) +
+ #         geom_violin(scale = "width") +
+ #         scale_fill_discrete(name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
+ #         xlab("Treatment Group") +
+ #         ylab("RII Score") +
+ #         ggtitle("Violin Plot of RII Scores by Treatment and Time") +
+ #         theme_bw()
+
+ 
+ # Calculate means and standard errors for plotting
+plot_data <- filtered_by_subclass_1 %>%
+  group_by(treatment, independence_timing) %>%
+  summarize(
+    mean_RII = mean(RII),
+    se_RII = sd(RII) / sqrt(n())
+  )
+
+# # Plot
+# p <- ggplot(plot_data, aes(x = independence_timing, y = mean_RII, group = treatment, color = factor(treatment))) +
+#   geom_line(aes(linetype = factor(treatment))) + 
+#   geom_point(size = 3) + 
+#   geom_errorbar(aes(ymin = mean_RII - se_RII, ymax = mean_RII + se_RII), width = 0.2) +
+#   labs(
+#     title = "Effect of Intervention on Researcher Independence Index (RII)",
+#     x = "Independence Timing",
+#     y = "Mean RII",
+#     color = "Treatment Group",
+#     linetype = "Treatment Group"
+#   ) +
+#   scale_color_manual(values = c("blue", "red"), labels = c("Control", "Treatment")) +
+#   scale_linetype_manual(values = c("dashed", "solid")) +
+#   theme_minimal()
+
+ 
+ 
+dodge_width <- 0.5
+
+combined_plot <- ggplot() +  
+  
+  geom_violin(data = filtered_by_subclass_1, 
+              aes(x = treatment, y = RII, fill = independence_timing), 
+              scale = "width", 
+              position = position_dodge(dodge_width)) + 
+  
+  geom_point(data = plot_data, 
+             aes(x = treatment, y = mean_RII, color = independence_timing), 
+             position = position_dodge(dodge_width), 
+             size = 3) +
+  
+  geom_errorbar(data = plot_data, 
+                aes(x = treatment, ymin = mean_RII - se_RII, ymax = mean_RII + se_RII, color = independence_timing), 
+                position = position_dodge(dodge_width), 
+                width = 0.2) +
+  
+  scale_fill_discrete(name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
+  scale_color_manual(values = c("black", "red"), name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
+  
+  labs(x = "Treatment Group",
+       y = "RII Score") +
+  theme_bw()
+
+print(combined_plot)
+
+```
+
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+
+# means_disc <- aggregate(RII ~ field, data = filtered_by_subclass_1, FUN = mean)
+# 
+# num_disc <- filtered_by_subclass_1 %>%
+#   group_by(field) %>%
+#   summarise(count = n(), .groups = "drop")
+# 
+# means_disc <- left_join(means_disc, num_disc, by = "field") 
+# 
+# # Step 1: Reorder the levels of 'field'
+# means_disc$field <- with(means_disc, factor(field, levels=unique(field[order(RII)])))
+# 
+# # Step 2: Optionally, sort the dataframe based on the reordered levels
+# means_disc <- means_disc %>% arrange(field)
+# 
+# se_ci_data <- filtered_by_subclass_1 %>%
+#   group_by(field) %>%
+#   summarise(mean_RII = mean(RII),
+#             se_RII = sd(RII) / sqrt(n()),
+#             lower_CI = mean_RII - (1.96 * se_RII),
+#             upper_CI = mean_RII + (1.96 * se_RII), 
+#             .groups = "drop")
+# 
+# means_disc <- merge(means_disc, se_ci_data, by = "field")
+# 
+# 
+# ggplot(data = means_disc, aes(x = field, y = mean_RII, fill = field)) +
+#   geom_bar(stat = "identity", position = "dodge") +
+#   
+#   # Add error bars for confidence intervals
+#   geom_errorbar(aes(ymin = lower_CI, ymax = upper_CI), position = position_dodge(width=0.9), width=0.25) +
+#   
+#   # Add the number of observations in the middle of the bars
+#   geom_text(aes(label=count, y = mean_RII/2), position=position_dodge(width=0.9), vjust=0.5) +
+#   
+#   # Change x-axis labels and add a title
+#   scale_x_discrete(labels = seq_along(unique(means_disc$field))) + # replace with numbers
+#   labs(
+#     x = "Field", 
+#     y = "Mean RII",
+#     title = "Differences in RII across disciplines" # Replace with your desired title
+#   ) +
+#   scale_fill_discrete(name = "Field") +
+#   theme_bw()
+
+
+```
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+
+
+filtered_by_subclass_2 <- pp %>% 
+    group_by(subclass) %>% 
+    filter(!any(treatment == 0)) %>% 
+    ungroup() %>%
+    mutate(treatment = as.numeric(as.character(treatment))) %>%
+    mutate(treatment = if_else(treatment == 2, 0, treatment)) %>%
+    mutate(treatment = factor(treatment, levels = c(0, 1)))
+
+filtered_by_subclass_2$subclass <- as.factor(filtered_by_subclass_2$subclass)
+filtered_by_subclass_2$treatment <- as.factor(filtered_by_subclass_2$treatment)
+filtered_by_subclass_2$independence_timing <- as.factor(filtered_by_subclass_2$independence_timing)
+filtered_by_subclass_2$field <- as.factor(filtered_by_subclass_2$field)
+
+# this DiD model unfortunately doesnt work for some reason that I cannot resolve, but it is possible to calculate the same using repeated measures anova or mixes effects model, so it should be fine
+#---> maybe if I edit the dataset so that there is only one row for each observation and it has columns RII_before and RII_after? ------or alternatively I can also just calculate the difference directly RII_diff = after-before and then test only this difference? Not sure how much of a difference this would make -> I should perhaps ask chatGPT
+
+
+# # Run regression model with interaction term
+# did_model <- plm::plm(RII ~ independence_timing * treatment + factor(subclass),
+#                  data = filtered_by_subclass_1,
+#                  index = c("subclass"),
+#                  model = "within")
+# 
+# # Calculate clustered standard errors
+# clustered_se <- coeftest(did_model, vcov = function(x) vcovHC(x, type = "HC1", cluster = "subclass"))
+
+
+# model2 <- lmer(RII ~ treatment * independence_timing + (1 | subclass), data = filtered_by_subclass_2)
+# summary(model2)
+# r.squaredGLMM(model2)
+
+
+
+result2 <- aov(RII ~ treatment * independence_timing + Error(subclass/independence_timing), data=filtered_by_subclass_2)
+# summary(result)
+eta_sq_result2 <- eta_squared(result2)
+
+
+# result2 <- ezANOVA(data = filtered_by_subclass_2,
+#                  dv = RII,
+#                  wid = subclass,
+#                  within = .(independence_timing),
+#                  between = treatment)
+# print(result)
+
+
+
+## adding disciplines:
+
+
+
+
+# result_disc2 <- ezANOVA(data = filtered_by_subclass_2,
+#                  dv = RII,
+#                  wid = subclass,
+#                  within = .(independence_timing),
+#                  between = .(treatment, field))
+# print(result_disc2)
+
+
+
+filtered_data_disc_2 <- filtered_by_subclass_2 %>%
+  group_by(field) %>%
+  filter(n() >= 8)
+
+filtered_data_disc_2$field <- droplevels(filtered_data_disc_2$field)
+
+# Calculate weights based on group size (you can adjust this based on other criteria if needed)
+group_sizes2 <- table(filtered_data_disc_2$field)
+max_size2 <- max(group_sizes2)
+filtered_data_disc_2$weights <- max_size2 / group_sizes2[filtered_data_disc_2$field]
+
+#this model addresses both unequal group sizes (via weights) and heteroscedasticity (via varIdent). Additionally, I've added a first-order autoregressive structure (corAR1) assuming you have repeated measures on the same subjects and to account for their paired nature (indicated by subclass/independence_timing)
+#this model directly tests whether there is a difference in disciplines - anyway it tests each discipline agains each other, so it doesnt produce the neat result of "yes, there are some significant differences between disciplines", but more nuanced version of "there is specifically difference between this and this discipline"
+
+model_gls_weighted2 <- gls(RII ~ field, data = filtered_data_disc_2, 
+                          weights = varIdent(form = ~ 1 | field),
+                          method = "ML",
+                          correlation = corAR1(form = ~ 1 | subject_id))  
+
+interaction_summary <- summary(model_gls_weighted2)
+
+#this model below is the same as the above but with added predictors
+
+model_gls_interactions_subclass2 <- gls(RII ~ field * treatment * independence_timing, 
+                              data = filtered_data_disc_2, 
+                              weights = varIdent(form = ~ 1 | field),
+                              method = "ML",
+                              correlation = corAR1(form = ~ 1 | subclass/independence_timing)) 
+
+# aa <- summary(model_gls_interactions_subclass2)
+
+
+#one potential strategy to get the neat result of "yes, there are some significant differences between disciplines" is following: create two similar models 
+
+
+model_without_field2 <- gls(RII ~ treatment + independence_timing + treatment:independence_timing, 
+                           data = filtered_data_disc_2, 
+                           correlation = corCompSymm(form = ~ 1 | subclass/independence_timing), 
+                           method = "ML")
+
+model_with_field_main_effect2 <- gls(RII ~ treatment + field + independence_timing + treatment:independence_timing, 
+                                    data = filtered_data_disc_2, 
+                                    correlation = corCompSymm(form = ~ 1 | subclass/independence_timing), 
+                                    method = "ML")
+
+
+anova_result2 <- anova(model_without_field2, model_with_field_main_effect2)
+
+model_summary2 <- summary(model_with_field_main_effect2)
+
+
+
+
+```
+
+
+
+
+In the second analysis, we examined the effects of treatment, independence_timing, and their interaction on the researcher independence (RII) for the treatment group and funded control group. Again, there was a significant main effect of time on independence, F(`r format(summary(result2)$"Error: subclass:independence_timing"[[1]]$"Df"[1])`, `r format(summary(result2)$"Error: subclass:independence_timing"[[1]]$"Df"[2])`) = `r format(summary(result2)$"Error: subclass:independence_timing"[[1]]$"F value"[1], digits=2)`, p = `r round(summary(result2)$"Error: subclass:independence_timing"[[1]]$"Pr(>F)"[1], 3)`). The effect accounted for approximately `r format(eta_sq_result2[eta_sq_result2$Parameter == "independence_timing", "Eta2_partial"] * 100, digits=2)`% of the observed variance (partial \(\eta^2 = `r round(eta_sq_result2[eta_sq_result2$Parameter == "independence_timing", "Eta2_partial"], 3)`\), 95% CI [`r round(eta_sq_result2[eta_sq_result2$Parameter == "independence_timing", "CI_low"], 3)`, `r eta_sq_result2[eta_sq_result2$Parameter == "independence_timing", "CI_high"]`]).
+
+Importantly, this time the interaction effect between treatment and time was not significant, F(`r format(summary(result2)$"Error: Within"[[1]]$"Df"[2])`, `r format(summary(result2)$"Error: Within"[[1]]$"Df"[3])`) = `r format(summary(result2)$"Error: Within"[[1]]$"F value"[2], digits=2)`, p = `r format(summary(result2)$"Error: Within"[[1]]$"Pr(>F)"[2], digits=2)`. This interaction effect explained about `r format(eta_sq_result2[eta_sq_result2$Parameter == "treatment:independence_timing", "Eta2_partial"] * 100, digits=2)`% of the variability (partial \(\eta^2 = `r round(eta_sq_result2[eta_sq_result2$Parameter == "treatment:independence_timing", "Eta2_partial"], 3)`\), 95% CI [`r round(eta_sq_result2[eta_sq_result2$Parameter == "treatment:independence_timing", "CI_low"], 3)`, `r eta_sq_result2[eta_sq_result2$Parameter == "treatment:independence_timing", "CI_high"]`]), suggesting that funding has the same effects, regardless of its type or source.
+
+
+Same as in previous chapter, the comparison of models suggested that there are statistically significant differences in the RII based on the field of study. Specifically, adding the field of study to the model resulted in a significant increase in the log-likelihood by `r round(anova_result2$L.Ratio[2], 2)` units (p = `r round(anova_result2$"p-value"[2], 3)`), emphasizing its importance as a predictor. Specifically, compared to the Agricultural and Veterinary Sciences, being in the Medical and Health Sciences field is associated with an increase in RII by `r  round(coef(model_summary2)["fieldMedical and Health Sciences", 1], 2)` units (p = `r round(coef(model_summary2)["fieldMedical and Health Sciences", 4], 3)`), being in the Natural Sciences is associated with an increase in RII by `r  round(coef(model_summary2)["fieldNatural Sciences", 1], 2)` units (p = `r round(coef(model_summary2)["fieldNatural Sciences", 4], 3)`), Engineering and Technology are associated with an increase in RII by `r  round(coef(model_summary2)["fieldEngineering and Technology", 1], 2)` units (p = `r round(coef(model_summary2)["fieldEngineering and Technology", 4], 3)`), Social Sciences are associated with an increase in RII by `r round(coef(model_summary2)["fieldSocial Sciences", 1], 2)` units (p = `r round(coef(model_summary2)["fieldSocial Sciences", 4], 3)`), and Humanities and the Arts are associated with an increase in RII by `r round(coef(model_summary2)["fieldHumanities and the Arts", 1], 2)` units (p = `r round(coef(model_summary2)["fieldHumanities and the Arts", 4], 3)`). 
+
+The three-way interaction among treatment, independence_timing, and field was not statistically significant. This implies that the interaction effect of treatment and independence_timing on independence remained consistent across different disciplines.
+
+
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Violin Plot of RII Scores by Treatment and Time with Mean and CI Overlayed for the Funded Control Group."}
+
+
+### visualisations
+     
+
+plot_data2 <- filtered_by_subclass_2 %>%
+  group_by(treatment, independence_timing) %>%
+  summarize(
+    mean_RII = mean(RII),
+    se_RII = sd(RII) / sqrt(n())
+  )
+
+ 
+dodge_width <- 0.5
+
+combined_plot2 <- ggplot() +  
+  
+  geom_violin(data = filtered_by_subclass_2, 
+              aes(x = treatment, y = RII, fill = independence_timing), 
+              scale = "width", 
+              position = position_dodge(dodge_width)) + 
+  
+  geom_point(data = plot_data2, 
+             aes(x = treatment, y = mean_RII, color = independence_timing), 
+             position = position_dodge(dodge_width), 
+             size = 3) +
+  
+  geom_errorbar(data = plot_data2, 
+                aes(x = treatment, ymin = mean_RII - se_RII, ymax = mean_RII + se_RII, color = independence_timing), 
+                position = position_dodge(dodge_width), 
+                width = 0.2) +
+  
+  scale_fill_discrete(name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
+  scale_color_manual(values = c("black", "red"), name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
+  
+  labs(x = "Treatment Group",
+       y = "RII Score") +
+  theme_bw()
+
+print(combined_plot2)
+
+
+
+# means2 <- aggregate(RII ~ treatment + independence_timing, data = filtered_by_subclass_2, FUN = mean)
+# 
+# 
+# means_disc2 <- aggregate(RII ~ field, data = filtered_by_subclass_2, FUN = mean)
+#      
+# num_disc2 <- filtered_by_subclass_2 %>%
+#   group_by(field) %>%
+#   summarise(count = n(), .groups = "drop")
+#
+# means_disc2 <- left_join(means_disc2, num_disc2, by = "field") 
+# 
+# # Step 1: Reorder the levels of 'field'
+# means_disc2$field <- with(means_disc2, factor(field, levels=unique(field[order(RII)])))
+# 
+# # Step 2: Optionally, sort the dataframe based on the reordered levels
+# means_disc2 <- means_disc2 %>% arrange(field)
+# 
+# 
+# se_ci_data2 <- filtered_by_subclass_2 %>%
+#   group_by(field) %>%
+#   summarise(mean_RII = mean(RII),
+#             se_RII = sd(RII) / sqrt(n()),
+#             lower_CI = mean_RII - (1.96 * se_RII),
+#             upper_CI = mean_RII + (1.96 * se_RII), 
+#             .groups = "drop")
+#
+# means_disc2 <- merge(means_disc2, se_ci_data2, by = "field")
+# 
+# 
+# ggplot(data = means_disc2, aes(x = field, y = mean_RII, fill = field)) +
+#   geom_bar(stat = "identity", position = "dodge") +
+#   
+#   # Add error bars for confidence intervals
+#   geom_errorbar(aes(ymin = lower_CI, ymax = upper_CI), position = position_dodge(width=0.9), width=0.25) +
+#   
+#   # Add the number of observations in the middle of the bars
+#   geom_text(aes(label=count, y = mean_RII/2), position=position_dodge(width=0.9), vjust=0.5) +
+#   
+#   # Change x-axis labels and add a title
+#   scale_x_discrete(labels = seq_along(unique(means_disc2$field))) + # replace with numbers
+#   labs(
+#     x = "Field", 
+#     y = "Mean RII",
+#     title = "Differences in RII across disciplines" # Replace with your desired title
+#   ) +
+#   scale_fill_discrete(name = "Field") +
+#   theme_bw()
+
+
+
+# disc_data <- pp %>% 
+#     filter(independence_timing != "after_intervention")
+
+
+
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Differences in average RII across disciplines."}
+
+
+disc_data <- d %>%
+     filter(!is.na(RII)) %>%
+     group_by(vedidk, field, RII) %>%
+     sample_n(1) %>%
+     ungroup()
+
+means_disc_complete <- aggregate(RII ~ field, data = disc_data, FUN = mean)
+    
+
+num_disc_complete <- disc_data %>%
+  group_by(field) %>%
+  summarise(count = n(), .groups = "drop")
+
+means_disc_complete <- left_join(means_disc_complete, num_disc_complete, by = "field") 
+
+# Step 1: Reorder the levels of 'field'
+means_disc_complete$field <- with(means_disc_complete, factor(field, levels=unique(field[order(RII)])))
+
+# Step 2: Optionally, sort the dataframe based on the reordered levels
+means_disc_complete <- means_disc_complete %>% arrange(field)
+
+
+se_ci_data_complete <- disc_data %>%
+  group_by(field) %>%
+  summarise(mean_RII = mean(RII),
+            se_RII = sd(RII) / sqrt(n()),
+            lower_CI = mean_RII - (1.96 * se_RII),
+            upper_CI = mean_RII + (1.96 * se_RII), 
+            .groups = "drop")
+
+means_disc_complete <- merge(means_disc_complete, se_ci_data_complete, by = "field")
+
+
+ggplot(data = means_disc_complete, aes(x = field, y = mean_RII, fill = field)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  
+  # Add error bars for confidence intervals
+  geom_errorbar(aes(ymin = lower_CI, ymax = upper_CI), position = position_dodge(width=0.9), width=0.25) +
+  
+  # Add the number of observations in the middle of the bars
+  geom_text(aes(label=count, y = mean_RII/2), position=position_dodge(width=0.9), vjust=0.5) +
+  
+  # Change x-axis labels and add a title
+  scale_x_discrete(labels = seq_along(unique(means_disc_complete$field))) + # replace with numbers
+  labs(
+    x = "Field", 
+    y = "Mean RII",
+    ) +
+  scale_fill_discrete(name = "Field") +
+  theme_bw()
+
+
+
+ 
+```
+
+## Collaborative vs Cognitive Independence
+
+From the correlation matrix below, we can observe that the cognitive part of independence indicator (ind_topics) has notably lower correlation with the overall indicator (RII) and its remaining parts. 
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+
+cor_data <- d %>% dplyr::select(RII, ind_topics, ind_pubs, clustr, eig_centr)
+
+cor_matrix <- cor(cor_data, use = "pairwise.complete.obs")
+
+# reversed_cor_matrix <- cor_matrix[rev(rownames(cor_matrix)), rev(colnames(cor_matrix))]
+
+kable(cor_matrix, format = "markdown", digits = 2, caption = "Correlation Matrix of RII indicator and its sub-parts")
+
+
+
+ind_top_mean_before <- d %>% 
+    filter(independence_timing == "before_intervention") %>% 
+    group_by(vedidk, ind_topics) %>%
+    sample_n(1) %>%
+    ungroup() %>%
+    summarise(mean_value = mean(ind_topics, na.rm = TRUE)) %>%
+    pull(mean_value)
+
+ind_top_mean_after <- d %>% 
+    filter(independence_timing == "after_intervention") %>% 
+    group_by(vedidk, ind_topics) %>%
+    sample_n(1) %>%
+    ungroup() %>%
+    summarise(mean_value = mean(ind_topics, na.rm = TRUE)) %>%
+    pull(mean_value)
+
+
+```
+
+
+From the violin plot it seems that the cognitive part of the indicator has lower variability than full indicator, and the differences between treatment and (unfunded) control groups are not significant.
+
+This might suggest that while funding helps early career researchers to become more independent from their PhD advisors overall, this is likely driven creating new collaboration networks, rather than "opening up new lines of research". That being said, the average level of cognitive (topical) independence is around `r round(ind_top_mean_before, 2)` (which could roughly be translated as `r round(ind_top_mean_before*100, 2)` %) even before the funding intervention and rises to about `r round(ind_top_mean_after, 2)` (`r round(ind_top_mean_after*100, 2)` %) in the time after the intervention.
+
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Violin Plot of the Cognitive Part of RII Scores by Treatment and Time with Mean and CI Overlayed for the Unfunded Control Group."}
+
+### visualisations
+     
+     
+means <- aggregate(ind_topics ~ treatment + independence_timing, data = filtered_by_subclass_1, FUN = mean)
+
+
+ 
+ # Calculate means and standard errors for plotting
+plot_data <- filtered_by_subclass_1 %>%
+  group_by(treatment, independence_timing) %>%
+  summarize(
+    mean_ind_topics = mean(ind_topics),
+    se_ind_topics = sd(ind_topics) / sqrt(n())
+  )
+
+ 
+ 
+dodge_width <- 0.5
+
+combined_plot <- ggplot() +  
+  
+  geom_violin(data = filtered_by_subclass_1, 
+              aes(x = treatment, y = ind_topics, fill = independence_timing), 
+              scale = "width", 
+              position = position_dodge(dodge_width)) + 
+  
+  geom_point(data = plot_data, 
+             aes(x = treatment, y = mean_ind_topics, color = independence_timing), 
+             position = position_dodge(dodge_width), 
+             size = 3) +
+  
+  geom_errorbar(data = plot_data, 
+                aes(x = treatment, ymin = mean_ind_topics - se_ind_topics, ymax = mean_ind_topics + se_ind_topics, color = independence_timing), 
+                position = position_dodge(dodge_width), 
+                width = 0.2) +
+  
+  scale_fill_discrete(name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
+  scale_color_manual(values = c("black", "red"), name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
+  
+  labs(x = "Treatment Group",
+       y = "ind_topics Score") +
+  theme_bw()
+
+print(combined_plot)
+
+
+```
+
+
+Similar pattern can be observed in differences across disciplines - while there were significant differences in full indicator scores, its cognitive part doesn't show any differences, suggesting that collaboration is the factor driving differences across fields of study.
+
+
+```{r echo=FALSE, fig.cap="Differences in Average Cognitive RII Scores (ind_topic) Across Disciplines and Time."}
+
+disc_data <- d %>%
+     group_by(vedidk, subclass) %>%  # Assuming 'id' is your current unique identifier
+     mutate(subject_id = cur_group_id()) %>%  # This creates a unique ID for each group
+     ungroup() 
+
+disc_data <- disc_data[!duplicated(disc_data[c("subject_id", "independence_timing")]), ]
+    
+
+diff_data_tp <- disc_data %>%
+  select(subject_id, independence_timing, ind_topics) %>%
+  spread(independence_timing, ind_topics) %>%
+  mutate(ind_topics_diff = after_intervention - before_intervention) %>%
+  select(subject_id, ind_topics_diff)
+
+disc_data <- left_join(disc_data, diff_data_tp, by = "subject_id")
+
+disc_data <-  disc_data %>% 
+     filter(!is.na(ind_topics)) %>%
+     group_by(vedidk, field, ind_topics) %>%
+     sample_n(1) %>%
+     ungroup()
+
+
+means_disc_complete <- aggregate(ind_topics ~ field, data = disc_data, FUN = mean)
+    
+
+
+num_disc_complete <- disc_data %>%
+  group_by(field) %>%
+  summarise(count = n(), .groups = "drop")
+
+means_disc_complete <- left_join(means_disc_complete, num_disc_complete, by = "field") 
+
+# Step 1: Reorder the levels of 'field'
+means_disc_complete$field <- with(means_disc_complete, factor(field, levels=unique(field[order(ind_topics)])))
+
+# Step 2: Optionally, sort the dataframe based on the reordered levels
+means_disc_complete <- means_disc_complete %>% arrange(field)
+
+
+
+se_ci_data_complete <- disc_data %>%
+  group_by(field) %>%
+  summarise(mean_ind_topics = mean(ind_topics),
+            se_ind_topics = sd(ind_topics) / sqrt(n()),
+            lower_CI = mean_ind_topics - (1.96 * se_ind_topics),
+            upper_CI = mean_ind_topics + (1.96 * se_ind_topics), 
+            .groups = "drop")
+
+means_disc_complete <- merge(means_disc_complete, se_ci_data_complete, by = "field")
+
+
+ggplot(data = means_disc_complete, aes(x = field, y = mean_ind_topics, fill = field)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  
+  # Add error bars for confidence intervals
+  geom_errorbar(aes(ymin = lower_CI, ymax = upper_CI), position = position_dodge(width=0.9), width=0.25) +
+  
+  # Add the number of observations in the middle of the bars
+  geom_text(aes(label=count, y = mean_ind_topics/2), position=position_dodge(width=0.9), vjust=0.5) +
+  
+  # Change x-axis labels and add a title
+  scale_x_discrete(labels = seq_along(unique(means_disc_complete$field))) + # replace with numbers
+  labs(
+    x = "Field", 
+    y = "Mean ind_topics",
+     ) +
+  scale_fill_discrete(name = "Field") +
+  theme_bw()
+
+ 
+
+
+```
+
+```{r echo=FALSE, fig.cap="Average Change in Cognitive RII Scores (ind_topic) Across Disciplines."}
+
+
+
+disc_data_change <- disc_data %>% filter(!is.na(ind_topics_diff)) %>% 
+     group_by(vedidk, field, ind_topics_diff) %>%
+     sample_n(1) %>%
+     ungroup()
+
+
+means_disc_change <- aggregate(ind_topics_diff ~ field, data = disc_data_change, FUN = mean)
+    
+
+
+num_disc_change <- disc_data_change %>%
+  group_by(field) %>%
+  summarise(count = n(), .groups = "drop")
+
+means_disc_change <- left_join(means_disc_change, num_disc_change, by = "field") 
+
+# Step 1: Reorder the levels of 'field'
+means_disc_change$field <- with(means_disc_change, factor(field, levels=unique(field[order(ind_topics_diff)])))
+
+# Step 2: Optionally, sort the dataframe based on the reordered levels
+means_disc_change <- means_disc_change %>% arrange(field)
+
+
+
+se_ci_data_change <- disc_data_change %>%
+  group_by(field) %>%
+  summarise(mean_ind_topics_diff = mean(ind_topics_diff),
+            se_ind_topics_diff = sd(ind_topics_diff) / sqrt(n()),
+            lower_CI = mean_ind_topics_diff - (1.96 * se_ind_topics_diff),
+            upper_CI = mean_ind_topics_diff + (1.96 * se_ind_topics_diff), 
+            .groups = "drop")
+
+means_disc_change <- merge(means_disc_change, se_ci_data_change, by = "field")
+
+
+ggplot(data = means_disc_change, aes(x = field, y = mean_ind_topics_diff, fill = field)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  
+  # Add error bars for confidence intervals
+  geom_errorbar(aes(ymin = lower_CI, ymax = upper_CI), position = position_dodge(width=0.9), width=0.25) +
+  
+  # Add the number of observations in the middle of the bars
+  geom_text(aes(label=count, y = mean_ind_topics_diff/2), position=position_dodge(width=0.9), vjust=0.5) +
+  
+  # Change x-axis labels and add a title
+  scale_x_discrete(labels = seq_along(unique(means_disc_change$field))) + # replace with numbers
+  labs(
+    x = "Field", 
+    y = "Mean ind_topics_diff",
+    ) +
+  scale_fill_discrete(name = "Field") +
+  theme_bw()
+
+
+
+```
+
+
+# Discussion
+
+The results of this study provide important insights into the effects of funding interventions on researcher independence. We did not find a significant intervention effect of funding programmes for early career researchers, compared to no funding or other types of grant funding. These results suggest funding might not be an important factor in developing researcher independence. This is surprising finding, since many people have voiced worries about funding having strong effect either by making junior researchers more cautious and risk-averse in order to fulfill the grant conditions, limiting the novelty of their work; or by giving them more protected space where they can freely experiment and step off the traditional paths, opening new lines of research. Neither of these theories are supported by our findings. Instead, there are likely other factors influencing development of research independence more significantly.
+
+The strongest effect we found across all control group comparisons was the effect of time: over time, researchers become more independent, regardless of their access to funding or their study discipline. This effect explains around 60% of the variance in independence.
+
+Additionally, the observed variation in independence across different disciplines underscores the importance of considering disciplinary differences, suggested by a moderate effect size. A moderate effect size for the field effect emphasizes that certain disciplines might inherently have variations in researchers' independence, but this is driven mostly by collaboration patterns rather than cognitive patterns (e.g. differences in practices, methodologies, or norms specific to each discipline). These differences remain constant across time and funding interventions, suggesting that funding has a uniform effect on the independence across disciplines.
+
+Finally, when looking closer into the composition of the independence indicator, we found that that the main driver of the increase in independence was the collaboration part of the indicator - creating new collaboration networks - rather than the cognitive part - opening up new lines of research in which their PhD advisor is not active. While the level of cognitive independence is still relatively high even early on after finishing one's PhD (researchers have around 40 % of topics not shared by their PhD advisor 8 years after their first publication) and increases over time, the funding does not stimulate more novelty and divergence from the portfolio of topics held by their PhD advisors.
+
+Given that funding for early career researchers does not have effect on stimulating their cognitive independence, does it make sense to continue providing it? While funding itself might not be the main driver of cognitive independence, it might still play an important role. For example, it could be a necessary, though not sufficient, condition for the development of independence. From a common sense view, it is hard to imagine that researchers can develop much of independence while only working on someone else's (often their advisor's) projects. In any case, our results suggest that the search for factors and interventions stimulating researchers' exploratory behaviours should continue.       
+
+
+Main value of this paper is manyfold. It investigated one potential factor (funding) hypothesized to stimulate researcher independence, rendering this factor unimportant, contrary to expectations, Further, it confirmed there are meaningful differences in level of independence across disciplines and has illuminated the magnitude of cognitive independence experienced by researchers early in their careers, including its development to later stages. This contributes to the discussions about tradition and innovation in research topic choice strategies and recreating status quo in science.
+
+
+
+
+
+## Limitations
+
+One of the main limitations of this study is that it only focuses on Czech environment - researchers growing up and spending most of their careers in the Czech Republic, only taking into account their publications affiliated with Czech research institutions. Studies testing our results on samples from other countries, and possibly tracking international mobility, would strengthen our conclusions.  
+
+Another potential limitation is the length of the time after the intervention. We have tracked the effects of funding between 2-7 years after the grant projects started, at a point where researchers created on average `r round(mean_pubs_after, 1)` publications (while `r na_counts_researchers` % of them have created less than 3 publications and were removed from this analysis). It might be possible that independence needs more time to develop and had we measured the effects later, we would have found stronger effects.
+
+Further research could look into which other factors influence researcher independence (especially its cognitive part) and how strongly, compared to grant funding. 
+
+
+
+## Conclusion
+
+Our results showed that funding does not help to stimulate independence of early career researchers. The largest effect on increase in independence was time: over time, researchers become more independent, regardless of their access to funding or their study discipline. There were also significant differences in independence level across study disciplines, where social sciences and humanities allowed for more independence than other disciplines. Researchers usually start with around 40 % of topics not shared by their PhD advisor early on after finishing their PhD and grow more independent over time (up to 47 % of independent topics 14 years after their first publication). Search for factors and interventions stimulating researchers' cognitive independence and exploratory behaviour should thus continue.
+
+
+
+# Attachments
+
+
+## Identification of supervisors
+
+
+```{r echo=FALSE}
+
+treatment_found_pc <- round(nrow(tar_read(final_data) %>% filter(!is.na(sup_name)) %>% filter(treatment == 1) %>% distinct(vedidk))/348*100, 2)
+
+control_found_pc <- round(nrow(tar_read(final_data) %>% filter(!is.na(sup_name)) %>% filter(treatment != 1) %>% distinct(vedidk))/nrow(tar_read(final_data) %>% filter(treatment != 1) %>% distinct(vedidk))*100, 2)
+
+
+treatment_match <- left_join(tar_read(final_data) %>% filter(!is.na(sup_name)), tar_read(sup_alg), by = "vedidk") %>% 
+    mutate(match = ifelse(sup_vedidk.x == sup_vedidk.y, 1, 0)) 
+    
+    
+match_yes <- nrow(treatment_match %>% filter(match == 1) %>% distinct(vedidk))
+match_yes_pc <- round(nrow(treatment_match %>% filter(match == 1) %>% distinct(vedidk))/nrow(treatment_match %>% distinct(vedidk))*100, 2)
+    
+match_no <- nrow(treatment_match %>% filter(match == 0) %>% distinct(vedidk))
+match_no_pc <- round(nrow(treatment_match %>% filter(match == 0) %>% distinct(vedidk))/nrow(treatment_match %>% distinct(vedidk))*100, 2)
+
+match_na <- nrow(treatment_match %>% filter(is.na(match)) %>% distinct(vedidk))
+match_na_pc <- round(nrow(treatment_match %>% filter(is.na(match)) %>% distinct(vedidk))/nrow(treatment_match %>% distinct(vedidk))*100, 2)
+
+
+
+```
+
+
+Data about PhD student-PhD advisor connections are usually not available. One must search for these connections manually on the internet, which is time consuming and not fully reliable (we were only able to find about `r treatment_found_pc` % of these connections in our treatment group and `r control_found_pc`) % in control groups. Therefore, we tried to come up with an alternative way of identifying supervisors from the available data: we assumed that since many researchers only start their publication career during their PhD studies, their PhD supervisors might often coauthor their first publications. That led us to creating an algorithm to identify the supervisor solely from the student's publication history as "the most frequent co-author of the first 5 publications".
+
+To check whether we can use "the most frequent co-author of the first 5 publications" as a proxy to identify supervisors, we have compared the supervisors identified via this method with the manually found supervisors for each researcher in our sample. Across our full sample of `r nrow(tar_read(final_data) %>% filter(!is.na(sup_name)) %>% distinct(vedidk))` researchers for whom we identified supervisors manually, `r match_yes` (`r match_yes_pc` %) had their most frequent co-author same as their supervisor and `r match_no` (`r match_no_pc` %) had someone other than their supervisor as their most frequent co-author in their first 5 publications, and `r match_na` (`r match_na_pc`%) had no co-author in their first 5 publications.   
+
+This suggest that the algorithmic approach as we defined is not able to identify real supervisors often enough. Either new algorithm is needed or future studies should redefine the "supervisory role" based on other characteristics than formal supervision.
+
+
+
+# References
+

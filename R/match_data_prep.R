@@ -8,7 +8,7 @@
 #' @return
 #' @author fatal: unable to access 'C:/Users/David Jank?/Documents/.config/git/config': Invalid argument
 #' @export
-match_data_prep <- function(db_path, ids, gender, sup_control, sup_control_second) {
+match_data_prep <- function(db_path, ids, gender, blacklist_control) {
 
     
     con <-  DBI::dbConnect(RSQLite::SQLite(), db_path)
@@ -52,11 +52,13 @@ match_data_prep <- function(db_path, ids, gender, sup_control, sup_control_secon
     
     #number of wos/scopus publications up to 2014 (ie the year when the grant was awarded)
     
-    control_id <- n_pubs_types2014$id_unique
-    n_pubs_ws2014 <- dplyr::tbl(con, "riv_disc") %>% 
-        filter(id_unique %in% control_id) %>% #it doesn't really matter whether I use this filter or not - it always come with the same result which is weird
-        distinct() %>% 
-        dplyr::collect() %>% 
+    n_pubs_ws2014 <- DBI::dbReadTable(con, "riv_disc") %>%
+        dplyr::select(id_unique, utwos, eid) %>%
+        tidyr::unite(ws, c(utwos, eid), na.rm = TRUE) %>%
+        mutate(across(everything(), ~replace(., . == "", NA))) %>%
+        filter(!is.na(ws)) %>% 
+        filter(id_unique %in% n_pubs_types2014$id_unique) %>% #it doesn't really matter whether I use this filter or not - it always come with the same result which is weird
+        distinct() %>%  
         as_tibble()
     
     n_pubs_ws2014 <- left_join(n_pubs_ws2014, n_pubs_filtered2014, by = "id_unique") 
@@ -300,7 +302,7 @@ match_data_prep <- function(db_path, ids, gender, sup_control, sup_control_secon
     
     funding_vedidk <- DBI::dbReadTable(con, "cep_investigators") %>%
         filter(!is.na(vedidk)) %>% #pozor! více než 50 % projektů v databázi nemá přiřazený vedidk řešitele!
-        # filter(role_researcher == G) %>% filtruje jen hlavní řešitele (G) a ne "další řešitele" (R)
+        filter(role_researcher == "G") %>% # filtruje jen hlavní řešitele (G) a ne "další řešitele" (R)
         dplyr::select(kod, vedidk) %>% 
         distinct() %>% 
         as_tibble
@@ -322,7 +324,7 @@ match_data_prep <- function(db_path, ids, gender, sup_control, sup_control_secon
     
     
     grants2014 <- funding_data %>% 
-        filter(year_start < 2014) %>% 
+        filter(year_start < 2018) %>% 
         group_by(vedidk) %>% 
         dplyr::count(name = "grants2014") %>% 
         ungroup() 
@@ -487,7 +489,11 @@ match_data_prep <- function(db_path, ids, gender, sup_control, sup_control_secon
     
     #number of wos/scopus publications up to 2015 (ie the year when the grant was awarded)
     
-    n_pubs_ws2015 <- DBI::dbReadTable(con, "riv_disc") %>% 
+    n_pubs_ws2015 <- DBI::dbReadTable(con, "riv_disc") %>%
+        dplyr::select(id_unique, utwos, eid) %>% 
+        tidyr::unite(ws, c(utwos, eid), na.rm = TRUE) %>%
+        mutate(across(everything(), ~replace(., . == "", NA))) %>%
+        filter(!is.na(ws)) %>% 
         filter(id_unique %in% n_pubs_types2015$id_unique) %>% #it doesn't really matter whether I use this filter or not - it always come with the same result which is weird
         distinct() %>% 
         as_tibble()
@@ -581,7 +587,7 @@ match_data_prep <- function(db_path, ids, gender, sup_control, sup_control_secon
     
     
     grants2015 <- funding_data %>% 
-        filter(year_start < 2015) %>% 
+        filter(year_start < 2019) %>% 
         group_by(vedidk) %>% 
         dplyr::count(name = "grants2015") %>% 
         ungroup() 
@@ -662,6 +668,10 @@ match_data_prep <- function(db_path, ids, gender, sup_control, sup_control_secon
     #number of wos/scopus publications up to 2016 (ie the year when the grant was awarded)
     
     n_pubs_ws2016 <- DBI::dbReadTable(con, "riv_disc") %>% 
+        dplyr::select(id_unique, utwos, eid) %>%
+        tidyr::unite(ws, c(utwos, eid), na.rm = TRUE) %>%
+        mutate(across(everything(), ~replace(., . == "", NA))) %>%
+        filter(!is.na(ws)) %>% 
         filter(id_unique %in% n_pubs_types2016$id_unique) %>% #it doesn't really matter whether I use this filter or not - it always come with the same result which is weird
         distinct() %>% 
         as_tibble()
@@ -757,7 +767,7 @@ match_data_prep <- function(db_path, ids, gender, sup_control, sup_control_secon
     
     
     grants2016 <- funding_data %>% 
-        filter(year_start < 2016) %>% 
+        filter(year_start < 2020) %>% 
         group_by(vedidk) %>% 
         dplyr::count(name = "grants2016") %>% 
         ungroup() 
@@ -838,6 +848,10 @@ match_data_prep <- function(db_path, ids, gender, sup_control, sup_control_secon
     #number of wos/scopus publications up to 2017 (ie the year when the grant was awarded)
     
     n_pubs_ws2017 <- DBI::dbReadTable(con, "riv_disc") %>% 
+        dplyr::select(id_unique, utwos, eid) %>% 
+        tidyr::unite(ws, c(utwos, eid), na.rm = TRUE) %>%
+        mutate(across(everything(), ~replace(., . == "", NA))) %>%
+        filter(!is.na(ws)) %>% 
         filter(id_unique %in% n_pubs_types2017$id_unique) %>% #it doesn't really matter whether I use this filter or not - it always come with the same result which is weird
         distinct() %>% 
         as_tibble()
@@ -930,7 +944,7 @@ match_data_prep <- function(db_path, ids, gender, sup_control, sup_control_secon
     
     
     grants2017 <- funding_data %>% 
-        filter(year_start < 2017) %>% 
+        filter(year_start < 2021) %>% 
         group_by(vedidk) %>% 
         dplyr::count(name = "grants2017") %>% 
         ungroup() 
@@ -1018,7 +1032,11 @@ match_data_prep <- function(db_path, ids, gender, sup_control, sup_control_secon
     
     #number of wos/scopus publications up to 2018 (ie the year when the grant was awarded)
     
-    n_pubs_ws2018 <- DBI::dbReadTable(con, "riv_disc") %>% 
+    n_pubs_ws2018 <- DBI::dbReadTable(con, "riv_disc") %>%
+        dplyr::select(id_unique, utwos, eid) %>% 
+        tidyr::unite(ws, c(utwos, eid), na.rm = TRUE) %>%
+        mutate(across(everything(), ~replace(., . == "", NA))) %>%
+        filter(!is.na(ws)) %>% 
         filter(id_unique %in% n_pubs_types2018$id_unique) %>% #it doesn't really matter whether I use this filter or not - it always come with the same result which is weird
         distinct() %>% 
         as_tibble()
@@ -1112,7 +1130,7 @@ match_data_prep <- function(db_path, ids, gender, sup_control, sup_control_secon
     
     
     grants2018 <- funding_data %>% 
-        filter(year_start < 2018) %>% 
+        filter(year_start < 2022) %>% 
         group_by(vedidk) %>% 
         dplyr::count(name = "grants2018") %>% 
         ungroup() 
@@ -1191,6 +1209,10 @@ match_data_prep <- function(db_path, ids, gender, sup_control, sup_control_secon
     #number of wos/scopus publications up to 2019 (ie the year when the grant was awarded)
     
     n_pubs_ws2019 <- DBI::dbReadTable(con, "riv_disc") %>% 
+        dplyr::select(id_unique, utwos, eid) %>%
+        tidyr::unite(ws, c(utwos, eid), na.rm = TRUE) %>%
+        mutate(across(everything(), ~replace(., . == "", NA))) %>%
+        filter(!is.na(ws)) %>% 
         filter(id_unique %in% n_pubs_types2019$id_unique) %>% #it doesn't really matter whether I use this filter or not - it always come with the same result which is weird
         distinct() %>% 
         as_tibble()
@@ -1283,7 +1305,7 @@ match_data_prep <- function(db_path, ids, gender, sup_control, sup_control_secon
     
     
     grants2019 <- funding_data %>% 
-        filter(year_start < 2019) %>% 
+        filter(year_start < 2023) %>% 
         group_by(vedidk) %>% 
         dplyr::count(name = "grants2019") %>% 
         ungroup() 
@@ -1370,11 +1392,14 @@ match_data_prep <- function(db_path, ids, gender, sup_control, sup_control_secon
     final_data$gender[final_data$vedidk == "3972305"] <- "female"
     
     
-    sup_out <- sup_control %>% filter(is.na(sup_name_first))
-    sup_out_second <- sup_control_second %>% filter(is.na(sup_name_first))
-    # 
-    final_data <- final_data %>% filter(!vedidk %in% sup_out$vedidk)
-    final_data <- final_data %>% filter(!vedidk %in% sup_out_second$vedidk)
+    # sup_out <- sup_control %>% filter(is.na(sup_name_first))
+    # sup_out_second <- sup_control_second %>% filter(is.na(sup_name_first))
+    # # 
+    final_data <- final_data %>% filter(!vedidk %in% blacklist_control$vedidk)
+    # final_data <- final_data %>% filter(!vedidk %in% sup_out_second$vedidk)
+    
+    treatment_out <- final_data %>% filter(treatment == 0) %>% filter(vedidk %in% treatment_group$vedidk)
+    final_data <- final_data %>% filter(!vedidk %in% treatment_out$vedidk)
     
     
     #excluding rows with missing values

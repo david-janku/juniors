@@ -18,7 +18,7 @@ get_random_pubs <- function(db_path) {
     comb_vedidk_pubids <- DBI::dbReadTable(con, "authors_by_pubs") %>% 
         select(id_unique) %>% 
         distinct() %>% 
-        sample_n(1200, replace = FALSE) %>% 
+        sample_n(3000, replace = FALSE) %>% 
         as_tibble()
     
     # comb_vedidk_pubids <- DBI::dbReadTable(con, "authors_by_pubs") %>%

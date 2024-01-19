@@ -255,6 +255,21 @@ write.csv(b, file = here::here("data", "raw", "backup", "all_control_sup_final.c
 
 
 
+#contruction of blacklist -> researchers whose supervisors we could not find:
+
+blacklist_control <- bind_rows(sup_control %>% filter(is.na(sup_name_first)), sup_control_second %>% filter(is.na(sup_name_first)), sup_control_third %>% filter(is.na(sup_name_first)))
+
+blacklist_control <- blacklist_control %>% filter(!is.na(name_first))
+
+blacklist_control$vedidk <- as.character(blacklist_control$vedidk)
+
+
+blacklist_control_after_disamb <- bind_rows(blacklist_control, sup_complete %>% filter(is.na(sup_name))) 
+
+blacklist_control_after_disamb$vedidk <- as.character(blacklist_control_after_disamb$vedidk)
+
+
+write.csv(blacklist_control_after_disamb, file = here::here("data", "raw", "backup", "blacklist_control_after_disamb.csv"))
 
 
 
