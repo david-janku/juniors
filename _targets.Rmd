@@ -354,7 +354,7 @@ list(
     #            sup_test(matching, db_path, ids, sup_control, ids_complete),
     #            format = "qs") ,
     # 
-    tarchetypes::tar_render(article, here::here("article.Rmd"))
+    tarchetypes::tar_render(article, here::here("article_formatted_doc.Rmd"))
 )
 
 

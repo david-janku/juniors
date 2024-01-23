@@ -8,7 +8,7 @@ author:
 - name: Radim Hladík
   affiliation: '[1] Centre for Science, Technology, and Society Studies, Institute
     of Philosophy, Czech Academy of Sciences, Czech Republic'
-output: bookdown::word_document2
+output: bookdown::html_document2
 always_allow_html: true
   # pdf_document: default
   # html_document:

@@ -1,13 +1,5 @@
 ---
-title: "Funding programmes for early career researchers do not improve their independence"
-author:
-- name: David Janků
-  affiliation: '[1] Institute of Sociological Studies, Faculty of Social Sciences,
-    Charles University, Czech Republic; [2] Centre for Science, Technology, and Society
-    Studies, Institute of Philosophy, Czech Academy of Sciences, Czech Republic'
-- name: Radim Hladík
-  affiliation: '[1] Centre for Science, Technology, and Society Studies, Institute
-    of Philosophy, Czech Academy of Sciences, Czech Republic'
+title: "Mission Unaccomplished: A Funding Programme for Early Career Researchers Fails to Promote Independence"
 output: bookdown::word_document2
 always_allow_html: true
   # pdf_document: default
@@ -23,13 +15,10 @@ bibliography: merged.bib
 csl: apa.csl
 ---
 
-**Authors:**
-
-David Janků  
-[1] Institute of Sociological Studies, Faculty of Social Sciences, Charles University, Czech Republic; 
-[2] Centre for Science, Technology, and Society Studies, Institute of Philosophy, Czech Academy of Sciences, Czech Republic
-
-Radim Hladík  
+## Authors:
+- David Janků
+[1] Centre for Science, Technology, and Society Studies, Institute of Philosophy, Czech Academy of Sciences, Czech Republic; [2] Institute of Sociological Studies, Faculty of Social Sciences, Charles University, Czech Republic; 
+- Radim Hladík
 [1] Centre for Science, Technology, and Society Studies, Institute of Philosophy, Czech Academy of Sciences, Czech Republic
 
 
@@ -53,8 +42,8 @@ David Janku reports a relationship with Czech Science Foundation that includes: 
 Name: David Janků 
 
 Affiliation: 
-[1] Institute of Sociological Studies, Faculty of Social Sciences, Charles University, Czech Republic
-[2] Centre for Science, Technology, and Society Studies, Institute of Philosophy, Czech Academy of Sciences, Czech Republic  
+[1] Centre for Science, Technology, and Society Studies, Institute of Philosophy, Czech Academy of Sciences, Czech Republic
+[2] Institute of Sociological Studies, Faculty of Social Sciences, Charles University, Czech Republic  
 Address: U Kříže 661/8, Praha 5 – Jinonice  
 E-mail: david.janku@fsv.cuni.cz
 
@@ -84,22 +73,33 @@ library(nlme)
 
 # Abstract
 
-Independence is important quality constituting one factor of research excellence, often used in assessments for hiring, tenure and promotion in academia [@moherAssessingScientistsHiring2018]. From a bigger picture view, encouraging more independence might also lead to faster exploration of the cognitive map of science and thus lead to faster innovation. Many national research funders have created programmes specifically aimed at increasing independence of early career researchers, yet until recently, there was no quantifiable way to measure changes in independence. We employed recently proposed measure by @vandenbesselaarMeasuringResearcherIndependence2019 to assess whether one such a funding programme by Czech Science Foundation is effective at stimulating more independence. We found that funding for early career researchers is not effective at stimulating their independence, regardless of the source of funding. The strongest effect on independence growth is time, explaining around 60% of the variance in independence.  Additionally, we found differences in levels of independence across disciplines that were stable across time and treatment groups, with Social Sciences and Humanities showing highest independence, while  Agricultural and Veterinary sciences and Medical and Health Sciences showing lowest independence. However, these differences reflect only changes in collaboration patterns, while there were no changes in cognitive patterns across disciplines and only modest changes across time (from 40 % to 46 % of topics not shared by their PhD advisor).
+Independence is an important factor in research excellence, often assessed for hiring, tenure, and promotion in academia. From a macro perspective, increased independence might also lead to faster exploration of the cognitive map of science and thus accelerate innovation. Many national research funders have created programmes specifically aimed at increasing the independence of early career researchers (ECRs). A quantifiable measure of such programmes' impact on changes in independence has long been lacking. We employed a recently proposed independence indicator [@vandenbesselaarMeasuringResearcherIndependence2019], to assess whether one such funding programme operated by Czech Science Foundation succeeds at stimulating independence. The indicator tracks overlaps in collaboration networks and topic focus between ECRs and their Ph.D. advisors. We found that the funding scheme designed for ECRs is not effective at fostering their independence. Regardless of the type of funding, the strongest effect on independence growth is time, explaining around 60% of the variance in independence. Additionally, we found differences in levels of independence across disciplines that were stable across time and treatment groups. Researchers in Social Sciences and Humanities demonstrated the highest independence scores, while those in Agricultural and Veterinary Sciences, and Medical and Health Sciences, showed the lowest. However, observed changes in independence across time and disciplines were caused by changes in collaboration patterns, while there were no changes in cognitive patterns across disciplines and only modest changes across time (from 40 % to 46 % of topics not shared by their PhD advisor).
 
 ## Keywords
-research independence; early career researchers; grant funding; mentoring; counter-factual analysis; research evaluation   
+research independence; early career researchers; project funding; mentoring; counter-factual analysis; research evaluation   
 
 
 
 
 # Introduction 
 
-To what extent is scientific progress conserved and impeded by novices mirroring seniors’ research agendas? Such a phenomenon is likely to occur because following tradition is usually a more beneficial and safer option for novices. Indeed, empirical data suggest that this strategy is chosen by a majority of researchers [@foster2015], and only a small fraction dares to deviate and explore the cognitive map of science more rapidly. For early career researchers specifically, partnering with already well-established seniors provides a large career boost [@li2019] and being thematically closer to their PhD as well as their post-doc advisor increases the probability of continuing in academia and having more mentees later on [@lienard2018]. However, this effect might stifle scientific progress as it leads to a slower exploration of its cognitive map [@rzhetsky2015]. Moreover, this mirroring further strengthens the existing positions of senior faculty, making little space for disrupting the status quo and creating new perspectives.
+The development of an independent research agenda is important not only to the career prospects of early career researchers (ECRs) but contributes to the advancement of science as a whole. Independent ECRs help accelerate scientific progress and push state of the art beyond the status quo. They are more likely to come up with new topics and ideas [@packalen2019] and challenge commonly held views [@vandenbesselaarMeasuringResearcherIndependence2019, p.2].
+The need to cultivate research independence is a recognized objective in science policies, leading to the creation of grant programmes targeting Early Career Researchers (ECRs) by governments and funding agencies. Yet, the effectiveness of these financial incentives in fostering independence has not been empirically assessed.
+
+An independent investigator is defined by the US National Academies of Science [@nationalresearchcouncilus2005] as “one who enjoys the independence of thought—the freedom to define the problem of interest and to choose or develop the best strategies and approaches to addressing that problem–especially during the earlier career phase” [@vandenbesselaarMeasuringResearcherIndependence2019, p.4]. Such a definition does not necessarily put independence in relation to other actors (e.g. one’s PhD advisor), but only in relation to one’s own freedom and resources. However, other institutions, such as European Research Council via their Starting Grants scheme [@neufeldPeerReviewbasedSelection2013], think of independence in a relational manner, in terms of having few publications without the former PhD supervisor being co-author; being PI on a grant; or being lab director or research leader.
+
+## Literature review 
+
+A considerable obstacle on the road to independence is the tendency of novices to mirror the research agendas of their mentors. This phenomenon is common because following established traditions is often seen as a safer and more advantageous option for ECRs, despite the significant importance of independence in hiring procedures. Partnering with well-established seniors can provide significant career benefits [@li2019]. Being thematically aligned with their PhD and post-doc advisors increases the likelihood of continuing in academia and having more mentees in the future [@lienard2018]. Empirical evidence indicates that a majority of researchers choose this strategy [@foster2015].
+<!-- To what extent is scientific progress conserved and impeded by novices mirroring seniors’ research agendas? Such a phenomenon is likely to occur because following tradition is usually a more beneficial and safer option for novices. Indeed, empirical data suggest that this strategy is chosen by a majority of researchers [@foster2015], and only a small fraction dares to deviate and explore the cognitive map of science more rapidly. For early career researchers specifically, partnering with already well-established seniors provides a large career boost [@li2019] and being thematically closer to their PhD as well as their post-doc advisor increases the probability of continuing in academia and having more mentees later on [@lienard2018].  -->
+However, this effect might stifle scientific progress as it leads to a slower exploration of its cognitive map [@rzhetsky2015]. Moreover, this mirroring further strengthens the existing positions of senior faculty, making little space for disrupting the status quo and creating new perspectives.
+
 This was illustrated by @azoulay2010, who investigated the effects of unexpected deaths of prominent scientists in their research fields and their collaborators' careers. They found a decrease in the productivity of junior collaborators and an increase in published work by young newcomers in the field rewarded by an increased citation rate. That suggests the sudden departures of prominent scientists gave room for more disruptive changes in the field and for bringing new ideas and perspectives while harming the status quo holders who worked with the prominent scientists on their research agendas - a “Goliath effect,” as coined by @wang2021, p.42.
 
 This mirroring effect is also closely connected to the concept of academic inbreeding [@machacek2022], which focuses more on academic mobility and conservation of institutional habitus rather than specifically on the inheritance of research agendas. However, inbreeding is also often thought to increase dependence and decrease exploration of new ideas.
 
-As younger researchers are already more likely to come up with new topics and ideas [@packalen2019], it would be fitting to empower them and stimulate their independence so that they can “challenge the existing common views and open up new lines of research” [@vandenbesselaarMeasuringResearcherIndependence2019, p.2] and accelerate scientific progress rather than recreate the existing status quo. An independent investigator is then defined by the US National Academies of Science [@nationalresearchcouncilus2005] as “one who enjoys the independence of thought—the freedom to define the problem of interest and to choose or develop the best strategies and approaches to addressing that problem–especially during the earlier career phase” [@vandenbesselaarMeasuringResearcherIndependence2019, p.4]. Such a definition does not necessarily put independence in relation to other actors (e.g. one’s PhD advisor), but only in relation to one’s own freedom and resources. However other institutions, such as European Research Council via their Starting Grants scheme [@neufeldPeerReviewbasedSelection2013] think of independence in a relational manner, in terms of having one (or a few) publications without the former PhD supervisor being co-author; being PI on a grant; or being lab director or research leader. 
+<!-- As younger researchers are already more likely to come up with new topics and ideas [@packalen2019], it would be fitting to empower them and stimulate their independence so that they can “challenge the existing common views and open up new lines of research” [@vandenbesselaarMeasuringResearcherIndependence2019, p.2] and accelerate scientific progress rather than recreate the existing status quo. -->
+<!-- An independent investigator is then defined by the US National Academies of Science [@nationalresearchcouncilus2005] as “one who enjoys the independence of thought—the freedom to define the problem of interest and to choose or develop the best strategies and approaches to addressing that problem–especially during the earlier career phase” [@vandenbesselaarMeasuringResearcherIndependence2019, p.4]. Such a definition does not necessarily put independence in relation to other actors (e.g. one’s PhD advisor), but only in relation to one’s own freedom and resources. However other institutions, such as European Research Council via their Starting Grants scheme [@neufeldPeerReviewbasedSelection2013], think of independence in a relational manner, in terms of having one (or a few) publications without the former PhD supervisor being co-author; being PI on a grant; or being lab director or research leader. -->
 
 Developing independence is also one of the things that the system of science expects from its members - it is one of the criteria often used for assessing researchers for hiring, tenure and promotion [@vanarensbergenDifferentViewsScholarly2014; @moherAssessingScientistsHiring2018], constituting one factor of research excellence. Even from the perspective of scholarly output, protégés were found to “do their best work when they break from their mentor’s research topics and coauthor no more than a small portion of their overall research with their mentors” [@ma2020]. @lienard2018 found that making a larger thematic step from the PhD advisor and finding a post-doc advisor with less similar interests was also related to increased chances of continuing in academia and having more mentees later on (although under the condition that one remains thematically close to the post-doc advisor). There is also some direct preliminary evidence that higher independence modestly correlates with the number of citations acquired [@rojkoScientificPerformanceResearch2022], but others argue that even the research systems with very low independence can create a lot of scientific impact, and thus the relationships between independence and impact might not be as clear [@glaserIndependenceResearchReview2022].
 
@@ -336,7 +336,7 @@ df_summary <- df_summary %>%
   )
 
 # Print the updated table
-kable(df_summary, format = "markdown", digits = 3, caption = "Counts and Proportions of Missing Data by Field") 
+kable(df_summary, format = "markdown", digits = 3, caption = "Counts and Proportions of Missing Data by Field")
 
 
 ```
@@ -364,9 +364,33 @@ colnames(table_before_2) <- paste0(colnames(table_before_2), "_2")
 combined_table_before <- cbind(table_before_1, table_before_0, table_before_2)
 
 kable(combined_table_before, 
-      format = "markdown", digits = 3, align = "c", booktabs = TRUE, caption = "Descriptives of All Groups Before Intervention") 
+      format = "markdown", digits = 3, align = "c", booktabs = TRUE, caption = "Descriptives of All Groups Before Intervention")
   # kableExtra::add_header_above(c(" " = 1, "Treatment Group" = 5, "Unfunded Control Group" = 5, "Funded Control Group" = 5))
 
+
+#### below is html version - comment it away if you are printing in doc
+
+
+# df <- filtered_by_subclass %>% filter(independence_timing == "before_intervention")
+# numeric_vars <- df %>%
+#   select(where(is.numeric)) %>%
+#   select(-weights, -funded_control, -id, -treatment_year, -career_start_year) %>%
+#   names()
+# 
+# # descriptive stats for each treatment level
+# table_before_1 <- df %>% filter(treatment == 1) %>% distinct(vedidk, .keep_all = TRUE) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
+# table_before_0 <- df %>% filter(treatment == 0) %>% distinct(vedidk, .keep_all = TRUE) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
+# table_before_2 <- df %>% filter(treatment == 2) %>% distinct(vedidk, .keep_all = TRUE) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
+# 
+# colnames(table_before_0) <- paste0(colnames(table_before_0), "_0")
+# colnames(table_before_2) <- paste0(colnames(table_before_2), "_2")
+# 
+# combined_table_before <- cbind(table_before_1, table_before_0, table_before_2)
+# 
+# kable(combined_table_before,
+#       digits = 3, align = "c", booktabs = TRUE, caption = "Descriptives of All Groups Before Intervention") %>%
+#   kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>%
+#   add_header_above(c(" " = 1, "Treatment Group" = 5, "Unfunded Control Group" = 5, "Funded Control Group" = 5))
 
 
 
@@ -457,6 +481,41 @@ kable(combined_table_after,
 # table_after_2_md <- knitr::kable(table_after_2, format = "markdown", 
 #                                  caption = "Funded Control Group")
 # 
+
+
+#### below is html version - comment it away if you are printing in doc
+
+# df <- filtered_by_subclass %>% filter(independence_timing == "after_intervention")
+# df$career_length2022 <- 2022-df$career_start_year
+# numeric_vars <- df %>% 
+#   select(where(is.numeric)) %>% 
+#   select(-weights, -funded_control, -id, -treatment_year, -career_start_year, -career_length, -pubs_total, -ws_pubs, -interdisc_proportion, -grants, -total_coauthor_count, -first_grant) %>% 
+#   names()
+# 
+# # descriptive stats for each treatment level
+# table_after_1 <- df %>% filter(treatment == 1) %>% distinct(vedidk, .keep_all = TRUE) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
+# table_after_0 <- df %>% filter(treatment == 0) %>% distinct(vedidk, .keep_all = TRUE) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
+# table_after_2 <- df %>% filter(treatment == 2) %>% distinct(vedidk, .keep_all = TRUE) %>% select(all_of(numeric_vars)) %>% describe() %>% select(n, mean, sd, min, max) %>% round(., digits = 3)
+# 
+# colnames(table_after_0) <- paste0(colnames(table_after_0), "_0")
+# colnames(table_after_2) <- paste0(colnames(table_after_2), "_2")
+# 
+# # Move 'career_length2022' row to the top for each table
+# reorder_row <- function(tbl) {
+#   return(tbl[c("career_length2022", setdiff(rownames(tbl), "career_length2022")), ])
+# }
+# 
+# table_after_1 <- reorder_row(table_after_1)
+# table_after_0 <- reorder_row(table_after_0)
+# table_after_2 <- reorder_row(table_after_2)
+# 
+# # Re-combine tables
+# combined_table_after <- cbind(table_after_1, table_after_0, table_after_2)
+# 
+# kable(combined_table_after, 
+#       digits = 3, align = "c", booktabs = TRUE, caption = "Descriptives of All Groups After Intervention") %>%
+#   kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>%
+#   add_header_above(c(" " = 1, "Treatment Group" = 5, "Unfunded Control Group" = 5, "Funded Control Group" = 5))
 
 
 
@@ -1042,8 +1101,9 @@ combined_plot <- ggplot() +
   
   scale_fill_discrete(name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
   scale_color_manual(values = c("black", "red"), name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
-  
-  labs(x = "Treatment Group",
+  scale_x_discrete(labels=c("Unfunded control", "Treatment")) + # This line changes the x-axis labels
+    
+  labs(x = "Treatment group",
        y = "RII Score") +
   theme_bw()
 
@@ -1294,8 +1354,9 @@ combined_plot2 <- ggplot() +
   
   scale_fill_discrete(name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
   scale_color_manual(values = c("black", "red"), name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
-  
-  labs(x = "Treatment Group",
+  scale_x_discrete(labels=c("Funded control", "Treatment")) + # This line changes the x-axis labels
+    
+  labs(x = "Treatment group",
        y = "RII Score") +
   theme_bw()
 
@@ -1500,7 +1561,8 @@ combined_plot <- ggplot() +
   
   scale_fill_discrete(name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
   scale_color_manual(values = c("black", "red"), name = "Independence Timing", labels = c("Before intervention", "After intervention")) +
-  
+  scale_x_discrete(labels=c("Unfunded control", "Treatment")) + # This line changes the x-axis labels
+    
   labs(x = "Treatment Group",
        y = "ind_topics Score") +
   theme_bw()
